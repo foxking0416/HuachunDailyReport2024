@@ -2,6 +2,26 @@ import json
 import os
 import datetime
 import unittest
+from enum import Enum
+
+class WorkDay(Enum):
+    ONE_DAY_OFF = 0
+    TWO_DAY_OFF = 1
+    NO_DAY_OFF = 2
+
+class Weekday(Enum):
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
+
+class CountWorkingDay(Enum):
+    COUNT_ALL_DAY = 0
+    COUNT_HALF_DAY = 1
+    NO_COUNT = 2
 
 arrGlobalConstHoliday = []
 arrGlobalConstWorkday = []
@@ -36,9 +56,9 @@ def LoadJsonDailyReportData(dictVariableHoliday):
     for item in data:
         date = item["date"]
         if(item["morning_weather"] != 0 or item["morning_other"] != 0 ):
-            dictVariableHoliday[date] = 2
+            dictVariableHoliday[date] = CountWorkingDay.NO_COUNT
         elif(item["afternoon_weather"] != 0 or item["afternoon_other"] != 0 ):
-            dictVariableHoliday[date] = 1
+            dictVariableHoliday[date] = CountWorkingDay.COUNT_HALF_DAY
     
 
 def CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strDate, nWeekday, nCountType):
@@ -48,13 +68,13 @@ def CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strDate, nWeekday, nCountTy
         return True
     else:
         #周休一日
-        if nCountType == 0 and nWeekday != 6:
+        if nCountType == WorkDay.ONE_DAY_OFF and nWeekday != Weekday.SUNDAY.value:
             return True
         #周休二日
-        elif nCountType == 1 and nWeekday != 5 and nWeekday != 6:
+        elif nCountType == WorkDay.TWO_DAY_OFF and nWeekday != Weekday.SATURDAY.value and nWeekday != Weekday.SUNDAY.value:
             return True
         #沒周休
-        elif nCountType == 2:
+        elif nCountType == WorkDay.NO_DAY_OFF:
             return True
 
 def CountExpectFinishDate(strStart, nCountType, nTotalDay, arrConstHoliday, arrConstWorkday):
@@ -101,9 +121,9 @@ def CountRealFinishDate(strStart, nCountType, nTotalDay, arrConstHoliday, arrCon
         if CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strEndDate, nWeekday, nCountType):
             if kEndDate <= kTodayDate:
                 if strEndDate in dictVariableHoliday:
-                    if dictVariableHoliday[strEndDate] == 2:#全日不計工期
+                    if dictVariableHoliday[strEndDate] == CountWorkingDay.NO_COUNT:
                         pass
-                    elif dictVariableHoliday[strEndDate] == 1:#下午不計工期
+                    elif dictVariableHoliday[strEndDate] == CountWorkingDay.COUNT_HALF_DAY:
                         nTotalDay -= 0.5
                     else:
                         nTotalDay -= 1
@@ -125,29 +145,29 @@ class TestFunction(unittest.TestCase):
     # 測試函數的測試用例
     def test_OneDayOffExpectFinishDate1(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        endDate = CountExpectFinishDate('2023-01-01', 0, 1, arrGlobalConstHoliday, arrGlobalConstWorkday)
+        endDate = CountExpectFinishDate('2023-01-01', WorkDay.ONE_DAY_OFF, 1, arrGlobalConstHoliday, arrGlobalConstWorkday)
         self.assertEqual(endDate, '2023-01-03')
 
     def test_OneDayOffExpectFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        endDate = CountExpectFinishDate('2023-01-01', 0, 60, arrGlobalConstHoliday, arrGlobalConstWorkday)
+        endDate = CountExpectFinishDate('2023-01-01', WorkDay.ONE_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday)
         self.assertEqual(endDate, '2023-03-25')
         
     def test_TwoDayOffExpectFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        endDate = CountExpectFinishDate('2023-01-01', 1, 60, arrGlobalConstHoliday, arrGlobalConstWorkday)
+        endDate = CountExpectFinishDate('2023-01-01', WorkDay.TWO_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday)
         self.assertEqual(endDate, '2023-03-31')
 
     def test_TwoDayOffRealFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
         LoadJsonDailyReportData(dictGlobalVariableHoliday)
-        endDate = CountRealFinishDate('2023-01-01', 1, 60, arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalVariableHoliday, '2023-01-17')
+        endDate = CountRealFinishDate('2023-01-01', WorkDay.TWO_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalVariableHoliday, '2023-01-17')
         self.assertEqual(endDate, '2023-04-06')
 
     def test_TwoDayOffRealFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
         LoadJsonDailyReportData(dictGlobalVariableHoliday)
-        endDate = CountRealFinishDate('2023-01-01', 1, 60, arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalVariableHoliday, '2023-01-18')
+        endDate = CountRealFinishDate('2023-01-01', WorkDay.TWO_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalVariableHoliday, '2023-01-18')
         self.assertEqual(endDate, '2023-04-07')
 
 if __name__ == '__main__':
