@@ -5,9 +5,8 @@ import datetime
 arrGlobalConstHoliday = []
 arrGlobalConstWorkday = []
 
-
 # 從 Holiday.json 的檔案讀取補班或放假的資料
-def LoadPythonHolidayData(arrConstHoliday, arrConstWorkday):
+def LoadJsonHolidayData(arrConstHoliday, arrConstWorkday):
     # 取得目前工作目錄
     current_dir = os.path.dirname(__file__)
     # 組合JSON檔案的路徑
@@ -57,6 +56,6 @@ def CountFinishDate(strStart, nCountType, nTotalDay, arrConstHoliday, arrConstWo
     print('End Date : ' + kEndDate.strftime("%Y-%m-%d"))
 
 
-LoadPythonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
+LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
 CountFinishDate('2023-01-01',0,60,arrGlobalConstHoliday,arrGlobalConstWorkday)
 CountFinishDate('2023-01-01',1,60,arrGlobalConstHoliday,arrGlobalConstWorkday)
