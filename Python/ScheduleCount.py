@@ -138,7 +138,8 @@ def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConst
     #今日開始追加工期
     #累計追加工期
     #工期總計
-    #變動完工日
+    #變動完工日        RealFinishDate
+    #變動完工天數      RealTotalCalendarDays
 
 
     while(True):
@@ -165,8 +166,8 @@ def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConst
         kEndDate += datetime.timedelta(days=1)
     # print('End Date : ' + kEndDate.strftime("%Y-%m-%d"))
     returnValue = {}
-    returnValue['ExpectFinishDate'] = kEndDate.strftime("%Y-%m-%d")
-    returnValue['ExpectTotalCalendarDays'] = (kEndDate - kStartDate).days - 1
+    returnValue['RealFinishDate'] = kEndDate.strftime("%Y-%m-%d")
+    returnValue['RealTotalCalendarDays'] = (kEndDate - kStartDate).days + 1
     # returnValue['WorkDaysFromStart']
     # returnValue['CalendarDaysFromStart']
 
@@ -196,14 +197,17 @@ class TestFunction(unittest.TestCase):
         LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
         LoadJsonExtendData(dictGlobalExtendData)
         returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-01-17', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
-        self.assertEqual(returnValue['ExpectFinishDate'], '2023-04-06')
+        # self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
+        self.assertEqual(returnValue['RealFinishDate'], '2023-04-06')
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 96)
 
     def test_TwoDayOffRealFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
         LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
         LoadJsonExtendData(dictGlobalExtendData)
         returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-01-18', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
-        self.assertEqual(returnValue['ExpectFinishDate'], '2023-04-07')
+        self.assertEqual(returnValue['RealFinishDate'], '2023-04-07')
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 97)
 
 if __name__ == '__main__':
     unittest.main()
