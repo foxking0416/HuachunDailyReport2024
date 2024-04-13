@@ -25,7 +25,8 @@ class CountWorkingDay(Enum):
 
 arrGlobalConstHoliday = []
 arrGlobalConstWorkday = []
-dictGlobalVariableHoliday = {}
+dictGlobalWeatherRelatedHoliday = {}
+dictGlobalExtendData = {}
 
 # 從 Holiday.json 的檔案讀取補班或放假的資料
 def LoadJsonHolidayData(arrConstHoliday, arrConstWorkday):
@@ -46,7 +47,7 @@ def LoadJsonHolidayData(arrConstHoliday, arrConstWorkday):
 
 
 # 從 DailyReport.json 的檔案讀取美日資料
-def LoadJsonDailyReportData(dictVariableHoliday):
+def LoadJsonDailyReportData(dictWeatherRelatedHoliday):
     current_dir = os.path.dirname(__file__)
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
 
@@ -56,61 +57,87 @@ def LoadJsonDailyReportData(dictVariableHoliday):
     for item in data:
         date = item["date"]
         if(item["morning_weather"] != 0 or item["morning_other"] != 0 ):
-            dictVariableHoliday[date] = CountWorkingDay.NO_COUNT
+            dictWeatherRelatedHoliday[date] = CountWorkingDay.NO_COUNT
         elif(item["afternoon_weather"] != 0 or item["afternoon_other"] != 0 ):
-            dictVariableHoliday[date] = CountWorkingDay.COUNT_HALF_DAY
+            dictWeatherRelatedHoliday[date] = CountWorkingDay.COUNT_HALF_DAY
     
 
-def CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strDate, nWeekday, nCountType):
+# 從 ExtendData.json 的檔案讀取美日資料
+def LoadJsonExtendData(dictExtendData):
+    current_dir = os.path.dirname(__file__)
+    json_file_path = os.path.join(current_dir, 'ExtendData.json')
+
+    with open(json_file_path,'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    for item in data:
+        dictExtendData[item["extend_start_date"]] = item["extend_days"]
+
+
+
+#根據固定因素判斷是否為工作日
+def CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strDate, nWeekday, eCountType):
     if strDate in arrConstHoliday :
         return False
     elif strDate in arrConstWorkday:
         return True
     else:
         #周休一日
-        if nCountType == WorkDay.ONE_DAY_OFF and nWeekday != Weekday.SUNDAY.value:
+        if eCountType == WorkDay.ONE_DAY_OFF and nWeekday != Weekday.SUNDAY.value:
             return True
         #周休二日
-        elif nCountType == WorkDay.TWO_DAY_OFF and nWeekday != Weekday.SATURDAY.value and nWeekday != Weekday.SUNDAY.value:
+        elif eCountType == WorkDay.TWO_DAY_OFF and nWeekday != Weekday.SATURDAY.value and nWeekday != Weekday.SUNDAY.value:
             return True
         #沒周休
-        elif nCountType == WorkDay.NO_DAY_OFF:
+        elif eCountType == WorkDay.NO_DAY_OFF:
             return True
 
-def CountExpectFinishDate(strStart, nCountType, nTotalDay, arrConstHoliday, arrConstWorkday):
+def CountExpectFinishDate(eCountType, nTotalWorkdays, strStart, arrConstHoliday, arrConstWorkday):
+    kStartDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
     kEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
 
     while(True):
         nWeekday = kEndDate.weekday()
         strEndDate = kEndDate.strftime("%Y-%m-%d")
 
-        if CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strEndDate, nWeekday, nCountType):
-            nTotalDay -= 1
+        if CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strEndDate, nWeekday, eCountType):
+            nTotalWorkdays -= 1
 
-        if(nTotalDay <= 0):
+        if(nTotalWorkdays <= 0):
             break
 
         kEndDate += datetime.timedelta(days=1)
-    # print('End Date : ' + kEndDate.strftime("%Y-%m-%d"))
-    return kEndDate.strftime("%Y-%m-%d")
+
+    returnValue = {}
+    returnValue['ExpectFinishDate'] = kEndDate.strftime("%Y-%m-%d")
+    returnValue['ExpectTotalCalendarDays'] = (kEndDate - kStartDate).days - 1
+
+    return returnValue
     
 
 # kStartDate 開工日字串，如 '2023-01-01'
-# nCountType 工期計算方式 0:周休一日  1:周休二日  2:日曆天
-# nTotalDay 工期天數
+# eCountType 工期計算方式 0:周休一日  1:周休二日  2:日曆天
+# nTotalWorkdays 工期天數
 # arrConstHoliday 固定因素放假日
 # arrConstWorkday 固定因素補班日
-def CountRealFinishDate(strStart, nCountType, nTotalDay, arrConstHoliday, arrConstWorkday, dictVariableHoliday, strToday ):
+def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData):
+    kStartDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
     kEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
     kTodayDate = datetime.datetime.strptime(strToday, "%Y-%m-%d")
     
-    #契約工期
-    #契約天數
-    #開工迄今天數
+    for key, value in dictExtendData.items():
+        kExtendStartDate = datetime.datetime.strptime(key, "%Y-%m-%d")
+        if kTodayDate >= kExtendStartDate:
+            nTotalWorkdays += value
+
+    #契約工期         合約給定
+    #契約天數         ExpectTotalCalendarDays
+    #契約完工日       ExpectFinishDate
+    #開工迄今工作天數  WorkDaysFromStart
+    #開工迄今日曆天數  CalendarDaysFromStart
     #今日開始追加工期
     #累計追加工期
     #工期總計
-    #契約完工日
     #變動完工日
 
 
@@ -118,26 +145,32 @@ def CountRealFinishDate(strStart, nCountType, nTotalDay, arrConstHoliday, arrCon
         nWeekday = kEndDate.weekday()
         strEndDate = kEndDate.strftime("%Y-%m-%d")
 
-        if CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strEndDate, nWeekday, nCountType):
+        if CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strEndDate, nWeekday, eCountType):
             if kEndDate <= kTodayDate:
-                if strEndDate in dictVariableHoliday:
-                    if dictVariableHoliday[strEndDate] == CountWorkingDay.NO_COUNT:
+                if strEndDate in dictWeatherRelatedHoliday:
+                    if dictWeatherRelatedHoliday[strEndDate] == CountWorkingDay.NO_COUNT:
                         pass
-                    elif dictVariableHoliday[strEndDate] == CountWorkingDay.COUNT_HALF_DAY:
-                        nTotalDay -= 0.5
+                    elif dictWeatherRelatedHoliday[strEndDate] == CountWorkingDay.COUNT_HALF_DAY:
+                        nTotalWorkdays -= 0.5
                     else:
-                        nTotalDay -= 1
+                        nTotalWorkdays -= 1
                 else:
-                    nTotalDay -= 1#沒填日報表就當作一般晴天
+                    nTotalWorkdays -= 1#沒填日報表就當作一般晴天
             else:
-                nTotalDay -= 1#未來的日子還沒有日報表
+                nTotalWorkdays -= 1#未來的日子還沒有日報表
 
-        if(nTotalDay <= 0):
+        if(nTotalWorkdays <= 0):
             break
 
         kEndDate += datetime.timedelta(days=1)
     # print('End Date : ' + kEndDate.strftime("%Y-%m-%d"))
-    return kEndDate.strftime("%Y-%m-%d")
+    returnValue = {}
+    returnValue['ExpectFinishDate'] = kEndDate.strftime("%Y-%m-%d")
+    returnValue['ExpectTotalCalendarDays'] = (kEndDate - kStartDate).days - 1
+    # returnValue['WorkDaysFromStart']
+    # returnValue['CalendarDaysFromStart']
+
+    return returnValue
 
 
 class TestFunction(unittest.TestCase):
@@ -145,30 +178,32 @@ class TestFunction(unittest.TestCase):
     # 測試函數的測試用例
     def test_OneDayOffExpectFinishDate1(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        endDate = CountExpectFinishDate('2023-01-01', WorkDay.ONE_DAY_OFF, 1, arrGlobalConstHoliday, arrGlobalConstWorkday)
-        self.assertEqual(endDate, '2023-01-03')
+        returnValue = CountExpectFinishDate(WorkDay.ONE_DAY_OFF, 1, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-01-03')
 
     def test_OneDayOffExpectFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        endDate = CountExpectFinishDate('2023-01-01', WorkDay.ONE_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday)
-        self.assertEqual(endDate, '2023-03-25')
+        returnValue = CountExpectFinishDate(WorkDay.ONE_DAY_OFF, 60, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-25')
         
     def test_TwoDayOffExpectFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        endDate = CountExpectFinishDate('2023-01-01', WorkDay.TWO_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday)
-        self.assertEqual(endDate, '2023-03-31')
+        returnValue = CountExpectFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
 
     def test_TwoDayOffRealFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        LoadJsonDailyReportData(dictGlobalVariableHoliday)
-        endDate = CountRealFinishDate('2023-01-01', WorkDay.TWO_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalVariableHoliday, '2023-01-17')
-        self.assertEqual(endDate, '2023-04-06')
+        LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
+        LoadJsonExtendData(dictGlobalExtendData)
+        returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-01-17', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-04-06')
 
     def test_TwoDayOffRealFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        LoadJsonDailyReportData(dictGlobalVariableHoliday)
-        endDate = CountRealFinishDate('2023-01-01', WorkDay.TWO_DAY_OFF, 60, arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalVariableHoliday, '2023-01-18')
-        self.assertEqual(endDate, '2023-04-07')
+        LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
+        LoadJsonExtendData(dictGlobalExtendData)
+        returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-01-18', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-04-07')
 
 if __name__ == '__main__':
     unittest.main()
@@ -176,7 +211,7 @@ if __name__ == '__main__':
 # LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
 # endDate = CountExpectFinishDate('2023-01-01',0,60,arrGlobalConstHoliday,arrGlobalConstWorkday)
 
-# LoadJsonDailyReportData(dictGlobalVariableHoliday)
-# CountFinishDate('2023-01-01',1,60,arrGlobalConstHoliday,arrGlobalConstWorkday,dictGlobalVariableHoliday, '2023-01-17')
+# LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
+# CountFinishDate('2023-01-01',1,60,arrGlobalConstHoliday,arrGlobalConstWorkday,dictGlobalWeatherRelatedHoliday, '2023-01-17')
 
 # print(jsonGlobalVariableHoliday)
