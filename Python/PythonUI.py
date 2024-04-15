@@ -35,14 +35,26 @@ def UpdateValue():
 def CalculateSchedule():
     arrConstHoliday = []
     arrConstWorkday = []
+    dictWeatherRelatedHoliday = {}
+    dictExtendData = {}
     ScheduleCount.LoadJsonHolidayData(arrConstHoliday,arrConstWorkday)
+    ScheduleCount.LoadJsonDailyReportData(dictWeatherRelatedHoliday)
+    ScheduleCount.LoadJsonExtendData(dictExtendData)
     if radio_var.get() == 'OneDayOff':
-        returnValue = ScheduleCount.CountExpectFinishDate(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, arrConstHoliday, arrConstWorkday)
+        returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
         print(returnValue['ExpectFinishDate'])
+        print(returnValue['ExpectTotalCalendarDays'])
+        print(returnValue['RealFinishDate'])
+        print(returnValue['RealTotalCalendarDays'])
+        print(returnValue['FromStartCalendarDays'])
     elif radio_var.get() == 'TwoDayOff':
-        returnValue = ScheduleCount.CountExpectFinishDate(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, arrConstHoliday, arrConstWorkday)
+        returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
         print(returnValue['ExpectFinishDate'])
-    
+        print(returnValue['ExpectFinishDate'])
+        print(returnValue['ExpectTotalCalendarDays'])
+        print(returnValue['RealFinishDate'])
+        print(returnValue['RealTotalCalendarDays'])
+        print(returnValue['FromStartCalendarDays'])
 
 group_frame_select_date = Frame(window)
 group_frame_select_date.pack(padx=10, pady=10)
@@ -51,7 +63,7 @@ calendar_select_start_date = Calendar(group_frame_select_date, selectmode='day',
 calendar_select_start_date.pack(side="left", padx=10)
 calendar_select_start_date.bind("<<CalendarSelected>>", SelectStartDate)
 
-calendar_select_current_date = Calendar(group_frame_select_date, selectmode='day', date_pattern='yyyy-mm-dd')
+calendar_select_current_date = Calendar(group_frame_select_date, selectmode='day', date_pattern='yyyy-mm-dd',year=2023,month=1,day=1)
 calendar_select_current_date.pack(side="left", padx=10)
 calendar_select_current_date.bind("<<CalendarSelected>>", SelectCurrentDate)
 
