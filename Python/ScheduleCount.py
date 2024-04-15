@@ -207,6 +207,17 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
         self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
 
+    def test_OneDayOffRealFinishDate(self):
+        LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
+        LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
+        LoadJsonExtendData(dictGlobalExtendData)
+        returnValue = CountRealFinishDate(WorkDay.ONE_DAY_OFF, 60, '2023-01-01', '2023-01-17', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-25')
+        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 84)
+        self.assertEqual(returnValue['RealFinishDate'], '2023-03-27')
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 86)
+        self.assertEqual(returnValue['FromStartCalendarDays'], 17)
+
     def test_TwoDayOffRealFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
         LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
@@ -240,16 +251,16 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(returnValue['RealTotalCalendarDays'], 102)
         self.assertEqual(returnValue['FromStartCalendarDays'], 72)
 
-    # def test_TwoDayOffRealFinishDate4(self):
-    #     LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-    #     LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
-    #     LoadJsonExtendData(dictGlobalExtendData)
-    #     returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-03-14', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
-    #     self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
-    #     self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
-    #     self.assertEqual(returnValue['RealFinishDate'], '2023-04-12')
-    #     self.assertEqual(returnValue['RealTotalCalendarDays'], 102)
-    #     self.assertEqual(returnValue['FromStartCalendarDays'], 72)
+    def test_TwoDayOffRealFinishDate4(self):
+        LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
+        LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
+        LoadJsonExtendData(dictGlobalExtendData)
+        returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-03-14', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
+        self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
+        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
+        self.assertEqual(returnValue['RealFinishDate'], '2023-05-03')
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 123)
+        self.assertEqual(returnValue['FromStartCalendarDays'], 73)
 
 if __name__ == '__main__':
     unittest.main()
