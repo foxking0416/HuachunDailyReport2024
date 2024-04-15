@@ -42,6 +42,10 @@ def CalculateSchedule():
     ScheduleCount.LoadJsonExtendData(dictExtendData)
     if radio_var.get() == 'OneDayOff':
         returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
+        label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
+        label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
+        label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
         print(returnValue['ExpectFinishDate'])
         print(returnValue['ExpectTotalCalendarDays'])
         print(returnValue['RealFinishDate'])
@@ -49,11 +53,10 @@ def CalculateSchedule():
         print(returnValue['FromStartCalendarDays'])
     elif radio_var.get() == 'TwoDayOff':
         returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
-        print(returnValue['ExpectFinishDate'])
-        print(returnValue['ExpectFinishDate'])
-        print(returnValue['ExpectTotalCalendarDays'])
-        print(returnValue['RealFinishDate'])
-        print(returnValue['RealTotalCalendarDays'])
+        label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
+        label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
+        label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
+        label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
         print(returnValue['FromStartCalendarDays'])
 
 group_frame_select_date = Frame(window)
@@ -88,10 +91,10 @@ label_current_date_value.pack(side="left")
 
 radio_var = StringVar()
 radio_button_one_day_off = Radiobutton(window, text="周休一日", variable=radio_var, value="OneDayOff", command=UpdateRadioButtonSelection)
-radio_button_one_day_off.pack()
+radio_button_one_day_off.pack(padx=10, anchor="w")
 
 radio_button_two_day_off = Radiobutton(window, text="周休二日", variable=radio_var, value="TwoDayOff", command=UpdateRadioButtonSelection)
-radio_button_two_day_off.pack()
+radio_button_two_day_off.pack(padx=10, anchor="w")
 
 radio_var.set("OneDayOff")
 
@@ -106,15 +109,6 @@ spinbox_total_workdays = Spinbox(group_frame_total_work_days, from_=1, to=1000, 
 spinbox_total_workdays.pack(side="left")
 
 
-group_frame_expect_total_calendar_days = Frame(window)
-group_frame_expect_total_calendar_days.pack(anchor="w")
-
-label_expect_total_calendar_days = Label(group_frame_expect_total_calendar_days, text="契約天數")
-label_expect_total_calendar_days.pack(side="left", padx=10)
-label_expect_total_calendar_days_value = Label(group_frame_expect_total_calendar_days, text="?")
-label_expect_total_calendar_days_value.pack(side="left", padx=10)
-
-
 group_frame_expect_finish_date = Frame(window)
 group_frame_expect_finish_date.pack(anchor="w")
 
@@ -124,6 +118,18 @@ label_expect_finish_date_value = Label(group_frame_expect_finish_date, text="?")
 label_expect_finish_date_value.pack(side="left", padx=10)
 
 
+group_frame_expect_total_calendar_days = Frame(window)
+group_frame_expect_total_calendar_days.pack(anchor="w")
+
+label_expect_total_calendar_days = Label(group_frame_expect_total_calendar_days, text="預計完工天數")
+label_expect_total_calendar_days.pack(side="left", padx=10)
+label_expect_total_calendar_days_value = Label(group_frame_expect_total_calendar_days, text="?")
+label_expect_total_calendar_days_value.pack(side="left", padx=10)
+
+
+
+
+
 group_frame_real_finish_date = Frame(window)
 group_frame_real_finish_date.pack(anchor="w")
 
@@ -131,6 +137,15 @@ label_real_finish_date = Label(group_frame_real_finish_date, text="變動完工�
 label_real_finish_date.pack(side="left",padx=10)
 label_real_finish_date_value = Label(group_frame_real_finish_date, text="?")
 label_real_finish_date_value.pack(side="left", padx=10)
+
+
+group_frame_real_total_calendar_days = Frame(window)
+group_frame_real_total_calendar_days.pack(anchor="w")
+
+label_real_total_calendar_days = Label(group_frame_real_total_calendar_days, text="變動完工天數")
+label_real_total_calendar_days.pack(side="left",padx=10)
+label_real_total_calendar_days_value = Label(group_frame_real_total_calendar_days, text="?")
+label_real_total_calendar_days_value.pack(side="left", padx=10)
 
 
 
