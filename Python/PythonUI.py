@@ -1,3 +1,5 @@
+#打包指令
+#pyinstaller --hidden-import "babel.numbers" PythonUI.py
 import ScheduleCount
 from tkinter import *
 from tkcalendar import Calendar
@@ -46,18 +48,20 @@ def CalculateSchedule():
         label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
         label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
         label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
-        print(returnValue['ExpectFinishDate'])
-        print(returnValue['ExpectTotalCalendarDays'])
-        print(returnValue['RealFinishDate'])
-        print(returnValue['RealTotalCalendarDays'])
-        print(returnValue['FromStartCalendarDays'])
+        label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
+        label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
+        label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
+        label_real_rest_calendar_days_value.config(text= returnValue['RealRestCalendarkDays'])
     elif radio_var.get() == 'TwoDayOff':
         returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
         label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
         label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
         label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
         label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
-        print(returnValue['FromStartCalendarDays'])
+        label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
+        label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
+        label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
+        label_real_rest_calendar_days_value.config(text= returnValue['RealRestCalendarkDays'])
 
 group_frame_select_date = Frame(window)
 group_frame_select_date.pack(padx=10, pady=10)
@@ -101,12 +105,12 @@ radio_var.set("OneDayOff")
 group_frame_total_work_days = Frame(window)
 group_frame_total_work_days.pack(anchor="w")
 
-label_total_workdays = Label(group_frame_total_work_days, text="契約工期")
-label_total_workdays.pack(side="left", padx=10, anchor="w")
+label_total_work_days = Label(group_frame_total_work_days, text="契約工期")
+label_total_work_days.pack(side="left", padx=10, anchor="w")
 
 spinbox_var = StringVar()
-spinbox_total_workdays = Spinbox(group_frame_total_work_days, from_=1, to=1000, textvariable=spinbox_var, command=UpdateValue)
-spinbox_total_workdays.pack(side="left")
+spinbox_total_work_days = Spinbox(group_frame_total_work_days, from_=1, to=1000, textvariable=spinbox_var, command=UpdateValue)
+spinbox_total_work_days.pack(side="left")
 
 
 group_frame_expect_finish_date = Frame(window)
@@ -147,6 +151,41 @@ label_real_total_calendar_days.pack(side="left",padx=10)
 label_real_total_calendar_days_value = Label(group_frame_real_total_calendar_days, text="?")
 label_real_total_calendar_days_value.pack(side="left", padx=10)
 
+
+group_frame_expect_rest_work_days = Frame(window)
+group_frame_expect_rest_work_days.pack(anchor="w")
+
+label_expect_rest_work_days = Label(group_frame_expect_rest_work_days, text="預計剩餘工期")
+label_expect_rest_work_days.pack(side="left",padx=10)
+label_expect_rest_work_days_value = Label(group_frame_expect_rest_work_days, text="?")
+label_expect_rest_work_days_value.pack(side="left", padx=10)
+
+
+group_frame_expect_rest_calendar_days = Frame(window)
+group_frame_expect_rest_calendar_days.pack(anchor="w")
+
+label_expect_rest_calendar_days = Label(group_frame_expect_rest_calendar_days, text="預計剩餘天數")
+label_expect_rest_calendar_days.pack(side="left",padx=10)
+label_expect_rest_calendar_days_value = Label(group_frame_expect_rest_calendar_days, text="?")
+label_expect_rest_calendar_days_value.pack(side="left", padx=10)
+
+
+group_frame_real_rest_work_days = Frame(window)
+group_frame_real_rest_work_days.pack(anchor="w")
+
+label_real_rest_work_days = Label(group_frame_real_rest_work_days, text="實際剩餘工期")
+label_real_rest_work_days.pack(side="left",padx=10)
+label_real_rest_work_days_value = Label(group_frame_real_rest_work_days, text="?")
+label_real_rest_work_days_value.pack(side="left", padx=10)
+
+
+group_frame_real_rest_calendar_days = Frame(window)
+group_frame_real_rest_calendar_days.pack(anchor="w")
+
+label_real_rest_calendar_days = Label(group_frame_real_rest_calendar_days, text="實際剩餘天數")
+label_real_rest_calendar_days.pack(side="left",padx=10)
+label_real_rest_calendar_days_value = Label(group_frame_real_rest_calendar_days, text="?")
+label_real_rest_calendar_days_value.pack(side="left", padx=10)
 
 
 button_calculate = Button(window, text="計算", command=CalculateSchedule)

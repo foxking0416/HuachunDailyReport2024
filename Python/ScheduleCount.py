@@ -92,25 +92,25 @@ def CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strDate, nWeekday, eCountTy
         elif eCountType == WorkDay.NO_DAY_OFF:
             return True
 
-def CountExpectFinishDate(eCountType, nTotalWorkdays, strStart, arrConstHoliday, arrConstWorkday):
+def CountExpectFinishDate(eCountType, nExpectTotalWorkdays, strStart, arrConstHoliday, arrConstWorkday):
     kStartDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
-    kEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
+    kExpectEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
 
     while(True):
-        nWeekday = kEndDate.weekday()
-        strEndDate = kEndDate.strftime("%Y-%m-%d")
+        nWeekday = kExpectEndDate.weekday()
+        strEndDate = kExpectEndDate.strftime("%Y-%m-%d")
 
         if CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strEndDate, nWeekday, eCountType):
-            nTotalWorkdays -= 1
+            nExpectTotalWorkdays -= 1
 
-        if(nTotalWorkdays <= 0):
+        if(nExpectTotalWorkdays <= 0):
             break
 
-        kEndDate += datetime.timedelta(days=1)
+        kExpectEndDate += datetime.timedelta(days=1)
 
     returnValue = {}
-    returnValue['ExpectFinishDate'] = kEndDate.strftime("%Y-%m-%d")
-    returnValue['ExpectTotalCalendarDays'] = (kEndDate - kStartDate).days + 1
+    returnValue['ExpectFinishDate'] = kExpectEndDate.strftime("%Y-%m-%d")
+    returnValue['ExpectTotalCalendarDays'] = (kExpectEndDate - kStartDate).days + 1
 
     return returnValue
     
@@ -120,17 +120,23 @@ def CountExpectFinishDate(eCountType, nTotalWorkdays, strStart, arrConstHoliday,
 # nTotalWorkdays 工期天數
 # arrConstHoliday 固定因素放假日
 # arrConstWorkday 固定因素補班日
-def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData):
-    kStartDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
-    kRealEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
-    kExpectEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
+def CountRealFinishDate(eCountType, nExpectTotalWorkdays, strStart, strToday, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData):
+    kStartDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")#開工日期
     kTodayDate = datetime.datetime.strptime(strToday, "%Y-%m-%d")
-    nExpectTotalWorkdays = nTotalWorkdays
-    
+    kRealEndDate = kStartDate 
+    kExpectEndDate = kStartDate
+    nRealRestWorkdays = nExpectTotalWorkdays
+    nExpectRestWorkdays = nExpectTotalWorkdays
+
+    nPastWorkdays = 0
+    nTotalExtendDays = 0
+
     for key, value in dictExtendData.items():
         kExtendStartDate = datetime.datetime.strptime(key, "%Y-%m-%d")
         if kTodayDate >= kExtendStartDate:
-            nTotalWorkdays += value
+            nTotalExtendDays += value
+
+    nRealRestWorkdays += nTotalExtendDays
 
     #契約工期         合約給定
     #契約完工日       ExpectFinishDate
@@ -138,13 +144,18 @@ def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConst
 
     #開工迄今工作天數  FromStartWorkDays
     #開工迄今日曆天數  FromStartCalendarDays
-    #變動完工日        RealFinishDate
-    #變動完工天數      RealTotalCalendarDays
+    #變動完工日       RealFinishDate
+    #變動完工天數     RealTotalCalendarDays
+    #預計剩餘工期     ExpectRestWorkDays
+    #預計剩餘天數     ExpectRestCalendarkDays
+    #實際剩餘工期     RealRestWorkDays
+    #實際剩餘天數     RealRestCalendarkDays
+    
     #今日開始追加工期
     #累計追加工期
     #工期總計
 
-
+    
 
     while(True):
         nWeekday = kRealEndDate.weekday()
@@ -156,19 +167,22 @@ def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConst
                     if dictWeatherRelatedHoliday[strEndDate] == CountWorkingDay.NO_COUNT:
                         pass
                     elif dictWeatherRelatedHoliday[strEndDate] == CountWorkingDay.COUNT_HALF_DAY:
-                        nTotalWorkdays -= 0.5
+                        nPastWorkdays += 0.5
+                        nRealRestWorkdays -= 0.5
                     else:
-                        nTotalWorkdays -= 1
+                        nPastWorkdays += 1
+                        nRealRestWorkdays -= 1
                 else:
-                    nTotalWorkdays -= 1#沒填日報表就當作一般晴天
+                    nPastWorkdays += 1
+                    nRealRestWorkdays -= 1#沒填日報表就當作一般晴天
             else:
-                nTotalWorkdays -= 1#未來的日子還沒有日報表
-            nExpectTotalWorkdays -= 1
+                nRealRestWorkdays -= 1#未來的日子還沒有日報表
+            nExpectRestWorkdays -= 1
 
-        if(nTotalWorkdays <= 0):
+        if(nRealRestWorkdays <= 0):
             break
 
-        if nExpectTotalWorkdays > 0:
+        if nExpectRestWorkdays > 0:
             kExpectEndDate += datetime.timedelta(days=1)
 
         kRealEndDate += datetime.timedelta(days=1)
@@ -181,7 +195,11 @@ def CountRealFinishDate(eCountType, nTotalWorkdays, strStart, strToday, arrConst
     returnValue['RealFinishDate'] = kRealEndDate.strftime("%Y-%m-%d")
     returnValue['RealTotalCalendarDays'] = (kRealEndDate - kStartDate).days + 1
     returnValue['FromStartCalendarDays'] = (kTodayDate - kStartDate).days + 1
-    # returnValue['FromStartWorkDays'] 
+    returnValue['FromStartWorkDays'] = nPastWorkdays
+    returnValue['ExpectRestWorkDays'] = nExpectTotalWorkdays - nPastWorkdays
+    returnValue['ExpectRestCalendarkDays'] = (kExpectEndDate - kTodayDate).days
+    returnValue['RealRestWorkDays'] = nExpectTotalWorkdays + nTotalExtendDays - nPastWorkdays
+    returnValue['RealRestCalendarkDays'] = (kRealEndDate - kTodayDate).days 
 
     return returnValue
 
@@ -217,6 +235,11 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(returnValue['RealFinishDate'], '2023-03-27')
         self.assertEqual(returnValue['RealTotalCalendarDays'], 86)
         self.assertEqual(returnValue['FromStartCalendarDays'], 17)
+        self.assertEqual(returnValue['FromStartWorkDays'], 12.5)
+        self.assertEqual(returnValue['ExpectRestWorkDays'], 47.5)
+        self.assertEqual(returnValue['ExpectRestCalendarkDays'], 67)#14+28+25
+        self.assertEqual(returnValue['RealRestWorkDays'], 47.5)
+        self.assertEqual(returnValue['RealRestCalendarkDays'], 69)#14+28+27
 
     def test_TwoDayOffRealFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
@@ -224,10 +247,15 @@ class TestFunction(unittest.TestCase):
         LoadJsonExtendData(dictGlobalExtendData)
         returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-01-17', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
-        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
+        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)#31+28+31
         self.assertEqual(returnValue['RealFinishDate'], '2023-04-06')
-        self.assertEqual(returnValue['RealTotalCalendarDays'], 96)
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 96)#31+28+31+6
         self.assertEqual(returnValue['FromStartCalendarDays'], 17)
+        self.assertEqual(returnValue['FromStartWorkDays'], 11.5)
+        self.assertEqual(returnValue['ExpectRestWorkDays'], 48.5)#60-11.5
+        self.assertEqual(returnValue['ExpectRestCalendarkDays'], 73)#14+28+31
+        self.assertEqual(returnValue['RealRestWorkDays'], 48.5)#60-11.5
+        self.assertEqual(returnValue['RealRestCalendarkDays'], 79)#14+28+31+6
         
     def test_TwoDayOffRealFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
@@ -235,10 +263,15 @@ class TestFunction(unittest.TestCase):
         LoadJsonExtendData(dictGlobalExtendData)
         returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-01-18', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
-        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
+        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)#31+28+31
         self.assertEqual(returnValue['RealFinishDate'], '2023-04-07')
-        self.assertEqual(returnValue['RealTotalCalendarDays'], 97)
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 97)#31+28+31+7
         self.assertEqual(returnValue['FromStartCalendarDays'], 18)
+        self.assertEqual(returnValue['FromStartWorkDays'], 11.5)
+        self.assertEqual(returnValue['ExpectRestWorkDays'], 48.5)#60-11.5
+        self.assertEqual(returnValue['ExpectRestCalendarkDays'], 72)#13+28+31
+        self.assertEqual(returnValue['RealRestWorkDays'], 48.5)#60-11.5
+        self.assertEqual(returnValue['RealRestCalendarkDays'], 79)#13+28+31+7
 
     def test_TwoDayOffRealFinishDate3(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
@@ -246,10 +279,15 @@ class TestFunction(unittest.TestCase):
         LoadJsonExtendData(dictGlobalExtendData)
         returnValue = CountRealFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', '2023-03-13', arrGlobalConstHoliday, arrGlobalConstWorkday, dictGlobalWeatherRelatedHoliday, dictGlobalExtendData)
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
-        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
+        self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)#31+28+31
         self.assertEqual(returnValue['RealFinishDate'], '2023-04-12')
-        self.assertEqual(returnValue['RealTotalCalendarDays'], 102)
-        self.assertEqual(returnValue['FromStartCalendarDays'], 72)
+        self.assertEqual(returnValue['RealTotalCalendarDays'], 102)#31+28+31+12
+        self.assertEqual(returnValue['FromStartCalendarDays'], 72)#31+28+13
+        self.assertEqual(returnValue['FromStartWorkDays'], 40)
+        self.assertEqual(returnValue['ExpectRestWorkDays'], 20)#60-40
+        self.assertEqual(returnValue['ExpectRestCalendarkDays'], 18)# 0313~0331 
+        self.assertEqual(returnValue['RealRestWorkDays'], 20)#60-40
+        self.assertEqual(returnValue['RealRestCalendarkDays'], 30)#18+12
 
     def test_TwoDayOffRealFinishDate4(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
@@ -260,7 +298,12 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
         self.assertEqual(returnValue['RealFinishDate'], '2023-05-03')
         self.assertEqual(returnValue['RealTotalCalendarDays'], 123)
-        self.assertEqual(returnValue['FromStartCalendarDays'], 73)
+        self.assertEqual(returnValue['FromStartCalendarDays'], 73)#31+28+14
+        self.assertEqual(returnValue['FromStartWorkDays'], 41)
+        self.assertEqual(returnValue['ExpectRestWorkDays'], 19)#60-41
+        self.assertEqual(returnValue['ExpectRestCalendarkDays'], 17)#0314~0331
+        self.assertEqual(returnValue['RealRestWorkDays'], 34)#60+15-41
+        self.assertEqual(returnValue['RealRestCalendarkDays'], 50)#0314~0503=17+30+3
 
 if __name__ == '__main__':
     unittest.main()
