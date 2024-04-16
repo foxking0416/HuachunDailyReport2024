@@ -48,6 +48,8 @@ def CalculateSchedule():
         label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
         label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
         label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
+        label_from_start_work_days_value.config(text= returnValue['FromStartWorkDays'])
+        label_from_start_calendar_days_value.config(text= returnValue['FromStartCalendarDays'])
         label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
         label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
         label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
@@ -58,6 +60,8 @@ def CalculateSchedule():
         label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
         label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
         label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
+        label_from_start_work_days_value.config(text= returnValue['FromStartWorkDays'])
+        label_from_start_calendar_days_value.config(text= returnValue['FromStartCalendarDays'])
         label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
         label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
         label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
@@ -131,7 +135,22 @@ label_expect_total_calendar_days_value = Label(group_frame_expect_total_calendar
 label_expect_total_calendar_days_value.pack(side="left", padx=10)
 
 
+group_frame_from_start_work_days = Frame(window)
+group_frame_from_start_work_days.pack(anchor="w")
 
+label_from_start_work_days = Label(group_frame_from_start_work_days, text="開工迄今工作天數")
+label_from_start_work_days.pack(side="left", padx=10)
+label_from_start_work_days_value = Label(group_frame_from_start_work_days, text="?")
+label_from_start_work_days_value.pack(side="left", padx=10)
+
+
+group_frame_from_start_calendar_days = Frame(window)
+group_frame_from_start_calendar_days.pack(anchor="w")
+
+label_from_start_calendar_days = Label(group_frame_from_start_calendar_days, text="開工迄今日曆天數")
+label_from_start_calendar_days.pack(side="left", padx=10)
+label_from_start_calendar_days_value = Label(group_frame_from_start_calendar_days, text="?")
+label_from_start_calendar_days_value.pack(side="left", padx=10)
 
 
 group_frame_real_finish_date = Frame(window)
