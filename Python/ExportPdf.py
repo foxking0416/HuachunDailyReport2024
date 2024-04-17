@@ -83,6 +83,11 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 
+from openpyxl import Workbook
+from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
+from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
+from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
+
 def InsertImageIntoExcel(excel_file, image_path, output_excel):
     # Open the Excel file
     wb = openpyxl.load_workbook(excel_file)
@@ -96,15 +101,14 @@ def InsertImageIntoExcel(excel_file, image_path, output_excel):
     # Calculate dimensions and resize if needed
     img.width, img.height = img.width * 0.2, img.height * 0.2
     
-    cell = ws['C8']
-    # Add image to the worksheet
-    # img.offset = (20,20)
-    ws.add_image(img, 'C8')
-    # ws.add_image(img, anchor=f"{get_column_letter(cell.column)}{cell.row}", x=20, y=20)
-    
-    # Set alignment for the cell containing the image
-    # cell.alignment = Alignment(horizontal='center', vertical='center')
-    
+    h, w = img.height, img.width
+
+    p2e = pixels_to_EMU
+    position = XDRPoint2D(p2e(500), p2e(500))
+    size = XDRPositiveSize2D(p2e(w), p2e(h))
+    img.anchor = AbsoluteAnchor(pos=position, ext=size)
+    ws.add_image(img)
+
     # Save the modified Excel file
     wb.save(output_excel)
 
