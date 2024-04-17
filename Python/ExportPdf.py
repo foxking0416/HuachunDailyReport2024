@@ -87,6 +87,7 @@ from openpyxl import Workbook
 from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
+from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
 def InsertImageIntoExcel(excel_file, image_path, output_excel):
     # Open the Excel file
@@ -101,12 +102,28 @@ def InsertImageIntoExcel(excel_file, image_path, output_excel):
     # Calculate dimensions and resize if needed
     img.width, img.height = img.width * 0.2, img.height * 0.2
     
-    h, w = img.height, img.width
+    c2e = cm_to_EMU
+    # Calculated number of cells width or height from cm into EMUs
+    cellh = lambda x: c2e((x * 49.77)/99)
+    cellw = lambda x: c2e((x * (18.65-1.71))/10)
 
+    # Want to place image in row 5 (6 in excel), column 2 (C in excel)
+    # Also offset by half a column.
+
+
+    h, w = img.height, img.width
     p2e = pixels_to_EMU
-    position = XDRPoint2D(p2e(500), p2e(500))
     size = XDRPositiveSize2D(p2e(w), p2e(h))
-    img.anchor = AbsoluteAnchor(pos=position, ext=size)
+
+    column = 0
+    coloffset = cellw(0.5)
+    row = 0
+    rowoffset = cellh(0.5)
+    marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
+    img.anchor = OneCellAnchor(_from=marker, ext=size)
+
+    # position = XDRPoint2D(p2e(500), p2e(500))
+    # img.anchor = AbsoluteAnchor(pos=position, ext=size)
     ws.add_image(img)
 
     # Save the modified Excel file
