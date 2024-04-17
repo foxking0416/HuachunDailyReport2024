@@ -89,13 +89,29 @@ from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
+def ReadCellDimension( worksheet ):
+    column_widthA = worksheet.column_dimensions["A"].width
+    column_widthB = worksheet.column_dimensions["B"].width
+    row_height1 = worksheet.row_dimensions[1].height
+    row_height2 = worksheet.row_dimensions[2].height
+    print(column_widthA)
+    print(column_widthB)
+    print(row_height1)
+    print(row_height2)
+
+
 def InsertImageIntoExcel(excel_file, image_path, output_excel):
     # Open the Excel file
-    wb = openpyxl.load_workbook(excel_file)
+    workbook = openpyxl.load_workbook(excel_file)
     
+
+
     # Select the active worksheet
-    ws = wb.active
-    
+    worksheet = workbook.active
+    ReadCellDimension(worksheet)
+
+
+
     # Load the image
     img = Image(image_path)
     
@@ -106,9 +122,6 @@ def InsertImageIntoExcel(excel_file, image_path, output_excel):
     # Calculated number of cells width or height from cm into EMUs
     cellh = lambda x: c2e((x * 49.77)/99)
     cellw = lambda x: c2e((x * (18.65-1.71))/10)
-
-    # Want to place image in row 5 (6 in excel), column 2 (C in excel)
-    # Also offset by half a column.
 
 
     h, w = img.height, img.width
@@ -122,19 +135,17 @@ def InsertImageIntoExcel(excel_file, image_path, output_excel):
     marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
     img.anchor = OneCellAnchor(_from=marker, ext=size)
 
-    # position = XDRPoint2D(p2e(500), p2e(500))
-    # img.anchor = AbsoluteAnchor(pos=position, ext=size)
-    ws.add_image(img)
+    worksheet.add_image(img)
 
     # Save the modified Excel file
-    wb.save(output_excel)
+    workbook.save(output_excel)
 
 
     pass
 
 
 # Example usage
-excel_file = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\DailyReportTemplate.xlsx'
+excel_file = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\test.xlsx'
 image_path_sun_all = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\Sun_All.png'
 output_excel = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\testOutput.xlsx'
 pdf_file = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\output.pdf'
