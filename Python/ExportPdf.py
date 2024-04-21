@@ -112,7 +112,33 @@ def read_data_and_export_file():
                 pass
     pass
 
-def test_week_num( date ):
+def number_to_string(n):
+    result = ''
+    while n > 0:
+        n -= 1
+        result = chr(ord('A') + n % 26) + result
+        n //= 26
+    return result
+
+def get_cell_num( date ):
+    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    month = date_obj.month
+    day = date_obj.day
+    weekday = ( date_obj.weekday() + 2 ) % 7 
+    if weekday == 0:
+        weekday += 7
+    row_num = 6 + month * 2
+    week_num = get_week_num( date )
+    column_num = 1 + ( week_num - 1 ) * 7 + weekday
+
+
+    returnValue = {}
+    returnValue['WeekNum'] = week_num
+    returnValue['RowNum'] = row_num
+    returnValue['ColumnNum'] = number_to_string( column_num )
+    return returnValue
+
+def get_week_num( date ):
     date_obj = datetime.strptime(date, "%Y-%m-%d")
     day = date_obj.day
 
@@ -141,28 +167,54 @@ def test_week_num( date ):
 
 # read_data_and_export_file()
 
-# test_week_num('2024-03-10')
+# get_week_num('2024-03-10')
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
-        returnValue = test_week_num('2024-02-14')
-        self.assertEqual(returnValue, 3)
-        returnValue = test_week_num('2024-03-09')
-        self.assertEqual(returnValue, 2)
-        returnValue = test_week_num('2024-03-10')
-        self.assertEqual(returnValue, 3)
-        returnValue = test_week_num('2024-03-31')
-        self.assertEqual(returnValue, 6)
-        returnValue = test_week_num('2024-04-06')
-        self.assertEqual(returnValue, 1)
-        returnValue = test_week_num('2024-04-07')
-        self.assertEqual(returnValue, 2)
-        returnValue = test_week_num('2024-06-30')
-        self.assertEqual(returnValue, 6)
-        returnValue = test_week_num('2024-09-07')
-        self.assertEqual(returnValue, 1)
-        returnValue = test_week_num('2024-09-14')
-        self.assertEqual(returnValue, 2)
+        returnValue = get_cell_num('2024-02-14')
+        self.assertEqual(returnValue['WeekNum'], 3)
+        self.assertEqual(returnValue['RowNum'], 10)
+        self.assertEqual(returnValue['ColumnNum'], 'S')
+
+        returnValue = get_cell_num('2024-03-09')
+        self.assertEqual(returnValue['WeekNum'], 2)
+        self.assertEqual(returnValue['RowNum'], 12)
+        self.assertEqual(returnValue['ColumnNum'], 'O')
+
+        returnValue = get_cell_num('2024-03-10')
+        self.assertEqual(returnValue['WeekNum'], 3)
+        self.assertEqual(returnValue['RowNum'], 12)
+        self.assertEqual(returnValue['ColumnNum'], 'P')
+
+        returnValue = get_cell_num('2024-03-31')
+        self.assertEqual(returnValue['WeekNum'], 6)
+        self.assertEqual(returnValue['RowNum'], 12)
+        self.assertEqual(returnValue['ColumnNum'], 'AK')
+
+        returnValue = get_cell_num('2024-04-06')
+        self.assertEqual(returnValue['WeekNum'], 1)
+        self.assertEqual(returnValue['RowNum'], 14)
+        self.assertEqual(returnValue['ColumnNum'], 'H')
+
+        returnValue = get_cell_num('2024-04-07')
+        self.assertEqual(returnValue['WeekNum'], 2)
+        self.assertEqual(returnValue['RowNum'], 14)
+        self.assertEqual(returnValue['ColumnNum'], 'I')
+
+        returnValue = get_cell_num('2024-06-30')
+        self.assertEqual(returnValue['WeekNum'], 6)
+        self.assertEqual(returnValue['RowNum'], 18)
+        self.assertEqual(returnValue['ColumnNum'], 'AK')
+
+        returnValue = get_cell_num('2024-09-07')
+        self.assertEqual(returnValue['WeekNum'], 1)
+        self.assertEqual(returnValue['RowNum'], 24)
+        self.assertEqual(returnValue['ColumnNum'], 'H')
+        
+        returnValue = get_cell_num('2024-09-14')
+        self.assertEqual(returnValue['WeekNum'], 2)
+        self.assertEqual(returnValue['RowNum'], 24)
+        self.assertEqual(returnValue['ColumnNum'], 'O')
 
 
 
