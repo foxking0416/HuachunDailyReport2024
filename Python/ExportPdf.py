@@ -42,8 +42,6 @@ def insert_image_into_excel(input_excel, output_excel, image_path):
     img = Image(image_path)
     
     # Calculate dimensions and resize if needed
-    img.width, img.height = img.width * 0.2, img.height * 0.2
-    
     c2e = cm_to_EMU
     # Calculated number of cells width or height from cm into EMUs
     cellh = lambda x: c2e((x * 49.77)/99)
@@ -86,15 +84,14 @@ def read_data_and_export_file():
 
     current_dir = os.path.dirname(__file__)
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
-    input_excel = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\DailyReportTemplate.xlsx'
-    output_excel = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\DailyReportFinal.xlsx'
-    image_path_sun_all = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\Sun_All.png'
-    image_path_rain_all = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\Rain_All.png'
-    image_path_sun_up_rain_down = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\Sun_Up_Rain_Down.png'
-    image_path_rain_up_sun_down = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\Rain_Up_Sun_Down.png'
+    input_excel =  os.path.join(current_dir, 'DailyReportTemplate.xlsx')
+    output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
+    image_path_sun_all = os.path.join(current_dir, 'Image\\Sun_All.png') 
+    image_path_rain_all = os.path.join(current_dir, 'Image\\Rain_All.png') 
+    image_path_sun_up_rain_down = os.path.join(current_dir, 'Image\\Sun_Up_Rain_Down.png') 
+    image_path_rain_up_sun_down = os.path.join(current_dir, 'Image\\Rain_Up_Sun_Down.png') 
 
     img_template = Image(image_path_sun_all)
-    img_template.width, img_template.height = img_template.width * 0.2, img_template.height * 0.2
 
 
     c2e = cm_to_EMU
@@ -138,7 +135,6 @@ def read_data_and_export_file():
                     img = Image(image_path_rain_up_sun_down)
                 else:
                     img = Image(image_path_rain_all)
-            img.width, img.height = img.width * 0.2, img.height * 0.2
             marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
             img.anchor = OneCellAnchor(_from=marker, ext=size)
             worksheet.add_image(img)
