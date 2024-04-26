@@ -1,7 +1,8 @@
+import ScheduleCount
 import json
 import os
-from datetime import datetime
-import ScheduleCount
+import datetime
+import unittest
 import openpyxl
 from openpyxl.drawing.image import Image
 from openpyxl.utils import get_column_letter
@@ -16,16 +17,29 @@ from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
-import unittest
 
 
-def ReadCellDimension( worksheet ):
+
+def ReadCellDimension():
+
+    current_dir = os.path.dirname(__file__)
+    input_excel =  os.path.join(current_dir, 'testOutput.xlsx')
+
+    # Open the Excel file
+    workbook = openpyxl.load_workbook(input_excel)
+    # Select the active worksheet
+    worksheet = workbook.active
+
     column_widthA = worksheet.column_dimensions["A"].width
     column_widthB = worksheet.column_dimensions["B"].width
+    column_widthC = worksheet.column_dimensions["C"].width
+    column_widthD = worksheet.column_dimensions["D"].width
     row_height1 = worksheet.row_dimensions[1].height
     row_height2 = worksheet.row_dimensions[2].height
     print(column_widthA)
     print(column_widthB)
+    print(column_widthC)
+    print(column_widthD)
     print(row_height1)
     print(row_height2)
 
@@ -75,6 +89,28 @@ def insert_image_into_excel(input_excel, output_excel, image_path):
     workbook.save(output_excel)
 
 
+def fill_in_day_each_month(worksheet, input_year):
+    first_day = str(input_year) + '-01-01'
+    date_obj = datetime.datetime.strptime(first_day, "%Y-%m-%d")  
+    is_leap_year = ( input_year % 4 == 0 )
+
+    if is_leap_year:
+        days_a_year = 366
+    else:
+        days_a_year = 365
+
+    for i in range(days_a_year):
+        day = date_obj.day
+        str_date = date_obj.strftime("%Y-%m-%d")
+
+        cell_num = get_cell_num(str_date)
+        column = cell_num['ColumnNum']
+        row = cell_num['RowNum']+1
+        cell = number_to_string(column)+str(row)
+        worksheet[cell] = day
+        date_obj += datetime.timedelta(days=1)
+
+
 def read_data_and_export_file():
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
@@ -99,11 +135,14 @@ def read_data_and_export_file():
     cellh = lambda x: c2e((x * 49.77)/99)
     cellw = lambda x: c2e((x * (18.65-1.71))/10)
 
-    coloffset = cellw(0.5)
-    rowoffset = cellh(0.5)
+    coloffset = 0#cellw(0.5) #304919
+    rowoffset = 0#cellh(0.5) #90490
 
-    h, w = img_template.height, img_template.width
+    h, w = img_template.height, img_template.width #pixel
     p2e = pixels_to_EMU
+    p2ew = p2e(w) #30 pixel = 285750 EMU ==> 1 pixel = 9525
+    p2eh = p2e(h) #29 pixel = 276225 EMU ==> 1 pixel = 9525
+
     size = XDRPositiveSize2D(p2e(w), p2e(h))
 
     # Open the Excel file
@@ -111,18 +150,27 @@ def read_data_and_export_file():
     # Select the active worksheet
     worksheet = workbook.active
 
+    lastyear = 0
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
 
     for item in data:
-        date_obj = datetime.strptime(item["date"], "%Y-%m-%d")
+        date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
         year = date_obj.year
         cell_num = get_cell_num(item["date"])
         column = cell_num['ColumnNum']-1
         row = cell_num['RowNum']-1
         img = None
+
+
+
         if year == 2023:
+
+            if year != lastyear:
+                fill_in_day_each_month(worksheet, year)
+                lastyear = year
+        
             print( item["date"])
             if item["morning_weather"] == 0:
                 if item["afternoon_weather"] == 0:
@@ -153,7 +201,7 @@ def number_to_string(n):
     return result
 
 def get_cell_num( date ):
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
     month = date_obj.month
     day = date_obj.day
     weekday = ( date_obj.weekday() + 2 ) % 7 
@@ -172,7 +220,7 @@ def get_cell_num( date ):
     return returnValue
 
 def get_week_num( date ):
-    date_obj = datetime.strptime(date, "%Y-%m-%d")
+    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
     day = date_obj.day
 
     weekday = ( date_obj.weekday() + 2 ) % 7 
@@ -192,8 +240,9 @@ def get_week_num( date ):
 # output_excel = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\DailyReportFinal.xlsx'
 # insert_image_into_excel(input_excel, output_excel, image_path_sun_all)
 
+# ReadCellDimension()
 read_data_and_export_file()
-
+# fill_in_day_each_month(4,2024)
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
