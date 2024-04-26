@@ -145,16 +145,27 @@ def read_data_and_export_file():
 
     size = XDRPositiveSize2D(p2e(w), p2e(h))
 
-    # Open the Excel file
     workbook = openpyxl.load_workbook(input_excel)
-    # Select the active worksheet
     worksheet = workbook.active
 
-    lastyear = 0
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
 
+    #先看有多少年的資料，建立所需worksheet
+    lastyear = 0
+    for item in data:
+        date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
+        year = date_obj.year
+
+        if year != lastyear:
+            if lastyear != 0:
+                worksheet = workbook.copy_worksheet(worksheet)
+            worksheet.title = str(year) + '年'
+            lastyear = year
+
+    worksheet_index = 0
+    lastyear = 0
     for item in data:
         date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
         year = date_obj.year
@@ -163,30 +174,30 @@ def read_data_and_export_file():
         row = cell_num['RowNum']-1
         img = None
 
-
-
-        if year == 2023:
-
-            if year != lastyear:
-                fill_in_day_each_month(worksheet, year)
-                lastyear = year
-        
-            print( item["date"])
-            if item["morning_weather"] == 0:
-                if item["afternoon_weather"] == 0:
-                    img = Image(image_path_sun_all)
-                else:
-                    img = Image(image_path_sun_up_rain_down)
-                pass
+        if year != lastyear:
+            worksheet = workbook.worksheets[worksheet_index]
+            fill_in_day_each_month(worksheet, year)
+            lastyear = year
+            worksheet_index += 1
+    
+        print( item["date"])
+        if item["morning_weather"] == 0:
+            if item["afternoon_weather"] == 0:
+                img = Image(image_path_sun_all)
             else:
-                if item["afternoon_weather"] == 0:
-                    img = Image(image_path_rain_up_sun_down)
-                else:
-                    img = Image(image_path_rain_all)
-            marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
-            img.anchor = OneCellAnchor(_from=marker, ext=size)
-            worksheet.add_image(img)
+                img = Image(image_path_sun_up_rain_down)
+            pass
+        else:
+            if item["afternoon_weather"] == 0:
+                img = Image(image_path_rain_up_sun_down)
+            else:
+                img = Image(image_path_rain_all)
+        marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
+        img.anchor = OneCellAnchor(_from=marker, ext=size)
+        worksheet.add_image(img)
 
+    # if os.path.exists(output_excel):
+    #     print(f"The file {file_path} exists.")
     workbook.save(output_excel)
 
     print('finish')
