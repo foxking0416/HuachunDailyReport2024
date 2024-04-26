@@ -162,6 +162,8 @@ def read_data_and_export_file():
             if lastyear != 0:
                 worksheet = workbook.copy_worksheet(worksheet)
             worksheet.title = str(year) + '年'
+            worksheet['B4'] = str(year) + '年(' + str(year-1911) + '年)' 
+
             lastyear = year
 
     worksheet_index = 0
