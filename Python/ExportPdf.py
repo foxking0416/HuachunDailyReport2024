@@ -74,7 +74,12 @@ def fill_in_day_each_month(worksheet, input_year):
         worksheet[cell] = day
         date_obj += datetime.timedelta(days=1)
 
-def read_data_and_export_file():
+def insert_image(worksheet, image_path, marker, size):
+    img = Image(image_path)
+    img.anchor = OneCellAnchor(_from=marker, ext=size)
+    worksheet.add_image(img)
+
+def read_data_and_export_file(eCountType):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
     dictGlobalWeatherRelatedHoliday = {}
@@ -85,6 +90,8 @@ def read_data_and_export_file():
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
     input_excel =  os.path.join(current_dir, 'DailyReportTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
+    image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
+    image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
     image_path_sun_all = os.path.join(current_dir, 'Image\\Sun_All.png') 
     image_path_rain_all = os.path.join(current_dir, 'Image\\Rain_All.png') 
     image_path_sun_up_rain_down = os.path.join(current_dir, 'Image\\Sun_Up_Rain_Down.png') 
@@ -133,11 +140,13 @@ def read_data_and_export_file():
     lastyear = 0
     for item in data:
         date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
+        nWeekday = date_obj.weekday()
         year = date_obj.year
         cell_num = get_cell_num(item["date"])
         column = cell_num['ColumnNum']-1
         row = cell_num['RowNum']-1
-        img = None
+        marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
+        image_path = None
 
         if year != lastyear:
             worksheet = workbook.worksheets[worksheet_index]
@@ -148,18 +157,39 @@ def read_data_and_export_file():
         print( item["date"])
         if item["morning_weather"] == 0:
             if item["afternoon_weather"] == 0:
-                img = Image(image_path_sun_all)
+                image_path = image_path_sun_all
             else:
-                img = Image(image_path_sun_up_rain_down)
+                image_path = image_path_sun_up_rain_down
             pass
         else:
             if item["afternoon_weather"] == 0:
-                img = Image(image_path_rain_up_sun_down)
+                image_path = image_path_rain_up_sun_down
             else:
-                img = Image(image_path_rain_all)
-        marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
-        img.anchor = OneCellAnchor(_from=marker, ext=size)
-        worksheet.add_image(img)
+                image_path = image_path_rain_all
+        insert_image( worksheet, image_path, marker, size)
+
+        if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
+            if nWeekday == 6:#Sunday
+                if item["date"] in arrGlobalConstWorkday:
+                    insert_image( worksheet, image_path_workday, marker, size)
+                else:
+                    insert_image( worksheet, image_path_holiday, marker, size)
+            else:
+                if item["date"] in arrGlobalConstHoliday:
+                    insert_image( worksheet, image_path_holiday, marker, size)
+        elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
+            if nWeekday == 6 or nWeekday == 5:#Sunday Saturday
+                if item["date"] in arrGlobalConstWorkday:
+                    insert_image( worksheet, image_path_workday, marker, size)
+                else:
+                    insert_image( worksheet, image_path_holiday, marker, size)
+            else:
+                if item["date"] in arrGlobalConstHoliday:
+                    insert_image( worksheet, image_path_holiday, marker, size)
+        elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
+            if item["date"] in arrGlobalConstHoliday:
+                    insert_image( worksheet, image_path_holiday, marker, size)
+
 
     serial_number = 1
     filename, extension = os.path.splitext(output_excel)
@@ -218,7 +248,7 @@ def get_week_num( date ):
     return week_num
 
 
-read_data_and_export_file()
+read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF)
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
