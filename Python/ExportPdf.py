@@ -5,44 +5,9 @@ import datetime
 import unittest
 import openpyxl
 from openpyxl.drawing.image import Image
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Alignment
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
-from reportlab.pdfgen import canvas
-
-from openpyxl import Workbook
-from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
-
-
-
-
-def ReadCellDimension():
-
-    current_dir = os.path.dirname(__file__)
-    input_excel =  os.path.join(current_dir, 'testOutput.xlsx')
-
-    # Open the Excel file
-    workbook = openpyxl.load_workbook(input_excel)
-    # Select the active worksheet
-    worksheet = workbook.active
-
-    column_widthA = worksheet.column_dimensions["A"].width
-    column_widthB = worksheet.column_dimensions["B"].width
-    column_widthC = worksheet.column_dimensions["C"].width
-    column_widthD = worksheet.column_dimensions["D"].width
-    row_height1 = worksheet.row_dimensions[1].height
-    row_height2 = worksheet.row_dimensions[2].height
-    print(column_widthA)
-    print(column_widthB)
-    print(column_widthC)
-    print(column_widthD)
-    print(row_height1)
-    print(row_height2)
-
 
 def insert_image_into_excel(input_excel, output_excel, image_path):
     # Open the Excel file
@@ -88,7 +53,6 @@ def insert_image_into_excel(input_excel, output_excel, image_path):
     # Save the modified Excel file
     workbook.save(output_excel)
 
-
 def fill_in_day_each_month(worksheet, input_year):
     first_day = str(input_year) + '-01-01'
     date_obj = datetime.datetime.strptime(first_day, "%Y-%m-%d")  
@@ -109,7 +73,6 @@ def fill_in_day_each_month(worksheet, input_year):
         cell = number_to_string(column)+str(row)
         worksheet[cell] = day
         date_obj += datetime.timedelta(days=1)
-
 
 def read_data_and_export_file():
     arrGlobalConstHoliday = []
@@ -135,8 +98,8 @@ def read_data_and_export_file():
     cellh = lambda x: c2e((x * 49.77)/99)
     cellw = lambda x: c2e((x * (18.65-1.71))/10)
 
-    coloffset = 0#cellw(0.5) #304919
-    rowoffset = 0#cellh(0.5) #90490
+    coloffset = cellw(0.1) #304919
+    rowoffset = cellh(0.25) #90490
 
     h, w = img_template.height, img_template.width #pixel
     p2e = pixels_to_EMU
@@ -198,8 +161,14 @@ def read_data_and_export_file():
         img.anchor = OneCellAnchor(_from=marker, ext=size)
         worksheet.add_image(img)
 
-    # if os.path.exists(output_excel):
-    #     print(f"The file {file_path} exists.")
+    serial_number = 1
+    filename, extension = os.path.splitext(output_excel)
+    while os.path.exists(output_excel):
+        # 如果文件已经存在，则添加流水号并重新检查
+        output_excel = f"{filename}_{serial_number}{extension}"
+        serial_number += 1
+
+
     workbook.save(output_excel)
 
     print('finish')
@@ -248,14 +217,8 @@ def get_week_num( date ):
     
     return week_num
 
-# input_excel = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\DailyReportTemplate.xlsx'
-# image_path_sun_all = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\Sun_All.png'
-# output_excel = 'C:\\_Everything\\HuachunDailyReport2024\\Python\\DailyReportFinal.xlsx'
-# insert_image_into_excel(input_excel, output_excel, image_path_sun_all)
 
-# ReadCellDimension()
 read_data_and_export_file()
-# fill_in_day_each_month(4,2024)
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
