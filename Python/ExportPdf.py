@@ -96,8 +96,13 @@ def read_data_and_export_file(eCountType):
     image_path_rain_all = os.path.join(current_dir, 'Image\\Rain_All.png') 
     image_path_sun_up_rain_down = os.path.join(current_dir, 'Image\\Sun_Up_Rain_Down.png') 
     image_path_rain_up_sun_down = os.path.join(current_dir, 'Image\\Rain_Up_Sun_Down.png') 
+    image_path_sun_up = os.path.join(current_dir, 'Image\\Sun_Up.png')
+    image_path_sun_down = os.path.join(current_dir, 'Image\\Sun_Down.png')
+    image_path_rain_up = os.path.join(current_dir, 'Image\\Rain_Up.png')
+    image_path_rain_down = os.path.join(current_dir, 'Image\\Rain_Down.png') 
 
     img_template = Image(image_path_sun_all)
+
 
 
     c2e = cm_to_EMU
@@ -105,15 +110,14 @@ def read_data_and_export_file(eCountType):
     cellh = lambda x: c2e((x * 49.77)/99)
     cellw = lambda x: c2e((x * (18.65-1.71))/10)
 
-    coloffset = cellw(0.1) #304919
-    rowoffset = cellh(0.25) #90490
+    col_offset = cellw(0.1) #60984
+    row_up_offset = cellh(0.25) #45245
+    row_down_offset = cellh(1) #180981
 
-    h, w = img_template.height, img_template.width #pixel
     p2e = pixels_to_EMU
-    p2ew = p2e(w) #30 pixel = 285750 EMU ==> 1 pixel = 9525
-    p2eh = p2e(h) #29 pixel = 276225 EMU ==> 1 pixel = 9525
 
-    size = XDRPositiveSize2D(p2e(w), p2e(h))
+    whole_size = XDRPositiveSize2D(p2e(30), p2e(30))
+    half_size = XDRPositiveSize2D(p2e(30), p2e(15))
 
     workbook = openpyxl.load_workbook(input_excel)
     worksheet = workbook.active
@@ -145,8 +149,8 @@ def read_data_and_export_file(eCountType):
         cell_num = get_cell_num(item["date"])
         column = cell_num['ColumnNum']-1
         row = cell_num['RowNum']-1
-        marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
-        image_path = None
+        up_marker = AnchorMarker(col=column, colOff=col_offset, row=row, rowOff=row_up_offset)
+        down_marker = AnchorMarker(col=column, colOff=col_offset, row=row, rowOff=row_down_offset)
 
         if year != lastyear:
             worksheet = workbook.worksheets[worksheet_index]
@@ -156,39 +160,37 @@ def read_data_and_export_file(eCountType):
     
         print( item["date"])
         if item["morning_weather"] == 0:
-            if item["afternoon_weather"] == 0:
-                image_path = image_path_sun_all
-            else:
-                image_path = image_path_sun_up_rain_down
-            pass
+            insert_image( worksheet, image_path_sun_up, up_marker, half_size)
         else:
-            if item["afternoon_weather"] == 0:
-                image_path = image_path_rain_up_sun_down
-            else:
-                image_path = image_path_rain_all
-        insert_image( worksheet, image_path, marker, size)
+            insert_image( worksheet, image_path_rain_up, up_marker, half_size)
+        if item["afternoon_weather"] == 0:
+            insert_image( worksheet, image_path_sun_down, down_marker, half_size)
+        else:
+            insert_image( worksheet, image_path_rain_down, down_marker, half_size)
+
+
 
         if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if nWeekday == 6:#Sunday
                 if item["date"] in arrGlobalConstWorkday:
-                    insert_image( worksheet, image_path_workday, marker, size)
+                    insert_image( worksheet, image_path_workday, up_marker, whole_size)
                 else:
-                    insert_image( worksheet, image_path_holiday, marker, size)
+                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
             else:
                 if item["date"] in arrGlobalConstHoliday:
-                    insert_image( worksheet, image_path_holiday, marker, size)
+                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if nWeekday == 6 or nWeekday == 5:#Sunday Saturday
                 if item["date"] in arrGlobalConstWorkday:
-                    insert_image( worksheet, image_path_workday, marker, size)
+                    insert_image( worksheet, image_path_workday, up_marker, whole_size)
                 else:
-                    insert_image( worksheet, image_path_holiday, marker, size)
+                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
             else:
                 if item["date"] in arrGlobalConstHoliday:
-                    insert_image( worksheet, image_path_holiday, marker, size)
+                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
             if item["date"] in arrGlobalConstHoliday:
-                    insert_image( worksheet, image_path_holiday, marker, size)
+                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
 
 
     serial_number = 1
