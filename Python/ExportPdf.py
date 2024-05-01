@@ -4,6 +4,7 @@ import os
 import datetime
 import unittest
 import openpyxl
+import win32com.client
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
@@ -79,6 +80,64 @@ def insert_image(worksheet, image_path, marker, size):
     img.anchor = OneCellAnchor(_from=marker, ext=size)
     worksheet.add_image(img)
 
+def number_to_string(n):
+    result = ''
+    while n > 0:
+        n -= 1
+        result = chr(ord('A') + n % 26) + result
+        n //= 26
+    return result
+
+def get_cell_num( date ):
+    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
+    month = date_obj.month
+    day = date_obj.day
+    weekday = ( date_obj.weekday() + 2 ) % 7 
+    if weekday == 0:
+        weekday += 7
+    row_num = 6 + month * 2
+    week_num = get_week_num( date )
+    column_num = 1 + ( week_num - 1 ) * 7 + weekday
+
+
+    returnValue = {}
+    returnValue['WeekNum'] = week_num
+    returnValue['RowNum'] = row_num
+    returnValue['ColumnNum'] = column_num
+    returnValue['ColumnString'] = number_to_string( column_num )
+    return returnValue
+
+def get_week_num( date ):
+    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
+    day = date_obj.day
+
+    weekday = ( date_obj.weekday() + 2 ) % 7 
+    if weekday == 0:
+        weekday += 7
+    week_num = (day - 1) // 7 + 1
+    rest = day % 7
+    if rest == 0:
+        rest += 7
+    if weekday - rest < 0:
+        week_num += 1
+    
+    return week_num
+
+def excel_to_pdf(excel_file, pdf_file):
+    # 创建Excel应用程序对象
+    excel = win32com.client.Dispatch("Excel.Application")
+    # 打开Excel文件
+    wb = excel.Workbooks.Open(excel_file)
+    # 选择要保存为PDF的工作表
+    ws = wb.Worksheets[0]
+
+    # 将Excel文件保存为PDF
+    ws.ExportAsFixedFormat(0, pdf_file)
+
+    # 关闭Excel文件和应用程序
+    wb.Close(False)
+    excel.Quit()
+
 def read_data_and_export_file(eCountType):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
@@ -90,6 +149,7 @@ def read_data_and_export_file(eCountType):
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
     input_excel =  os.path.join(current_dir, 'DailyReportTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
+    output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf') 
     image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
     image_path_sun_all = os.path.join(current_dir, 'Image\\Sun_All.png') 
@@ -200,57 +260,33 @@ def read_data_and_export_file(eCountType):
         output_excel = f"{filename}_{serial_number}{extension}"
         serial_number += 1
 
+    serial_number = 1
+    filename, extension = os.path.splitext(output_pdf)
+    while os.path.exists(output_pdf):
+        # 如果文件已经存在，则添加流水号并重新检查
+        output_pdf = f"{filename}_{serial_number}{extension}"
+        serial_number += 1
 
-    workbook.save(output_excel)
 
+    workbook.save( output_excel )
+    excel_to_pdf( output_excel, output_pdf )
     print('finish')
     pass
 
-def number_to_string(n):
-    result = ''
-    while n > 0:
-        n -= 1
-        result = chr(ord('A') + n % 26) + result
-        n //= 26
-    return result
 
-def get_cell_num( date ):
-    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
-    month = date_obj.month
-    day = date_obj.day
-    weekday = ( date_obj.weekday() + 2 ) % 7 
-    if weekday == 0:
-        weekday += 7
-    row_num = 6 + month * 2
-    week_num = get_week_num( date )
-    column_num = 1 + ( week_num - 1 ) * 7 + weekday
+# current_dir = os.path.dirname(__file__)
+# input_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx')
+# output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf')
 
+# excel_to_pdf(input_excel,output_pdf)
 
-    returnValue = {}
-    returnValue['WeekNum'] = week_num
-    returnValue['RowNum'] = row_num
-    returnValue['ColumnNum'] = column_num
-    returnValue['ColumnString'] = number_to_string( column_num )
-    return returnValue
-
-def get_week_num( date ):
-    date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
-    day = date_obj.day
-
-    weekday = ( date_obj.weekday() + 2 ) % 7 
-    if weekday == 0:
-        weekday += 7
-    week_num = (day - 1) // 7 + 1
-    rest = day % 7
-    if rest == 0:
-        rest += 7
-    if weekday - rest < 0:
-        week_num += 1
-    
-    return week_num
-
-
+# current_dir = os.path.dirname(__file__)
+# input_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx')
+# output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf')
 read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF)
+
+
+
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
