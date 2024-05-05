@@ -128,11 +128,25 @@ def excel_to_pdf(excel_file, pdf_file):
     excel = win32com.client.Dispatch("Excel.Application")
     # 打开Excel文件
     wb = excel.Workbooks.Open(excel_file)
-    # 选择要保存为PDF的工作表
-    ws = wb.Worksheets[0]
 
-    # 将Excel文件保存为PDF
-    ws.ExportAsFixedFormat(0, pdf_file)
+    sheet_index = 0
+    for sheet in wb.Sheets:
+
+        serial_number = 1
+        filename, extension = os.path.splitext(pdf_file)
+        filename = filename + '_' + sheet.Name
+        output_pdf = filename + '.pdf'
+        while os.path.exists(output_pdf):
+            # 如果文件已经存在，则添加流水号并重新检查
+            output_pdf = f"{filename}_{serial_number}{extension}"
+            serial_number += 1
+
+        # 选择要保存为PDF的工作表
+        ws = wb.Worksheets[sheet_index]
+
+        # 将Excel文件保存为PDF
+        ws.ExportAsFixedFormat(0, output_pdf)
+        sheet_index += 1
 
     # 关闭Excel文件和应用程序
     wb.Close(False)
@@ -149,7 +163,7 @@ def read_data_and_export_file(eCountType):
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
     input_excel =  os.path.join(current_dir, 'DailyReportTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
-    output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf') 
+    # output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf') 
     image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
     image_path_sun_all = os.path.join(current_dir, 'Image\\Sun_All.png') 
@@ -252,38 +266,32 @@ def read_data_and_export_file(eCountType):
             if item["date"] in arrGlobalConstHoliday:
                     insert_image( worksheet, image_path_holiday, up_marker, whole_size)
 
-
+    any_serial_num = False
     serial_number = 1
     filename, extension = os.path.splitext(output_excel)
     while os.path.exists(output_excel):
         # 如果文件已经存在，则添加流水号并重新检查
         output_excel = f"{filename}_{serial_number}{extension}"
         serial_number += 1
+        any_serial_num = True
 
-    serial_number = 1
-    filename, extension = os.path.splitext(output_pdf)
-    while os.path.exists(output_pdf):
-        # 如果文件已经存在，则添加流水号并重新检查
-        output_pdf = f"{filename}_{serial_number}{extension}"
-        serial_number += 1
-
-
+    # serial_number = 1
+    # filename, extension = os.path.splitext(output_pdf)
+    # while os.path.exists(output_pdf):
+    #     # 如果文件已经存在，则添加流水号并重新检查
+    #     output_pdf = f"{filename}_{serial_number}{extension}"
+    #     serial_number += 1
+    if any_serial_num:
+        output_pdf = f"{filename}_{serial_number}{'.pdf'}"
+    else:
+        output_pdf = f"{filename}{'.pdf'}"
     workbook.save( output_excel )
     excel_to_pdf( output_excel, output_pdf )
     print('finish')
     pass
 
 
-# current_dir = os.path.dirname(__file__)
-# input_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx')
-# output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf')
-
-# excel_to_pdf(input_excel,output_pdf)
-
-# current_dir = os.path.dirname(__file__)
-# input_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx')
-# output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf')
-read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF)
+# read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF)
 
 
 
