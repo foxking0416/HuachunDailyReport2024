@@ -1,6 +1,7 @@
 #打包指令
 #pyinstaller --hidden-import "babel.numbers" PythonUI.py
 import ScheduleCount
+import ExportPdf
 from tkinter import *
 from tkcalendar import Calendar
 
@@ -66,6 +67,15 @@ def CalculateSchedule():
         label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
         label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
         label_real_rest_calendar_days_value.config(text= returnValue['RealRestCalendarkDays'])
+
+def ExportDailyReport():
+    if globalStartDate and globalCurrentDate:
+
+        if radio_var.get() == 'OneDayOff':
+            ExportPdf.read_data_and_export_file(ScheduleCount.WorkDay.ONE_DAY_OFF, globalStartDate, globalCurrentDate)
+        elif radio_var.get() == 'TwoDayOff':
+            ExportPdf.read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
+        pass
 
 group_frame_select_date = Frame(window)
 group_frame_select_date.pack(padx=10, pady=10)
@@ -206,9 +216,14 @@ label_real_rest_calendar_days.pack(side="left",padx=10)
 label_real_rest_calendar_days_value = Label(group_frame_real_rest_calendar_days, text="?")
 label_real_rest_calendar_days_value.pack(side="left", padx=10)
 
+group_frame_calculate_export = Frame(window)
+group_frame_calculate_export.pack(anchor="w")
 
-button_calculate = Button(window, text="計算", command=CalculateSchedule)
-button_calculate.pack(padx=5)
+button_calculate = Button(group_frame_calculate_export, text="計算", command=CalculateSchedule)
+button_calculate.pack(side="left",padx=5)
+
+button_export = Button(group_frame_calculate_export, text="輸出", command=ExportDailyReport)
+button_export.pack(side="left",padx=5)
 
 window.mainloop()
 

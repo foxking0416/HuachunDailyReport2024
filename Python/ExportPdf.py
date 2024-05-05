@@ -152,7 +152,7 @@ def excel_to_pdf(excel_file, pdf_file):
     wb.Close(False)
     excel.Quit()
 
-def read_data_and_export_file(eCountType):
+def read_data_and_export_file(eCountType, start_day, end_day):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
     dictGlobalWeatherRelatedHoliday = {}
@@ -163,7 +163,6 @@ def read_data_and_export_file(eCountType):
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
     input_excel =  os.path.join(current_dir, 'DailyReportTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
-    # output_pdf = os.path.join(current_dir, 'DailyReportFinal.pdf') 
     image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
     image_path_sun_all = os.path.join(current_dir, 'Image\\Sun_All.png') 
@@ -204,8 +203,18 @@ def read_data_and_export_file(eCountType):
     lastyear = 0
     for item in data:
         date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
-        year = date_obj.year
 
+        start_date_obj = datetime.datetime.strptime(start_day, "%Y-%m-%d")
+        end_date_obj = datetime.datetime.strptime(end_day, "%Y-%m-%d")
+
+        if date_obj < start_date_obj:
+            continue
+
+        if date_obj > end_date_obj:
+            break
+
+        year = date_obj.year
+        
         if year != lastyear:
             if lastyear != 0:
                 worksheet = workbook.copy_worksheet(worksheet)
@@ -218,6 +227,14 @@ def read_data_and_export_file(eCountType):
     lastyear = 0
     for item in data:
         date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
+        start_date_obj = datetime.datetime.strptime(start_day, "%Y-%m-%d")
+        end_date_obj = datetime.datetime.strptime(end_day, "%Y-%m-%d")
+        if date_obj < start_date_obj:
+            continue
+
+        if date_obj > end_date_obj:
+            break
+
         nWeekday = date_obj.weekday()
         year = date_obj.year
         cell_num = get_cell_num(item["date"])
@@ -282,6 +299,7 @@ def read_data_and_export_file(eCountType):
     #     output_pdf = f"{filename}_{serial_number}{extension}"
     #     serial_number += 1
     if any_serial_num:
+        serial_number -= 1
         output_pdf = f"{filename}_{serial_number}{'.pdf'}"
     else:
         output_pdf = f"{filename}{'.pdf'}"
@@ -291,7 +309,7 @@ def read_data_and_export_file(eCountType):
     pass
 
 
-# read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF)
+# read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF, '2023-02-10', '2023-04-16' )
 
 
 
