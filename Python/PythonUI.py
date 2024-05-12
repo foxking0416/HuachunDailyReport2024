@@ -43,30 +43,23 @@ def CalculateSchedule():
     ScheduleCount.LoadJsonHolidayData(arrConstHoliday,arrConstWorkday)
     ScheduleCount.LoadJsonDailyReportData(dictWeatherRelatedHoliday)
     ScheduleCount.LoadJsonExtendData(dictExtendData)
+    returnValue = None
     if radio_var.get() == 'OneDayOff':
         returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
-        label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
-        label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
-        label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
-        label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
-        label_from_start_work_days_value.config(text= returnValue['FromStartWorkDays'])
-        label_from_start_calendar_days_value.config(text= returnValue['FromStartCalendarDays'])
-        label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
-        label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
-        label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
-        label_real_rest_calendar_days_value.config(text= returnValue['RealRestCalendarkDays'])
     elif radio_var.get() == 'TwoDayOff':
         returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
-        label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
-        label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
-        label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
-        label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
-        label_from_start_work_days_value.config(text= returnValue['FromStartWorkDays'])
-        label_from_start_calendar_days_value.config(text= returnValue['FromStartCalendarDays'])
-        label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
-        label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
-        label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
-        label_real_rest_calendar_days_value.config(text= returnValue['RealRestCalendarkDays'])
+    elif radio_var.get() == 'NoDayOff':
+        returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+    label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
+    label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
+    label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
+    label_real_total_calendar_days_value.config(text= returnValue['RealTotalCalendarDays'])
+    label_from_start_work_days_value.config(text= returnValue['FromStartWorkDays'])
+    label_from_start_calendar_days_value.config(text= returnValue['FromStartCalendarDays'])
+    label_expect_rest_work_days_value.config(text= returnValue['ExpectRestWorkDays'])
+    label_expect_rest_calendar_days_value.config(text= returnValue['ExpectRestCalendarkDays'])
+    label_real_rest_work_days_value.config(text= returnValue['RealRestWorkDays'])
+    label_real_rest_calendar_days_value.config(text= returnValue['RealRestCalendarkDays'])
 
 def ExportDailyReport():
     if globalStartDate and globalCurrentDate:
@@ -108,6 +101,9 @@ label_current_date_value.pack(side="left")
 
 
 radio_var = StringVar()
+radio_button_no_day_off = Radiobutton(window, text="無周休", variable=radio_var, value="NoDayOff", command=UpdateRadioButtonSelection)
+radio_button_no_day_off.pack(padx=10, anchor="w")
+
 radio_button_one_day_off = Radiobutton(window, text="周休一日", variable=radio_var, value="OneDayOff", command=UpdateRadioButtonSelection)
 radio_button_one_day_off.pack(padx=10, anchor="w")
 
