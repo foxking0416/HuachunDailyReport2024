@@ -1,10 +1,10 @@
 import ScheduleCount
+import Utility
 import json
 import os
 import datetime
 import unittest
 import openpyxl
-import win32com.client
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
@@ -122,35 +122,6 @@ def get_week_num( date ):
         week_num += 1
     
     return week_num
-
-def excel_to_pdf(excel_file, pdf_file):
-    # 创建Excel应用程序对象
-    excel = win32com.client.Dispatch("Excel.Application")
-    # 打开Excel文件
-    wb = excel.Workbooks.Open(excel_file)
-
-    sheet_index = 0
-    for sheet in wb.Sheets:
-
-        serial_number = 1
-        filename, extension = os.path.splitext(pdf_file)
-        filename = filename + '_' + sheet.Name
-        output_pdf = filename + '.pdf'
-        while os.path.exists(output_pdf):
-            # 如果文件已经存在，则添加流水号并重新检查
-            output_pdf = f"{filename}_{serial_number}{extension}"
-            serial_number += 1
-
-        # 选择要保存为PDF的工作表
-        ws = wb.Worksheets[sheet_index]
-
-        # 将Excel文件保存为PDF
-        ws.ExportAsFixedFormat(0, output_pdf)
-        sheet_index += 1
-
-    # 关闭Excel文件和应用程序
-    wb.Close(False)
-    excel.Quit()
 
 def read_data_and_export_file(eCountType, start_day, end_day):
     arrGlobalConstHoliday = []
@@ -304,7 +275,7 @@ def read_data_and_export_file(eCountType, start_day, end_day):
     else:
         output_pdf = f"{filename}{'.pdf'}"
     workbook.save( output_excel )
-    excel_to_pdf( output_excel, output_pdf )
+    Utility.excel_to_pdf( output_excel, output_pdf )
     print('finish')
     pass
 
