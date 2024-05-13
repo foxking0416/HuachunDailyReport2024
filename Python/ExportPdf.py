@@ -126,8 +126,6 @@ def get_week_num( date ):
 def create_weather_report_form(eCountType, start_day, end_day):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
-    dictGlobalWeatherRelatedHoliday = {}
-    dictGlobalExtendData = {}
     ScheduleCount.LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
 
     current_dir = os.path.dirname(__file__)
@@ -136,16 +134,10 @@ def create_weather_report_form(eCountType, start_day, end_day):
     output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
     image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
-    image_path_sun_all = os.path.join(current_dir, 'Image\\Sun_All.png') 
-    image_path_rain_all = os.path.join(current_dir, 'Image\\Rain_All.png') 
-    image_path_sun_up_rain_down = os.path.join(current_dir, 'Image\\Sun_Up_Rain_Down.png') 
-    image_path_rain_up_sun_down = os.path.join(current_dir, 'Image\\Rain_Up_Sun_Down.png') 
     image_path_sun_up = os.path.join(current_dir, 'Image\\Sun_Up.png')
     image_path_sun_down = os.path.join(current_dir, 'Image\\Sun_Down.png')
     image_path_rain_up = os.path.join(current_dir, 'Image\\Rain_Up.png')
     image_path_rain_down = os.path.join(current_dir, 'Image\\Rain_Down.png') 
-
-    img_template = Image(image_path_sun_all)
 
 
 
