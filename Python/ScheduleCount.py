@@ -92,7 +92,7 @@ def CheckIsWorkDay(arrConstHoliday, arrConstWorkday, strDate, nWeekday, eCountTy
         elif eCountType == WorkDay.NO_DAY_OFF:
             return True
 
-def CountExpectFinishDate(eCountType, nExpectTotalWorkdays, strStart, arrConstHoliday, arrConstWorkday):
+def count_expect_finish_date(eCountType, nExpectTotalWorkdays, strStart, arrConstHoliday, arrConstWorkday):
     kStartDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
     kExpectEndDate = datetime.datetime.strptime(strStart, "%Y-%m-%d")
 
@@ -209,19 +209,19 @@ class TestFunction(unittest.TestCase):
     # 測試函數的測試用例
     def test_OneDayOffExpectFinishDate1(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        returnValue = CountExpectFinishDate(WorkDay.ONE_DAY_OFF, 1, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
+        returnValue = count_expect_finish_date(WorkDay.ONE_DAY_OFF, 1, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-01-03')
         self.assertEqual(returnValue['ExpectTotalCalendarDays'], 3)
 
     def test_OneDayOffExpectFinishDate2(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        returnValue = CountExpectFinishDate(WorkDay.ONE_DAY_OFF, 60, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
+        returnValue = count_expect_finish_date(WorkDay.ONE_DAY_OFF, 60, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-25')
         self.assertEqual(returnValue['ExpectTotalCalendarDays'], 84)
         
     def test_TwoDayOffExpectFinishDate(self):
         LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-        returnValue = CountExpectFinishDate(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
+        returnValue = count_expect_finish_date(WorkDay.TWO_DAY_OFF, 60, '2023-01-01', arrGlobalConstHoliday, arrGlobalConstWorkday)
         self.assertEqual(returnValue['ExpectFinishDate'], '2023-03-31')
         self.assertEqual(returnValue['ExpectTotalCalendarDays'], 90)
 
@@ -309,7 +309,7 @@ if __name__ == '__main__':
     unittest.main()
 
 # LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
-# endDate = CountExpectFinishDate('2023-01-01',0,60,arrGlobalConstHoliday,arrGlobalConstWorkday)
+# endDate = count_expect_finish_date('2023-01-01',0,60,arrGlobalConstHoliday,arrGlobalConstWorkday)
 
 # LoadJsonDailyReportData(dictGlobalWeatherRelatedHoliday)
 # CountFinishDate('2023-01-01',1,60,arrGlobalConstHoliday,arrGlobalConstWorkday,dictGlobalWeatherRelatedHoliday, '2023-01-17')
