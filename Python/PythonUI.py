@@ -65,9 +65,9 @@ def ExportDailyReport():
     if globalStartDate and globalCurrentDate:
 
         if radio_var.get() == 'OneDayOff':
-            ExportPdf.read_data_and_export_file(ScheduleCount.WorkDay.ONE_DAY_OFF, globalStartDate, globalCurrentDate)
+            ExportPdf.create_weather_report_form(ScheduleCount.WorkDay.ONE_DAY_OFF, globalStartDate, globalCurrentDate)
         elif radio_var.get() == 'TwoDayOff':
-            ExportPdf.read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
+            ExportPdf.create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
         pass
 
 group_frame_select_date = Frame(window)

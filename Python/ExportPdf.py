@@ -123,7 +123,7 @@ def get_week_num( date ):
     
     return week_num
 
-def read_data_and_export_file(eCountType, start_day, end_day):
+def create_weather_report_form(eCountType, start_day, end_day):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
     dictGlobalWeatherRelatedHoliday = {}
@@ -280,10 +280,10 @@ def read_data_and_export_file(eCountType, start_day, end_day):
     pass
 
 
-# read_data_and_export_file(ScheduleCount.WorkDay.TWO_DAY_OFF, '2023-02-10', '2023-04-16' )
 
 
 
+# create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, '2023-02-10', '2023-04-16' )
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
