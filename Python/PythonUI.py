@@ -40,16 +40,16 @@ def CalculateSchedule():
     arrConstWorkday = []
     dictWeatherRelatedHoliday = {}
     dictExtendData = {}
-    ScheduleCount.LoadJsonHolidayData(arrConstHoliday,arrConstWorkday)
-    ScheduleCount.LoadJsonDailyReportData(dictWeatherRelatedHoliday)
-    ScheduleCount.LoadJsonExtendData(dictExtendData)
+    ScheduleCount.load_json_holiday_data(arrConstHoliday,arrConstWorkday)
+    ScheduleCount.load_json_daily_report_data(dictWeatherRelatedHoliday)
+    ScheduleCount.load_json_extend_data(dictExtendData)
     returnValue = None
     if radio_var.get() == 'OneDayOff':
-        returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        returnValue = ScheduleCount.count_real_finish_date(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
     elif radio_var.get() == 'TwoDayOff':
-        returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        returnValue = ScheduleCount.count_real_finish_date(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
     elif radio_var.get() == 'NoDayOff':
-        returnValue = ScheduleCount.CountRealFinishDate(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        returnValue = ScheduleCount.count_real_finish_date(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
     label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
     label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
     label_real_finish_date_value.config(text= returnValue['RealFinishDate'])

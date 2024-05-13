@@ -126,7 +126,7 @@ def get_week_num( date ):
 def create_weather_report_form(eCountType, start_day, end_day):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
-    ScheduleCount.LoadJsonHolidayData(arrGlobalConstHoliday,arrGlobalConstWorkday)
+    ScheduleCount.load_json_holiday_data(arrGlobalConstHoliday,arrGlobalConstWorkday)
 
     current_dir = os.path.dirname(__file__)
     json_file_path = os.path.join(current_dir, 'DailyReport.json')
