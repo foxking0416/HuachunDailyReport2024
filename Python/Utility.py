@@ -1,5 +1,10 @@
 import os
 import win32com.client
+import openpyxl
+from openpyxl.drawing.image import Image
+from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
+from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
+from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
 def excel_to_pdf(excel_file, pdf_file):
     # 创建Excel应用程序对象
@@ -29,3 +34,17 @@ def excel_to_pdf(excel_file, pdf_file):
     # 关闭Excel文件和应用程序
     wb.Close(False)
     excel.Quit()
+
+def insert_image(worksheet, image_path, marker, size):
+    img = Image(image_path)
+    img.anchor = OneCellAnchor(_from=marker, ext=size)
+    worksheet.add_image(img)
+
+def number_to_string(n):
+    result = ''
+    while n > 0:
+        n -= 1
+        result = chr(ord('A') + n % 26) + result
+        n //= 26
+    return result
+

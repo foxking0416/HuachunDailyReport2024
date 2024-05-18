@@ -10,50 +10,6 @@ from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
-def insert_image_into_excel(input_excel, output_excel, image_path):
-    # Open the Excel file
-    workbook = openpyxl.load_workbook(input_excel)
-
-    # Select the active worksheet
-    worksheet = workbook.active
-    # ReadCellDimension(worksheet)
-
-    # Load the image
-    img = Image(image_path)
-    
-    # Calculate dimensions and resize if needed
-    c2e = cm_to_EMU
-    # Calculated number of cells width or height from cm into EMUs
-    cellh = lambda x: c2e((x * 49.77)/99)
-    cellw = lambda x: c2e((x * (18.65-1.71))/10)
-
-
-    h, w = img.height, img.width
-    p2e = pixels_to_EMU
-    size = XDRPositiveSize2D(p2e(w), p2e(h))
-
-    column = 1
-    coloffset = cellw(0.5)
-    row = 1
-    rowoffset = cellh(0.5)
-    marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
-    img.anchor = OneCellAnchor(_from=marker, ext=size)
-
-    worksheet.add_image(img)
-
-
-    img2 = Image(image_path)
-    img2.width, img2.height = img2.width * 0.2, img2.height * 0.2
-    column = 2
-    row = 2
-    marker = AnchorMarker(col=column, colOff=coloffset, row=row, rowOff=rowoffset)
-    img2.anchor = OneCellAnchor(_from=marker, ext=size)
-
-    worksheet.add_image(img2)
-
-    # Save the modified Excel file
-    workbook.save(output_excel)
-
 def fill_in_day_each_month(worksheet, input_year):
     first_day = str(input_year) + '-01-01'
     date_obj = datetime.datetime.strptime(first_day, "%Y-%m-%d")  
@@ -71,22 +27,9 @@ def fill_in_day_each_month(worksheet, input_year):
         cell_num = get_cell_num(str_date)
         column = cell_num['ColumnNum']
         row = cell_num['RowNum']+1
-        cell = number_to_string(column)+str(row)
+        cell = Utility.number_to_string(column)+str(row)
         worksheet[cell] = day
         date_obj += datetime.timedelta(days=1)
-
-def insert_image(worksheet, image_path, marker, size):
-    img = Image(image_path)
-    img.anchor = OneCellAnchor(_from=marker, ext=size)
-    worksheet.add_image(img)
-
-def number_to_string(n):
-    result = ''
-    while n > 0:
-        n -= 1
-        result = chr(ord('A') + n % 26) + result
-        n //= 26
-    return result
 
 def get_cell_num( date ):
     date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
@@ -104,7 +47,7 @@ def get_cell_num( date ):
     returnValue['WeekNum'] = week_num
     returnValue['RowNum'] = row_num
     returnValue['ColumnNum'] = column_num
-    returnValue['ColumnString'] = number_to_string( column_num )
+    returnValue['ColumnString'] = Utility.number_to_string( column_num )
     return returnValue
 
 def get_week_num( date ):
@@ -214,37 +157,37 @@ def create_weather_report_form(eCountType, start_day, end_day):
     
         print( item["date"])
         if item["morning_weather"] == 0:
-            insert_image( worksheet, image_path_sun_up, up_marker, half_size)
+            Utility.insert_image( worksheet, image_path_sun_up, up_marker, half_size)
         else:
-            insert_image( worksheet, image_path_rain_up, up_marker, half_size)
+            Utility.insert_image( worksheet, image_path_rain_up, up_marker, half_size)
         if item["afternoon_weather"] == 0:
-            insert_image( worksheet, image_path_sun_down, down_marker, half_size)
+            Utility.insert_image( worksheet, image_path_sun_down, down_marker, half_size)
         else:
-            insert_image( worksheet, image_path_rain_down, down_marker, half_size)
+            Utility.insert_image( worksheet, image_path_rain_down, down_marker, half_size)
 
 
 
         if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if nWeekday == 6:#Sunday
                 if item["date"] in arrGlobalConstWorkday:
-                    insert_image( worksheet, image_path_workday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
                 else:
-                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
             else:
                 if item["date"] in arrGlobalConstHoliday:
-                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if nWeekday == 6 or nWeekday == 5:#Sunday Saturday
                 if item["date"] in arrGlobalConstWorkday:
-                    insert_image( worksheet, image_path_workday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
                 else:
-                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
             else:
                 if item["date"] in arrGlobalConstHoliday:
-                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
             if item["date"] in arrGlobalConstHoliday:
-                    insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
 
     any_serial_num = False
     serial_number = 1
