@@ -1,7 +1,8 @@
 #打包指令
 #pyinstaller --hidden-import "babel.numbers" PythonUI.py
 import ScheduleCount
-import ExportPdf
+import ExportExpectFinishForm
+import ExportDailyReportForm
 from tkinter import *
 from tkcalendar import Calendar
 
@@ -65,10 +66,14 @@ def ExportDailyReport():
     if globalStartDate and globalCurrentDate:
 
         if radio_var.get() == 'OneDayOff':
-            ExportPdf.create_weather_report_form(ScheduleCount.WorkDay.ONE_DAY_OFF, globalStartDate, globalCurrentDate)
+            ExportDailyReportForm.create_weather_report_form(ScheduleCount.WorkDay.ONE_DAY_OFF, globalStartDate, globalCurrentDate)
         elif radio_var.get() == 'TwoDayOff':
-            ExportPdf.create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
-        pass
+            ExportDailyReportForm.create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
+        elif radio_var.get() == 'NoDayOff':
+            pass
+
+
+
 
 group_frame_select_date = Frame(window)
 group_frame_select_date.pack(padx=10, pady=10)
