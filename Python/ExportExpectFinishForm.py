@@ -11,7 +11,7 @@ from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
 
-def fill_in_day_each_month(obj_worksheet, n_input_year):
+def func_fill_in_day_each_month(obj_worksheet, n_input_year):
     str_first_day = str(n_input_year) + '-01-01'
     obj_date = datetime.datetime.strptime(str_first_day, "%Y-%m-%d")  
     b_is_leap_year = ( n_input_year % 4 == 0 )
@@ -25,14 +25,14 @@ def fill_in_day_each_month(obj_worksheet, n_input_year):
         n_day = obj_date.day
         str_date = obj_date.strftime("%Y-%m-%d")
 
-        obj_cell_num = get_cell_num(str_date)
+        obj_cell_num = func_get_cell_num(str_date)
         n_column = obj_cell_num['ColumnNum']
         n_row = obj_cell_num['RowNum']
         str_cell = Utility.number_to_string(n_column)+str(n_row)
         obj_worksheet[str_cell] = n_day
         obj_date += datetime.timedelta(days=1)
 
-def get_cell_num( str_date ):
+def func_get_cell_num( str_date ):
     obj_date = datetime.datetime.strptime(str_date, "%Y-%m-%d")
     n_month = obj_date.month
     n_day = obj_date.day
@@ -40,7 +40,7 @@ def get_cell_num( str_date ):
     if n_weekday == 0:
         n_weekday += 7
     n_row_num = 5 + n_month * 3
-    n_week_num = get_week_num( str_date )
+    n_week_num = func_get_week_num( str_date )
     n_column_num = 1 + ( n_week_num - 1 ) * 7 + n_weekday
 
 
@@ -51,7 +51,7 @@ def get_cell_num( str_date ):
     obj_returnValue['ColumnString'] = Utility.number_to_string( n_column_num )
     return obj_returnValue
 
-def get_week_num( str_date ):
+def func_get_week_num( str_date ):
     obj_date = datetime.datetime.strptime( str_date, "%Y-%m-%d")
     n_day = obj_date.day
 
@@ -67,7 +67,7 @@ def get_week_num( str_date ):
     
     return n_week_num
 
-def create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day):
+def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day):
     current_dir = os.path.dirname(__file__)
     input_excel =  os.path.join(current_dir, 'ExpectFinishFormTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'ExpectFinishFormFinal.xlsx') 
@@ -120,11 +120,11 @@ def create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day
 
         if n_year != n_lastyear:
             worksheet = workbook.worksheets[n_worksheet_index]
-            fill_in_day_each_month(worksheet, n_year)
+            func_fill_in_day_each_month(worksheet, n_year)
             n_lastyear = n_year
             n_worksheet_index += 1
 
-        obj_cell_num = get_cell_num(str_end_date)
+        obj_cell_num = func_get_cell_num(str_end_date)
         n_column = obj_cell_num['ColumnNum']-1
         n_row = obj_cell_num['RowNum']-1
         up_marker   = AnchorMarker(col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset)
@@ -187,4 +187,4 @@ def create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day
 
     pass
 
-# create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, '2023-01-01')
+# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, '2023-01-01')

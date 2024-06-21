@@ -10,7 +10,7 @@ from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
-def fill_in_day_each_month(worksheet, input_year):
+def func_fill_in_day_each_month(worksheet, input_year):
     first_day = str(input_year) + '-01-01'
     date_obj = datetime.datetime.strptime(first_day, "%Y-%m-%d")  
     is_leap_year = ( input_year % 4 == 0 )
@@ -24,14 +24,14 @@ def fill_in_day_each_month(worksheet, input_year):
         day = date_obj.day
         str_date = date_obj.strftime("%Y-%m-%d")
 
-        cell_num = get_cell_num(str_date)
+        cell_num = func_get_cell_num(str_date)
         column = cell_num['ColumnNum']
         row = cell_num['RowNum']+1
         cell = Utility.number_to_string(column)+str(row)
         worksheet[cell] = day
         date_obj += datetime.timedelta(days=1)
 
-def get_cell_num( date ):
+def func_get_cell_num( date ):
     date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
     month = date_obj.month
     day = date_obj.day
@@ -39,7 +39,7 @@ def get_cell_num( date ):
     if weekday == 0:
         weekday += 7
     row_num = 6 + month * 2
-    week_num = get_week_num( date )
+    week_num = func_get_week_num( date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
 
 
@@ -50,7 +50,7 @@ def get_cell_num( date ):
     returnValue['ColumnString'] = Utility.number_to_string( column_num )
     return returnValue
 
-def get_week_num( date ):
+def func_get_week_num( date ):
     date_obj = datetime.datetime.strptime(date, "%Y-%m-%d")
     day = date_obj.day
 
@@ -66,7 +66,7 @@ def get_week_num( date ):
     
     return week_num
 
-def create_weather_report_form(eCountType, start_day, end_day):
+def func_create_weather_report_form(eCountType, start_day, end_day):
     arrGlobalConstHoliday = []
     arrGlobalConstWorkday = []
     ScheduleCount.load_json_holiday_data(arrGlobalConstHoliday,arrGlobalConstWorkday)
@@ -143,7 +143,7 @@ def create_weather_report_form(eCountType, start_day, end_day):
 
         nWeekday = date_obj.weekday()
         year = date_obj.year
-        cell_num = get_cell_num(item["date"])
+        cell_num = func_get_cell_num(item["date"])
         column = cell_num['ColumnNum']-1
         row = cell_num['RowNum']-1
         up_marker = AnchorMarker(col=column, colOff=col_offset, row=row, rowOff=row_up_offset)
@@ -151,7 +151,7 @@ def create_weather_report_form(eCountType, start_day, end_day):
 
         if year != lastyear:
             worksheet = workbook.worksheets[worksheet_index]
-            fill_in_day_each_month(worksheet, year)
+            func_fill_in_day_each_month(worksheet, year)
             lastyear = year
             worksheet_index += 1
     
@@ -218,59 +218,59 @@ def create_weather_report_form(eCountType, start_day, end_day):
 
 
 
-# create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, '2023-02-10', '2023-04-16' )
+# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, '2023-02-10', '2023-04-16' )
 
 class TestFunction(unittest.TestCase):
     def test_week_number_1(self):
-        returnValue = get_cell_num('2024-02-14')
+        returnValue = func_get_cell_num('2024-02-14')
         self.assertEqual(returnValue['WeekNum'], 3)
         self.assertEqual(returnValue['RowNum'], 10)
         self.assertEqual(returnValue['ColumnNum'], 19)
         self.assertEqual(returnValue['ColumnString'], 'S')
 
-        returnValue = get_cell_num('2024-03-09')
+        returnValue = func_get_cell_num('2024-03-09')
         self.assertEqual(returnValue['WeekNum'], 2)
         self.assertEqual(returnValue['RowNum'], 12)
         self.assertEqual(returnValue['ColumnNum'], 15)
         self.assertEqual(returnValue['ColumnString'], 'O')
 
-        returnValue = get_cell_num('2024-03-10')
+        returnValue = func_get_cell_num('2024-03-10')
         self.assertEqual(returnValue['WeekNum'], 3)
         self.assertEqual(returnValue['RowNum'], 12)
         self.assertEqual(returnValue['ColumnNum'], 16)
         self.assertEqual(returnValue['ColumnString'], 'P')
 
-        returnValue = get_cell_num('2024-03-31')
+        returnValue = func_get_cell_num('2024-03-31')
         self.assertEqual(returnValue['WeekNum'], 6)
         self.assertEqual(returnValue['RowNum'], 12)
         self.assertEqual(returnValue['ColumnNum'], 37)
         self.assertEqual(returnValue['ColumnString'], 'AK')
 
-        returnValue = get_cell_num('2024-04-06')
+        returnValue = func_get_cell_num('2024-04-06')
         self.assertEqual(returnValue['WeekNum'], 1)
         self.assertEqual(returnValue['RowNum'], 14)
         self.assertEqual(returnValue['ColumnNum'], 8)
         self.assertEqual(returnValue['ColumnString'], 'H')
 
-        returnValue = get_cell_num('2024-04-07')
+        returnValue = func_get_cell_num('2024-04-07')
         self.assertEqual(returnValue['WeekNum'], 2)
         self.assertEqual(returnValue['RowNum'], 14)
         self.assertEqual(returnValue['ColumnNum'], 9)
         self.assertEqual(returnValue['ColumnString'], 'I')
 
-        returnValue = get_cell_num('2024-06-30')
+        returnValue = func_get_cell_num('2024-06-30')
         self.assertEqual(returnValue['WeekNum'], 6)
         self.assertEqual(returnValue['RowNum'], 18)
         self.assertEqual(returnValue['ColumnNum'], 37)
         self.assertEqual(returnValue['ColumnString'], 'AK')
 
-        returnValue = get_cell_num('2024-09-07')
+        returnValue = func_get_cell_num('2024-09-07')
         self.assertEqual(returnValue['WeekNum'], 1)
         self.assertEqual(returnValue['RowNum'], 24)
         self.assertEqual(returnValue['ColumnNum'], 8)
         self.assertEqual(returnValue['ColumnString'], 'H')
         
-        returnValue = get_cell_num('2024-09-14')
+        returnValue = func_get_cell_num('2024-09-14')
         self.assertEqual(returnValue['WeekNum'], 2)
         self.assertEqual(returnValue['RowNum'], 24)
         self.assertEqual(returnValue['ColumnNum'], 15)
