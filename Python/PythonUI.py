@@ -70,10 +70,17 @@ def ExportDailyReport():
         elif radio_var.get() == 'TwoDayOff':
             ExportDailyReportForm.create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
         elif radio_var.get() == 'NoDayOff':
-            pass
+            ExportDailyReportForm.create_weather_report_form(ScheduleCount.WorkDay.NO_DAY_OFF, globalStartDate, globalCurrentDate)
 
-
-
+def func_export_expect_finish_form():
+    if globalStartDate and globalCurrentDate:
+        if radio_var.get() == 'OneDayOff':
+            ExportExpectFinishForm.create_expect_finish_form(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate)
+        elif radio_var.get() == 'TwoDayOff':
+            ExportExpectFinishForm.create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate)
+        elif radio_var.get() == 'NoDayOff':
+            ExportExpectFinishForm.create_expect_finish_form(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var.get()), globalStartDate)
+    pass
 
 group_frame_select_date = Frame(window)
 group_frame_select_date.pack(padx=10, pady=10)
@@ -223,8 +230,11 @@ group_frame_calculate_export.pack(anchor="w")
 button_calculate = Button(group_frame_calculate_export, text="計算", command=CalculateSchedule)
 button_calculate.pack(side="left",padx=5)
 
-button_export = Button(group_frame_calculate_export, text="輸出", command=ExportDailyReport)
-button_export.pack(side="left",padx=5)
+button_export_dailyreport = Button(group_frame_calculate_export, text="輸出晴雨日報表", command=ExportDailyReport)
+button_export_dailyreport.pack(side="left",padx=5)
+
+button_export_expect_finish = Button(group_frame_calculate_export, text="輸出預計完工表", command=func_export_expect_finish_form)
+button_export_expect_finish.pack(side="left",padx=5)
 
 window.mainloop()
 
