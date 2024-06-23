@@ -33,7 +33,7 @@ def func_load_json_holiday_data(arrConstHoliday, arrConstWorkday):
     # 取得目前工作目錄
     current_dir = os.path.dirname(__file__)
     # 組合JSON檔案的路徑
-    json_file_path = os.path.join(current_dir, 'Holiday.json')
+    json_file_path = os.path.join(current_dir, 'ExternalData\\Holiday.json')
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -49,7 +49,7 @@ def func_load_json_holiday_data(arrConstHoliday, arrConstWorkday):
 # 從 DailyReport.json 的檔案讀取美日資料
 def func_load_json_daily_report_data(dictWeatherRelatedHoliday):
     current_dir = os.path.dirname(__file__)
-    json_file_path = os.path.join(current_dir, 'DailyReport.json')
+    json_file_path = os.path.join(current_dir, 'ExternalData\\DailyReport.json')
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -65,7 +65,7 @@ def func_load_json_daily_report_data(dictWeatherRelatedHoliday):
 # 從 ExtendData.json 的檔案讀取美日資料
 def func_load_json_extend_data(dictExtendData):
     current_dir = os.path.dirname(__file__)
-    json_file_path = os.path.join(current_dir, 'ExtendData.json')
+    json_file_path = os.path.join(current_dir, 'ExternalData\\ExtendData.json')
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)

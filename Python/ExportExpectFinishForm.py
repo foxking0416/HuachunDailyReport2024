@@ -69,10 +69,10 @@ def func_get_week_num( str_date ):
 
 def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day):
     current_dir = os.path.dirname(__file__)
-    input_excel =  os.path.join(current_dir, 'ExpectFinishFormTemplate.xlsx')
+    input_excel =  os.path.join(current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'ExpectFinishFormFinal.xlsx') 
-    image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
-    image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
+    image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
+    image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
 
     c2e = cm_to_EMU
     # Calculated number of cells width or height from cm into EMUs

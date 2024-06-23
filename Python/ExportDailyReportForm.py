@@ -72,15 +72,15 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
     ScheduleCount.func_load_json_holiday_data(arrGlobalConstHoliday,arrGlobalConstWorkday)
 
     current_dir = os.path.dirname(__file__)
-    json_file_path = os.path.join(current_dir, 'DailyReport.json')
-    input_excel =  os.path.join(current_dir, 'DailyReportTemplate.xlsx')
+    json_file_path = os.path.join(current_dir, 'ExternalData\\DailyReport.json')
+    input_excel =  os.path.join(current_dir, 'ExternalData\\DailyReportTemplate.xlsx')
     output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
-    image_path_holiday = os.path.join(current_dir, 'Image\\Holiday.png') 
-    image_path_workday = os.path.join(current_dir, 'Image\\Workday.png') 
-    image_path_sun_up = os.path.join(current_dir, 'Image\\Sun_Up.png')
-    image_path_sun_down = os.path.join(current_dir, 'Image\\Sun_Down.png')
-    image_path_rain_up = os.path.join(current_dir, 'Image\\Rain_Up.png')
-    image_path_rain_down = os.path.join(current_dir, 'Image\\Rain_Down.png') 
+    image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
+    image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
+    image_path_sun_up = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Up.png')
+    image_path_sun_down = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Down.png')
+    image_path_rain_up = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Up.png')
+    image_path_rain_down = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Down.png') 
 
 
 
