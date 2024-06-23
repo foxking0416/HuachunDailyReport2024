@@ -93,9 +93,9 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
 
     arr_const_holiday = []
     arr_const_workday = []
-    ScheduleCount.load_json_holiday_data(arr_const_holiday, arr_const_workday)
+    ScheduleCount.func_load_json_holiday_data(arr_const_holiday, arr_const_workday)
 
-    obj_return_value = ScheduleCount.count_expect_finish_date(eCountType, n_expect_total_workdays, str_start_day, arr_const_holiday, arr_const_workday)
+    obj_return_value = ScheduleCount.func_count_expect_finish_date(eCountType, n_expect_total_workdays, str_start_day, arr_const_holiday, arr_const_workday)
     str_expect_finish_date = obj_return_value['ExpectFinishDate']
     obj_start_date = datetime.datetime.strptime(str_start_day, "%Y-%m-%d")
     obj_end_date = datetime.datetime.strptime(str_expect_finish_date, "%Y-%m-%d")
@@ -155,7 +155,7 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
             if str_end_date in arr_const_holiday:
                     Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
 
-        if ScheduleCount.check_is_work_day(arr_const_holiday, arr_const_workday, str_end_date, n_weekday, eCountType):
+        if ScheduleCount.func_check_is_work_day(arr_const_holiday, arr_const_workday, str_end_date, n_weekday, eCountType):
             n_expect_total_workdays -= 1
             n_workdays_from_start += 1
 
