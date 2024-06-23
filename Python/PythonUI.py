@@ -1,6 +1,6 @@
 #打包指令
 #pyinstaller --hidden-import "babel.numbers" PythonUI.py
-# pyinstaller --hidden-import "babel.numbers" --add-data "source_path;." PythonUI.py
+# pyinstaller --hidden-import "babel.numbers" --add-data "ExternalData;./ExternalData" PythonUI.py
 import ScheduleCount
 import ExportExpectFinishForm
 import ExportDailyReportForm

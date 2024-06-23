@@ -72,9 +72,10 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
     ScheduleCount.func_load_json_holiday_data(arrGlobalConstHoliday,arrGlobalConstWorkday)
 
     current_dir = os.path.dirname(__file__)
+    parent_dir = os.path.dirname(current_dir)
     json_file_path = os.path.join(current_dir, 'ExternalData\\DailyReport.json')
     input_excel =  os.path.join(current_dir, 'ExternalData\\DailyReportTemplate.xlsx')
-    output_excel = os.path.join(current_dir, 'DailyReportFinal.xlsx') 
+    output_excel = os.path.join(parent_dir, 'DailyReportFinal.xlsx') 
     image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
     image_path_sun_up = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Up.png')

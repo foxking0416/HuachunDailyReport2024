@@ -69,8 +69,9 @@ def func_get_week_num( str_date ):
 
 def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day):
     current_dir = os.path.dirname(__file__)
+    parent_dir = os.path.dirname(current_dir)
     input_excel =  os.path.join(current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
-    output_excel = os.path.join(current_dir, 'ExpectFinishFormFinal.xlsx') 
+    output_excel = os.path.join(parent_dir, 'ExpectFinishFormFinal.xlsx') 
     image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
 
