@@ -82,8 +82,12 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
     image_path_sun_down = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Down.png')
     image_path_rain_up = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Up.png')
     image_path_rain_down = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Down.png') 
-
-
+    image_path_heavyrain_up = os.path.join(current_dir, 'ExternalData\\Image\\HeavyRain_Up.png')
+    image_path_heavyrain_down = os.path.join(current_dir, 'ExternalData\\Image\\HeavyRain_Down.png') 
+    image_path_typhoon_up = os.path.join(current_dir, 'ExternalData\\Image\\Typhoon_Up.png')
+    image_path_typhoon_down = os.path.join(current_dir, 'ExternalData\\Image\\Typhoon_Down.png')
+    image_path_hot_up = os.path.join(current_dir, 'ExternalData\\Image\\Hot_Up.png')
+    image_path_hot_down = os.path.join(current_dir, 'ExternalData\\Image\\Hot_Down.png')
 
     c2e = cm_to_EMU
     # Calculated number of cells width or height from cm into EMUs
@@ -157,15 +161,27 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
             worksheet_index += 1
     
         print( item["date"])
-        if item["morning_weather"] == 0:
+        if item["morning_weather"] == 0:#晴天
             Utility.insert_image( worksheet, image_path_sun_up, up_marker, half_size)
-        else:
+        elif item["morning_weather"] == 1:#雨天
             Utility.insert_image( worksheet, image_path_rain_up, up_marker, half_size)
-        if item["afternoon_weather"] == 0:
-            Utility.insert_image( worksheet, image_path_sun_down, down_marker, half_size)
-        else:
-            Utility.insert_image( worksheet, image_path_rain_down, down_marker, half_size)
+        elif item["morning_weather"] == 2:#豪雨
+            Utility.insert_image( worksheet, image_path_heavyrain_up, up_marker, half_size)
+        elif item["morning_weather"] == 3:#颱風
+            Utility.insert_image( worksheet, image_path_typhoon_up, up_marker, half_size)
+        elif item["morning_weather"] == 4:#酷熱
+            Utility.insert_image( worksheet, image_path_hot_up, up_marker, half_size)
 
+        if item["afternoon_weather"] == 0:#晴天
+            Utility.insert_image( worksheet, image_path_sun_down, down_marker, half_size)
+        elif item["afternoon_weather"] == 1:#雨天
+            Utility.insert_image( worksheet, image_path_rain_down, down_marker, half_size)
+        elif item["afternoon_weather"] == 2:#豪雨
+            Utility.insert_image( worksheet, image_path_rain_down, down_marker, half_size)
+        elif item["afternoon_weather"] == 3:#颱風
+            Utility.insert_image( worksheet, image_path_typhoon_down, down_marker, half_size)
+        elif item["afternoon_weather"] == 4:#酷熱
+            Utility.insert_image( worksheet, image_path_hot_down, down_marker, half_size)
 
 
         if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
