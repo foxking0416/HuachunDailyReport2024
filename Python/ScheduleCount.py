@@ -46,8 +46,26 @@ def func_load_json_holiday_data(arrConstHoliday, arrConstWorkday):
     # print(arrWorkday)
 
 
-# 從 DailyReport.json 的檔案讀取美日資料
-def func_load_json_daily_report_data(dictWeatherRelatedHoliday):
+# 從 ConditionSetting.json 的檔案讀取每日資料
+def func_load_json_condition_setting_data(dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting):
+    current_dir = os.path.dirname(__file__)
+    json_file_path = os.path.join(current_dir, 'ExternalData\\ConditionSetting.json')
+    with open(json_file_path,'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    for item in data:
+        weather_condition = item["weather_condition"]
+        dict_morning_weather_condition_setting[weather_condition] = item["morning_nocount"]
+        dict_afternoon_weather_condition_setting[weather_condition] = item["afternoon_nocount"]
+
+
+# 從 DailyReport.json 的檔案讀取每日資料
+def func_load_json_daily_report_data(dict_weather_related_holiday):
+
+    dict_morning_weather_condition_setting = {}
+    dict_afternoon_weather_condition_setting = {}
+    func_load_json_condition_setting_data(dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting)
+
     current_dir = os.path.dirname(__file__)
     json_file_path = os.path.join(current_dir, 'ExternalData\\DailyReport.json')
 
@@ -56,14 +74,39 @@ def func_load_json_daily_report_data(dictWeatherRelatedHoliday):
 
     for item in data:
         date = item["date"]
-        if(item["morning_weather"] != 0 or item["morning_other"] != 0 ):
-            dictWeatherRelatedHoliday[date] = CountWorkingDay.NO_COUNT
-        elif(item["afternoon_weather"] != 0 or item["afternoon_other"] != 0 ):
-            dictWeatherRelatedHoliday[date] = CountWorkingDay.COUNT_HALF_DAY
-    
 
-# 從 ExtendData.json 的檔案讀取美日資料
-def func_load_json_extend_data(dictExtendData):
+        morning_weather = item["morning_weather"]
+        morning_other = item["morning_other"]
+        afternoon_weather = item["afternoon_weather"]
+        afternoon_other = item["afternoon_other"]
+        nocount = 0
+        if(morning_weather != 0 or morning_other != 0 ):
+            if morning_weather in dict_morning_weather_condition_setting:
+                morning_nocount = dict_morning_weather_condition_setting[morning_weather]
+
+                if morning_nocount == 1:
+                    dict_weather_related_holiday[date] = CountWorkingDay.NO_COUNT
+                    continue
+                elif morning_nocount == 0.5:
+                    nocount = 0.5
+
+        if(afternoon_weather != 0 or afternoon_other != 0 ):
+            if afternoon_weather in dict_afternoon_weather_condition_setting:
+                afternoon_nocount = dict_afternoon_weather_condition_setting[afternoon_weather]
+
+                if afternoon_nocount == 1:
+                    dict_weather_related_holiday[date] = CountWorkingDay.NO_COUNT
+                    continue
+                elif afternoon_nocount == 0.5:
+                    nocount += 0.5
+
+        if nocount == 0.5:
+            dict_weather_related_holiday[date] = CountWorkingDay.COUNT_HALF_DAY
+        elif nocount == 1:
+            dict_weather_related_holiday[date] = CountWorkingDay.NO_COUNT
+
+# 從 ExtendData.json 的檔案讀取每日資料
+def func_load_json_extend_data(dict_extend_data):
     current_dir = os.path.dirname(__file__)
     json_file_path = os.path.join(current_dir, 'ExternalData\\ExtendData.json')
 
@@ -71,7 +114,7 @@ def func_load_json_extend_data(dictExtendData):
         data = json.load(f)
 
     for item in data:
-        dictExtendData[item["extend_start_date"]] = item["extend_days"]
+        dict_extend_data[item["extend_start_date"]] = item["extend_days"]
 
 
 

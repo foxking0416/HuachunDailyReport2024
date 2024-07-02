@@ -1,0 +1,26 @@
+[
+  {
+	"_comment":"下雨",
+    "weather_condition":1,
+    "morning_nocount":0.5,
+	"afternoon_nocount":0.5
+  },
+  {
+	"_comment":"豪雨",
+    "weather_condition":2,
+    "morning_nocount":1,
+	"afternoon_nocount":0.5
+  },
+  {
+	"_comment":"颱風",
+    "weather_condition":3,
+    "morning_nocount":1,
+	"afternoon_nocount":0.5
+  },
+  {
+	"_comment":"酷熱",
+    "weather_condition":4,
+    "morning_nocount":0,
+	"afternoon_nocount":0
+  }
+]

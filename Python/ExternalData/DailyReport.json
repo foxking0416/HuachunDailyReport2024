@@ -71,22 +71,22 @@
   },
   {
     "date":"2023-01-11",
-    "morning_weather":0,
+    "morning_weather":1,
     "afternoon_weather":0,
 	"morning_other":0,
     "afternoon_other":0
   },
   {
     "date":"2023-01-12",
-    "morning_weather":0,
-    "afternoon_weather":0,
+    "morning_weather":1,
+    "afternoon_weather":1,
 	"morning_other":0,
     "afternoon_other":0
   },
   {
     "date":"2023-01-13",
-    "morning_weather":0,
-    "afternoon_weather":0,
+    "morning_weather":4,
+    "afternoon_weather":4,
 	"morning_other":0,
     "afternoon_other":0
   },
