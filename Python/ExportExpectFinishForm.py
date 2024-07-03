@@ -72,6 +72,8 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
     parent_dir = os.path.dirname(current_dir)
     input_excel =  os.path.join(current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
     output_excel = os.path.join(parent_dir, 'ExpectFinishFormFinal.xlsx') 
+    image_path_start_day = os.path.join(current_dir, 'ExternalData\\Image\\StartDay.png') 
+    image_path_expect_finish_day = os.path.join(current_dir, 'ExternalData\\Image\\ExpectFinishDay.png') 
     image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
     image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
 
@@ -114,6 +116,8 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
     n_lastyear = 0
     n_worksheet_index = 0
     n_workdays_from_start = 0
+    b_insert_start_day_icon = False
+
     while(True):
         str_end_date = obj_end_date.strftime("%Y-%m-%d")
         n_weekday = obj_end_date.weekday()
@@ -129,6 +133,10 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
         n_column = obj_cell_num['ColumnNum']-1
         n_row = obj_cell_num['RowNum']-1
         up_marker   = AnchorMarker(col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset)
+
+        if not b_insert_start_day_icon:
+            Utility.insert_image( worksheet, image_path_start_day, up_marker, whole_size)
+            b_insert_start_day_icon = True
 
         n_column = obj_cell_num['ColumnNum']
         n_row = obj_cell_num['RowNum']+1
@@ -163,6 +171,7 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
         worksheet[cell] = n_workdays_from_start
         
         if(n_expect_total_workdays <= 0):
+            Utility.insert_image( worksheet, image_path_expect_finish_day, up_marker, whole_size)
             break
 
         obj_end_date += datetime.timedelta(days=1)
