@@ -68,14 +68,8 @@ def func_get_week_num( str_date ):
     return n_week_num
 
 def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day):
-    current_dir = os.path.dirname(__file__)
-    parent_dir = os.path.dirname(current_dir)
-    input_excel =  os.path.join(current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
-    output_excel = os.path.join(parent_dir, 'ExpectFinishFormFinal.xlsx') 
-    image_path_start_day = os.path.join(current_dir, 'ExternalData\\Image\\StartDay.png') 
-    image_path_expect_finish_day = os.path.join(current_dir, 'ExternalData\\Image\\ExpectFinishDay.png') 
-    image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
-    image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
+    input_excel =  os.path.join(Utility.current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
+    output_excel = os.path.join(Utility.parent_dir, 'ExpectFinishFormFinal.xlsx') 
 
     c2e = cm_to_EMU
     # Calculated number of cells width or height from cm into EMUs
@@ -135,7 +129,7 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
         up_marker   = AnchorMarker(col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset)
 
         if not b_insert_start_day_icon:
-            Utility.insert_image( worksheet, image_path_start_day, up_marker, whole_size)
+            Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size)
             b_insert_start_day_icon = True
 
         n_column = obj_cell_num['ColumnNum']
@@ -145,24 +139,24 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
         if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if n_weekday == 6:#Sunday
                 if str_end_date in arr_const_workday:
-                    Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size)
                 else:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
             else:
                 if str_end_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if n_weekday == 6 or n_weekday == 5:#Sunday Saturday
                 if str_end_date in arr_const_workday:
-                    Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size)
                 else:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
             else:
                 if str_end_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
             if str_end_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
 
         if ScheduleCount.func_check_is_work_day(arr_const_holiday, arr_const_workday, str_end_date, n_weekday, eCountType):
             n_expect_total_workdays -= 1
@@ -171,7 +165,7 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
         worksheet[cell] = n_workdays_from_start
         
         if(n_expect_total_workdays <= 0):
-            Utility.insert_image( worksheet, image_path_expect_finish_day, up_marker, whole_size)
+            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, whole_size)
             break
 
         obj_end_date += datetime.timedelta(days=1)

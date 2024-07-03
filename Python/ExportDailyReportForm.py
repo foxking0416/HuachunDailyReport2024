@@ -71,25 +71,9 @@ def func_create_weather_report_form(eCountType, start_day, current_day):
     arr_const_workday = []
     ScheduleCount.func_load_json_holiday_data(arr_const_holiday,arr_const_workday)
 
-    current_dir = os.path.dirname(__file__)
-    parent_dir = os.path.dirname(current_dir)
-    json_file_path = os.path.join(current_dir, 'ExternalData\\DailyReport.json')
-    input_excel =  os.path.join(current_dir, 'ExternalData\\DailyReportTemplate.xlsx')
-    output_excel = os.path.join(parent_dir, 'DailyReportFinal.xlsx') 
-    image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
-    image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
-    image_path_start_day = os.path.join(current_dir, 'ExternalData\\Image\\StartDay.png') 
-    image_path_expect_finish_day = os.path.join(current_dir, 'ExternalData\\Image\\ExpectFinishDay.png') 
-    image_path_sun_up = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Up.png')
-    image_path_sun_down = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Down.png')
-    image_path_rain_up = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Up.png')
-    image_path_rain_down = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Down.png') 
-    image_path_heavyrain_up = os.path.join(current_dir, 'ExternalData\\Image\\HeavyRain_Up.png')
-    image_path_heavyrain_down = os.path.join(current_dir, 'ExternalData\\Image\\HeavyRain_Down.png') 
-    image_path_typhoon_up = os.path.join(current_dir, 'ExternalData\\Image\\Typhoon_Up.png')
-    image_path_typhoon_down = os.path.join(current_dir, 'ExternalData\\Image\\Typhoon_Down.png')
-    image_path_hot_up = os.path.join(current_dir, 'ExternalData\\Image\\Hot_Up.png')
-    image_path_hot_down = os.path.join(current_dir, 'ExternalData\\Image\\Hot_Down.png')
+    json_file_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
+    input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplate.xlsx')
+    output_excel = os.path.join( Utility.parent_dir, 'DailyReportFinal.xlsx') 
 
 
     c2e = cm_to_EMU
@@ -166,49 +150,49 @@ def func_create_weather_report_form(eCountType, start_day, current_day):
     
         print( item["date"])
         if item["morning_weather"] == 0:#晴天
-            Utility.insert_image( worksheet, image_path_sun_up, up_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_sun_up, up_marker, half_size)
         elif item["morning_weather"] == 1:#雨天
-            Utility.insert_image( worksheet, image_path_rain_up, up_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_rain_up, up_marker, half_size)
         elif item["morning_weather"] == 2:#豪雨
-            Utility.insert_image( worksheet, image_path_heavyrain_up, up_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_heavyrain_up, up_marker, half_size)
         elif item["morning_weather"] == 3:#颱風
-            Utility.insert_image( worksheet, image_path_typhoon_up, up_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_typhoon_up, up_marker, half_size)
         elif item["morning_weather"] == 4:#酷熱
-            Utility.insert_image( worksheet, image_path_hot_up, up_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_hot_up, up_marker, half_size)
 
         if item["afternoon_weather"] == 0:#晴天
-            Utility.insert_image( worksheet, image_path_sun_down, down_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_sun_down, down_marker, half_size)
         elif item["afternoon_weather"] == 1:#雨天
-            Utility.insert_image( worksheet, image_path_rain_down, down_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_rain_down, down_marker, half_size)
         elif item["afternoon_weather"] == 2:#豪雨
-            Utility.insert_image( worksheet, image_path_heavyrain_down, down_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_heavyrain_down, down_marker, half_size)
         elif item["afternoon_weather"] == 3:#颱風
-            Utility.insert_image( worksheet, image_path_typhoon_down, down_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_typhoon_down, down_marker, half_size)
         elif item["afternoon_weather"] == 4:#酷熱
-            Utility.insert_image( worksheet, image_path_hot_down, down_marker, half_size)
+            Utility.insert_image( worksheet, Utility.image_path_hot_down, down_marker, half_size)
 
 
         if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if nWeekday == 6:#Sunday
                 if item["date"] in arr_const_workday:
-                    Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size)
                 else:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
             else:
                 if item["date"] in arr_const_holiday:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if nWeekday == 6 or nWeekday == 5:#Sunday Saturday
                 if item["date"] in arr_const_workday:
-                    Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size)
                 else:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
             else:
                 if item["date"] in arr_const_holiday:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
             if item["date"] in arr_const_holiday:
-                    Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
 
 
     worksheet = workbook.worksheets[0]
@@ -216,7 +200,7 @@ def func_create_weather_report_form(eCountType, start_day, current_day):
     column = cell_num['ColumnNum']-1
     row = cell_num['RowNum']-1
     up_marker = AnchorMarker(col=column, colOff=col_offset, row=row, rowOff=row_up_offset)
-    Utility.insert_image( worksheet, image_path_start_day, up_marker, whole_size)
+    Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size)
 
     any_serial_num = False
     serial_number = 1
