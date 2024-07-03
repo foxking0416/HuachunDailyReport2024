@@ -32,7 +32,7 @@ def func_update_radio_button_selection():
     # selection_label.config(text="Selected option: " + selected_option)
 
 def func_update_value():
-    selected_value = spinbox_var.get()
+    selected_value = spinbox_var_total_work_days.get()
     # value_label.config(text="Selected value: " + selected_value)
 
 
@@ -46,11 +46,11 @@ def func_calculate_schedule():
     ScheduleCount.func_load_json_extend_data(dictExtendData)
     returnValue = None
     if radio_var.get() == 'OneDayOff':
-        returnValue = ScheduleCount.func_count_real_finish_date(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        returnValue = ScheduleCount.func_count_real_finish_date(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
     elif radio_var.get() == 'TwoDayOff':
-        returnValue = ScheduleCount.func_count_real_finish_date(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        returnValue = ScheduleCount.func_count_real_finish_date(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
     elif radio_var.get() == 'NoDayOff':
-        returnValue = ScheduleCount.func_count_real_finish_date(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
+        returnValue = ScheduleCount.func_count_real_finish_date(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate, globalCurrentDate, arrConstHoliday, arrConstWorkday, dictWeatherRelatedHoliday, dictExtendData)
     label_expect_finish_date_value.config(text= returnValue['ExpectFinishDate'])
     label_expect_total_calendar_days_value.config(text= returnValue['ExpectTotalCalendarDays'])
     label_real_finish_date_value.config(text= returnValue['RealFinishDate'])
@@ -66,20 +66,20 @@ def func_export_daily_eport():
     if globalStartDate and globalCurrentDate:
 
         if radio_var.get() == 'OneDayOff':
-            ExportDailyReportForm.func_create_weather_report_form(ScheduleCount.WorkDay.ONE_DAY_OFF, globalStartDate, globalCurrentDate)
+            ExportDailyReportForm.func_create_weather_report_form(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate, globalCurrentDate)
         elif radio_var.get() == 'TwoDayOff':
-            ExportDailyReportForm.func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, globalStartDate, globalCurrentDate)
+            ExportDailyReportForm.func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate, globalCurrentDate)
         elif radio_var.get() == 'NoDayOff':
-            ExportDailyReportForm.func_create_weather_report_form(ScheduleCount.WorkDay.NO_DAY_OFF, globalStartDate, globalCurrentDate)
+            ExportDailyReportForm.func_create_weather_report_form(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate, globalCurrentDate)
 
 def func_export_expect_finish_form():
     if globalStartDate and globalCurrentDate:
         if radio_var.get() == 'OneDayOff':
-            ExportExpectFinishForm.func_create_expect_finish_form(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var.get()), globalStartDate)
+            ExportExpectFinishForm.func_create_expect_finish_form(ScheduleCount.WorkDay.ONE_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate)
         elif radio_var.get() == 'TwoDayOff':
-            ExportExpectFinishForm.func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var.get()), globalStartDate)
+            ExportExpectFinishForm.func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate)
         elif radio_var.get() == 'NoDayOff':
-            ExportExpectFinishForm.func_create_expect_finish_form(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var.get()), globalStartDate)
+            ExportExpectFinishForm.func_create_expect_finish_form(ScheduleCount.WorkDay.NO_DAY_OFF, int(spinbox_var_total_work_days.get()), globalStartDate)
     pass
 
 group_frame_select_date = Frame(window)
@@ -130,8 +130,8 @@ group_frame_total_work_days.pack(anchor="w")
 label_total_work_days = Label(group_frame_total_work_days, text="契約工期")
 label_total_work_days.pack(side="left", padx=10, anchor="w")
 
-spinbox_var = StringVar()
-spinbox_total_work_days = Spinbox(group_frame_total_work_days, from_=1, to=1000, textvariable=spinbox_var, command=func_update_value)
+spinbox_var_total_work_days = StringVar()
+spinbox_total_work_days = Spinbox(group_frame_total_work_days, from_=1, to=1000, textvariable=spinbox_var_total_work_days, command=func_update_value)
 spinbox_total_work_days.pack(side="left")
 
 

@@ -66,10 +66,12 @@ def func_get_week_num( date ):
     
     return week_num
 
-def func_create_weather_report_form(eCountType, start_day, current_day):
+def func_create_weather_report_form(eCountType, n_expect_total_workdays, start_day, current_day):
     arr_const_holiday = []
     arr_const_workday = []
     ScheduleCount.func_load_json_holiday_data(arr_const_holiday,arr_const_workday)
+
+    obj_return_value = ScheduleCount.func_count_expect_finish_date(eCountType, n_expect_total_workdays, start_day, arr_const_holiday, arr_const_workday)
 
     json_file_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
     input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplate.xlsx')
