@@ -66,10 +66,10 @@ def func_get_week_num( date ):
     
     return week_num
 
-def func_create_weather_report_form(eCountType, start_day, end_day):
-    arrGlobalConstHoliday = []
-    arrGlobalConstWorkday = []
-    ScheduleCount.func_load_json_holiday_data(arrGlobalConstHoliday,arrGlobalConstWorkday)
+def func_create_weather_report_form(eCountType, start_day, current_day):
+    arr_const_holiday = []
+    arr_const_workday = []
+    ScheduleCount.func_load_json_holiday_data(arr_const_holiday,arr_const_workday)
 
     current_dir = os.path.dirname(__file__)
     parent_dir = os.path.dirname(current_dir)
@@ -119,12 +119,12 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
         date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
 
         start_date_obj = datetime.datetime.strptime(start_day, "%Y-%m-%d")
-        end_date_obj = datetime.datetime.strptime(end_day, "%Y-%m-%d")
+        current_date_obj = datetime.datetime.strptime(current_day, "%Y-%m-%d")
 
         if date_obj < start_date_obj:
             continue
 
-        if date_obj > end_date_obj:
+        if date_obj > current_date_obj:
             break
 
         year = date_obj.year
@@ -143,11 +143,11 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
     for item in data:
         date_obj = datetime.datetime.strptime(item["date"], "%Y-%m-%d")
         start_date_obj = datetime.datetime.strptime(start_day, "%Y-%m-%d")
-        end_date_obj = datetime.datetime.strptime(end_day, "%Y-%m-%d")
+        current_date_obj = datetime.datetime.strptime(current_day, "%Y-%m-%d")
         if date_obj < start_date_obj:
             continue
 
-        if date_obj > end_date_obj:
+        if date_obj > current_date_obj:
             break
 
         nWeekday = date_obj.weekday()
@@ -190,24 +190,24 @@ def func_create_weather_report_form(eCountType, start_day, end_day):
 
         if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if nWeekday == 6:#Sunday
-                if item["date"] in arrGlobalConstWorkday:
+                if item["date"] in arr_const_workday:
                     Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
                 else:
                     Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
             else:
-                if item["date"] in arrGlobalConstHoliday:
+                if item["date"] in arr_const_holiday:
                     Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if nWeekday == 6 or nWeekday == 5:#Sunday Saturday
-                if item["date"] in arrGlobalConstWorkday:
+                if item["date"] in arr_const_workday:
                     Utility.insert_image( worksheet, image_path_workday, up_marker, whole_size)
                 else:
                     Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
             else:
-                if item["date"] in arrGlobalConstHoliday:
+                if item["date"] in arr_const_holiday:
                     Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
         elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
-            if item["date"] in arrGlobalConstHoliday:
+            if item["date"] in arr_const_holiday:
                     Utility.insert_image( worksheet, image_path_holiday, up_marker, whole_size)
 
 
