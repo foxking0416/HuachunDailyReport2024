@@ -11,9 +11,9 @@ from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
 
 
-def func_fill_in_day_each_month(obj_worksheet, n_input_year):
-    str_first_day = str(n_input_year) + '-01-01'
-    obj_date = datetime.datetime.strptime(str_first_day, "%Y-%m-%d")  
+def func_fill_in_day_each_month( obj_worksheet, n_input_year ):
+    str_first_day = str( n_input_year ) + '-01-01'
+    obj_date = datetime.datetime.strptime( str_first_day, "%Y-%m-%d" )  
     b_is_leap_year = ( n_input_year % 4 == 0 )
 
     if b_is_leap_year:
@@ -21,26 +21,24 @@ def func_fill_in_day_each_month(obj_worksheet, n_input_year):
     else:
         n_days_a_year = 365
 
-    for i in range(n_days_a_year):
+    for i in range( n_days_a_year ):
         n_day = obj_date.day
-        str_date = obj_date.strftime("%Y-%m-%d")
 
-        obj_cell_num = func_get_cell_num(str_date)
+        obj_cell_num = func_get_cell_num( obj_date )
         n_column = obj_cell_num['ColumnNum']
         n_row = obj_cell_num['RowNum']
-        str_cell = Utility.number_to_string(n_column)+str(n_row)
+        str_cell = Utility.number_to_string( n_column ) + str( n_row )
         obj_worksheet[str_cell] = n_day
-        obj_date += datetime.timedelta(days=1)
+        obj_date += datetime.timedelta( days = 1 )
 
-def func_get_cell_num( str_date ):
-    obj_date = datetime.datetime.strptime(str_date, "%Y-%m-%d")
+def func_get_cell_num( obj_date ):
     n_month = obj_date.month
     n_day = obj_date.day
     n_weekday = ( obj_date.weekday() + 2 ) % 7 
     if n_weekday == 0:
         n_weekday += 7
     n_row_num = 5 + n_month * 3
-    n_week_num = func_get_week_num( str_date )
+    n_week_num = func_get_week_num( obj_date )
     n_column_num = 1 + ( n_week_num - 1 ) * 7 + n_weekday
 
 
@@ -51,14 +49,13 @@ def func_get_cell_num( str_date ):
     obj_returnValue['ColumnString'] = Utility.number_to_string( n_column_num )
     return obj_returnValue
 
-def func_get_week_num( str_date ):
-    obj_date = datetime.datetime.strptime( str_date, "%Y-%m-%d")
+def func_get_week_num( obj_date ):
     n_day = obj_date.day
 
     n_weekday = ( obj_date.weekday() + 2 ) % 7 
     if n_weekday == 0:
         n_weekday += 7
-    n_week_num = (n_day - 1) // 7 + 1
+    n_week_num = ( n_day - 1 ) // 7 + 1
     n_rest = n_day % 7
     if n_rest == 0:
         n_rest += 7
@@ -67,7 +64,7 @@ def func_get_week_num( str_date ):
     
     return n_week_num
 
-def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_start_day):
+def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_start_date ):
     input_excel =  os.path.join(Utility.current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
     output_excel = os.path.join(Utility.parent_dir, 'ExpectFinishFormFinal.xlsx') 
 
@@ -90,85 +87,82 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
 
     arr_const_holiday = []
     arr_const_workday = []
-    ScheduleCount.func_load_json_holiday_data(arr_const_holiday, arr_const_workday)
+    ScheduleCount.func_load_json_holiday_data( arr_const_holiday, arr_const_workday )
 
-    obj_return_value = ScheduleCount.func_count_expect_finish_date(eCountType, n_expect_total_workdays, str_start_day, arr_const_holiday, arr_const_workday)
-    str_expect_finish_date = obj_return_value['ExpectFinishDate']
-    obj_start_date = datetime.datetime.strptime(str_start_day, "%Y-%m-%d")
-    obj_end_date = datetime.datetime.strptime(str_expect_finish_date, "%Y-%m-%d")
+    obj_return_value = ScheduleCount.func_count_expect_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, arr_const_holiday, arr_const_workday )
+    obj_end_date = obj_return_value['ExpectFinishDate']
     n_start_year = obj_start_date.year
     n_end_year = obj_end_date.year
     
     #先準備足夠年份的sheet
-    for n_year in range(n_start_year, n_end_year + 1):
+    for n_year in range( n_start_year, n_end_year + 1 ):
         if n_year != n_start_year:
-            worksheet = workbook.copy_worksheet(worksheet)
+            worksheet = workbook.copy_worksheet( worksheet )
         worksheet.title = str(n_year) + '年'
-        worksheet['B4'] = str(n_year) + '年(' + str(n_year-1911) + '年)' 
+        worksheet['B4'] = str(n_year) + '年(' + str( n_year - 1911 ) + '年)' 
 
-    obj_end_date = obj_start_date
+    obj_date = obj_start_date
     n_lastyear = 0
     n_worksheet_index = 0
     n_workdays_from_start = 0
     b_insert_start_day_icon = False
 
-    while(True):
-        str_end_date = obj_end_date.strftime("%Y-%m-%d")
-        n_weekday = obj_end_date.weekday()
-        n_year = obj_end_date.year
+    while( True ):
+        n_weekday = obj_date.weekday()
+        n_year = obj_date.year
 
         if n_year != n_lastyear:
-            worksheet = workbook.worksheets[n_worksheet_index]
-            func_fill_in_day_each_month(worksheet, n_year)
+            worksheet = workbook.worksheets[ n_worksheet_index ]
+            func_fill_in_day_each_month( worksheet, n_year )
             n_lastyear = n_year
             n_worksheet_index += 1
 
-        obj_cell_num = func_get_cell_num(str_end_date)
+        obj_cell_num = func_get_cell_num( obj_date )
         n_column = obj_cell_num['ColumnNum']-1
         n_row = obj_cell_num['RowNum']-1
-        up_marker   = AnchorMarker(col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset)
+        up_marker   = AnchorMarker( col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset )
 
         if not b_insert_start_day_icon:
-            Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size)
+            Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size )
             b_insert_start_day_icon = True
 
         n_column = obj_cell_num['ColumnNum']
         n_row = obj_cell_num['RowNum']+1
-        cell = Utility.number_to_string(n_column)+str(n_row)
+        cell = Utility.number_to_string( n_column ) + str( n_row )
 
-        if eCountType == ScheduleCount.WorkDay.ONE_DAY_OFF:
+        if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if n_weekday == 6:#Sunday
-                if str_end_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size)
+                if obj_date in arr_const_workday:
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
                 else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
             else:
-                if str_end_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
-        elif eCountType == ScheduleCount.WorkDay.TWO_DAY_OFF:
+                if obj_date in arr_const_holiday:
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+        elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if n_weekday == 6 or n_weekday == 5:#Sunday Saturday
-                if str_end_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size)
+                if obj_date in arr_const_workday:
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
                 else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
             else:
-                if str_end_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
-        elif eCountType == ScheduleCount.WorkDay.NO_DAY_OFF:
-            if str_end_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size)
+                if obj_date in arr_const_holiday:
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+        elif e_count_type == ScheduleCount.WorkDay.NO_DAY_OFF:
+            if obj_date in arr_const_holiday:
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
 
-        if ScheduleCount.func_check_is_work_day(arr_const_holiday, arr_const_workday, str_end_date, n_weekday, eCountType):
+        if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type ):
             n_expect_total_workdays -= 1
             n_workdays_from_start += 1
 
-        worksheet[cell] = n_workdays_from_start
+        worksheet[ cell ] = n_workdays_from_start
         
         if(n_expect_total_workdays <= 0):
-            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, whole_size)
+            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, whole_size )
             break
 
-        obj_end_date += datetime.timedelta(days=1)
+        obj_date += datetime.timedelta( days = 1 )
 
     any_serial_num = False
     serial_number = 1
@@ -191,4 +185,4 @@ def func_create_expect_finish_form(eCountType, n_expect_total_workdays, str_star
 
     pass
 
-# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, '2023-01-01')
+# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptisme('2023-01-01', "%Y-%m-%d") )

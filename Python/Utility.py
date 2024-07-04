@@ -16,6 +16,7 @@ image_path_holiday = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png
 image_path_workday = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
 image_path_start_day = os.path.join(current_dir, 'ExternalData\\Image\\StartDay.png') 
 image_path_expect_finish_day = os.path.join(current_dir, 'ExternalData\\Image\\ExpectFinishDay.png') 
+image_path_real_finish_day = os.path.join(current_dir, 'ExternalData\\Image\\RealFinishDay.png') 
 image_path_sun_up = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Up.png')
 image_path_sun_down = os.path.join(current_dir, 'ExternalData\\Image\\Sun_Down.png')
 image_path_rain_up = os.path.join(current_dir, 'ExternalData\\Image\\Rain_Up.png')
@@ -56,7 +57,7 @@ def excel_to_pdf(excel_file, pdf_file):
     wb.Close(False)
     excel.Quit()
 
-def insert_image(worksheet, image_path, marker, size):
+def insert_image( worksheet, image_path, marker, size ):
     img = Image(image_path)
     img.anchor = OneCellAnchor(_from=marker, ext=size)
     worksheet.add_image(img)
