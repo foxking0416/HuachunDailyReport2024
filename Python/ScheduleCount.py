@@ -1,7 +1,6 @@
 import json
 import os
 import datetime
-import unittest
 from enum import Enum
 
 class WorkDay(Enum):

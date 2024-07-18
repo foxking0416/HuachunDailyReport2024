@@ -1,9 +1,8 @@
 import ScheduleCount
 import Utility
-import json
+import LunarCalendar
 import os
 import datetime
-import unittest
 import openpyxl
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
@@ -65,6 +64,8 @@ def func_get_week_num( obj_date ):
     return n_week_num
 
 def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_start_date ):
+    LunarCalendar.func_load_lunar_holiday_data()
+
     input_excel =  os.path.join(Utility.current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
     output_excel = os.path.join(Utility.parent_dir, 'ExpectFinishFormFinal.xlsx') 
 
@@ -122,13 +123,20 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
         n_row = obj_cell_num['RowNum']-1
         up_marker   = AnchorMarker( col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset )
 
+        #插入開工日icon
         if not b_insert_start_day_icon:
             Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size )
             b_insert_start_day_icon = True
 
-        n_column = obj_cell_num['ColumnNum']
-        n_row = obj_cell_num['RowNum']+1
-        cell = Utility.number_to_string( n_column ) + str( n_row )
+        n_column = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
+        n_row_workdays_from_start = obj_cell_num['RowNum']+1
+        cell_workdays_from_start = Utility.number_to_string( n_column ) + str( n_row_workdays_from_start )
+
+        str_lunar_reason = LunarCalendar.func_get_lunar_reason( obj_date )
+        if str_lunar_reason != None:
+            n_row_note = obj_cell_num['RowNum']+2
+            cell_note = Utility.number_to_string( n_column ) + str( n_row_note )
+            worksheet[ cell_note ] = str_lunar_reason
 
         if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if n_weekday == 6:#Sunday
@@ -156,7 +164,7 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             n_expect_total_workdays -= 1
             n_workdays_from_start += 1
 
-        worksheet[ cell ] = n_workdays_from_start
+        worksheet[ cell_workdays_from_start ] = n_workdays_from_start
         
         if(n_expect_total_workdays <= 0):
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, whole_size )
