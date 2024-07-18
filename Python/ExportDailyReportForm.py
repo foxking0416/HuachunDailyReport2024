@@ -1,9 +1,9 @@
 import ScheduleCount
 import Utility
+import LunarCalendar
 import json
 import os
 import datetime
-import unittest
 import openpyxl
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
@@ -23,9 +23,9 @@ def func_fill_in_day_each_month( worksheet, input_year ):
     for i in range( days_a_year ):
         day = date_obj.day
 
-        cell_num = func_get_cell_num(date_obj)
-        column = cell_num['ColumnNum']
-        row = cell_num['RowNum']+1
+        obj_cell_num = func_get_cell_num( date_obj )
+        column = obj_cell_num['ColumnNum']
+        row = obj_cell_num['RowNum'] + 1
         cell = Utility.number_to_string(column)+str(row)
         worksheet[cell] = day
         date_obj += datetime.timedelta(days=1)
@@ -35,7 +35,7 @@ def func_get_cell_num( obj_date ):
     weekday = ( obj_date.weekday() + 2 ) % 7 
     if weekday == 0:
         weekday += 7
-    row_num = 6 + month * 2
+    row_num = 5 + month * 3
     week_num = func_get_week_num( obj_date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
 
@@ -69,8 +69,9 @@ def func_find_weather_data_by_date( weather_report_date, obj_date ):
     return None
 
 def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date ):
+    LunarCalendar.func_load_lunar_holiday_data()
     json_file_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
-    input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplate.xlsx')
+    input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar.xlsx')
     output_excel = os.path.join( Utility.parent_dir, 'DailyReportFinal.xlsx') 
 
     c2e = cm_to_EMU
@@ -120,17 +121,25 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         weather_data = func_find_weather_data_by_date( data, obj_date )
         nWeekday = obj_date.weekday()
         year = obj_date.year
-        cell_num = func_get_cell_num( obj_date )
-        column = cell_num['ColumnNum']-1
-        row = cell_num['RowNum']-1
-        up_marker = AnchorMarker( col=column, colOff=col_offset, row=row, rowOff=row_up_offset )
-        down_marker = AnchorMarker( col=column, colOff=col_offset, row=row, rowOff=row_down_offset )
+        obj_cell_num = func_get_cell_num( obj_date )
+        n_column_for_image = obj_cell_num['ColumnNum']-1
+        n_row_for_image = obj_cell_num['RowNum']-1
+        up_marker = AnchorMarker( col=n_column_for_image, colOff=col_offset, row=n_row_for_image, rowOff=row_up_offset )
+        down_marker = AnchorMarker( col=n_column_for_image, colOff=col_offset, row=n_row_for_image, rowOff=row_down_offset )
 
         if year != n_lastyear:
             worksheet = workbook.worksheets[ worksheet_index ]
             func_fill_in_day_each_month( worksheet, year )
             n_lastyear = year
             worksheet_index += 1
+
+        n_column_for_text = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
+
+        str_lunar_reason = LunarCalendar.func_get_lunar_reason( obj_date )
+        if str_lunar_reason != None:
+            n_row_for_note = obj_cell_num['RowNum']+2
+            cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
+            worksheet[ cell_note ] = str_lunar_reason
 
         if weather_data and obj_date <= obj_current_date:
             if weather_data["morning_weather"] == 0:#晴天
@@ -187,9 +196,9 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         obj_date += datetime.timedelta(days=1)
 
     worksheet = workbook.worksheets[0]
-    cell_num = func_get_cell_num( obj_start_date )
-    column = cell_num['ColumnNum']-1
-    row = cell_num['RowNum']-1
+    obj_cell_num = func_get_cell_num( obj_start_date )
+    column = obj_cell_num['ColumnNum']-1
+    row = obj_cell_num['RowNum']-1
     up_marker = AnchorMarker(col=column, colOff=col_offset, row=row, rowOff=row_up_offset)
     Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size)
 

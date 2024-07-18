@@ -119,23 +119,23 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             n_worksheet_index += 1
 
         obj_cell_num = func_get_cell_num( obj_date )
-        n_column = obj_cell_num['ColumnNum']-1
-        n_row = obj_cell_num['RowNum']-1
-        up_marker   = AnchorMarker( col = n_column, colOff = col_offset, row = n_row, rowOff = row_up_offset )
+        n_column_for_image = obj_cell_num['ColumnNum']-1
+        n_row_for_image = obj_cell_num['RowNum']-1
+        up_marker   = AnchorMarker( col = n_column_for_image, colOff = col_offset, row = n_row_for_image, rowOff = row_up_offset )
 
         #插入開工日icon
         if not b_insert_start_day_icon:
             Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size )
             b_insert_start_day_icon = True
 
-        n_column = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
+        n_column_for_text = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
         n_row_workdays_from_start = obj_cell_num['RowNum']+1
-        cell_workdays_from_start = Utility.number_to_string( n_column ) + str( n_row_workdays_from_start )
+        cell_workdays_from_start = Utility.number_to_string( n_column_for_text ) + str( n_row_workdays_from_start )
 
         str_lunar_reason = LunarCalendar.func_get_lunar_reason( obj_date )
         if str_lunar_reason != None:
-            n_row_note = obj_cell_num['RowNum']+2
-            cell_note = Utility.number_to_string( n_column ) + str( n_row_note )
+            n_row_for_note = obj_cell_num['RowNum']+2
+            cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
             worksheet[ cell_note ] = str_lunar_reason
 
         if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
