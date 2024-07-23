@@ -35,7 +35,7 @@ def func_get_cell_num( obj_date ):
     weekday = ( obj_date.weekday() + 2 ) % 7 
     if weekday == 0:
         weekday += 7
-    row_num = 5 + month * 3
+    row_num = 4 + month * 4
     week_num = func_get_week_num( obj_date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
 
@@ -117,9 +117,11 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     worksheet_index = 0
 
     obj_date = obj_start_date
+    n_workdays_from_start = 0
+
     while( True ):
         weather_data = func_find_weather_data_by_date( data, obj_date )
-        nWeekday = obj_date.weekday()
+        n_Weekday = obj_date.weekday()
         year = obj_date.year
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
@@ -140,6 +142,25 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             n_row_for_note = obj_cell_num['RowNum']+2
             cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
             worksheet[ cell_note ] = str_lunar_reason
+
+        n_row_workdays_from_start = obj_cell_num['RowNum']+3
+        cell_workdays_from_start = Utility.number_to_string( n_column_for_text ) + str( n_row_workdays_from_start )
+
+        if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_Weekday, e_count_type ):
+            if weather_data and obj_date <= obj_current_date:
+                if obj_date in dict_weather_related_holiday:
+                    if dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
+                        pass
+                    elif dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.COUNT_HALF_DAY:
+                        n_workdays_from_start += 0.5
+                    else:
+                        n_workdays_from_start += 1
+                else:
+                    n_workdays_from_start += 1
+            else:
+                n_workdays_from_start += 1
+
+        worksheet[ cell_workdays_from_start ] = n_workdays_from_start
 
         if weather_data and obj_date <= obj_current_date:
             if weather_data["morning_weather"] == 0:#晴天
@@ -165,7 +186,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 Utility.insert_image( worksheet, Utility.image_path_hot_down, down_marker, half_size )
 
         if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
-            if nWeekday == 6:#Sunday
+            if n_Weekday == 6:#Sunday
                 if obj_date in arr_const_workday:
                     Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
                 else:
@@ -174,7 +195,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 if obj_date in arr_const_holiday:
                     Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
         elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
-            if nWeekday == 6 or nWeekday == 5:#Sunday Saturday
+            if n_Weekday == 6 or n_Weekday == 5:#Sunday Saturday
                 if obj_date in arr_const_workday:
                     Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
                 else:
@@ -194,6 +215,8 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             break
 
         obj_date += datetime.timedelta(days=1)
+
+
 
     worksheet = workbook.worksheets[0]
     obj_cell_num = func_get_cell_num( obj_start_date )
