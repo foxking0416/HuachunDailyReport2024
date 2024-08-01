@@ -7,7 +7,15 @@ import datetime
 import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
-g_DailyReportType = Utility.DailyReportType.TYPE_B
+g_DailyReportType = Utility.DailyReportType.TYPE_A
+
+g_project_no = "Avenger001" #案號
+g_project_name = "鋼鐵人的基地興建工程" #工程名稱
+g_project_owner = "神盾局" #業主
+g_project_supervisor = "復仇者聯盟" #監造單位
+g_project_designer = "東尼史塔克" #設計單位
+g_project_contractor = "賈維斯" #承攬廠商 
+
 
 def func_fill_in_day_each_month( worksheet, input_year ):
     first_day = str( input_year ) + '-01-01'
@@ -172,6 +180,12 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             worksheet = workbook.copy_worksheet( worksheet )
         worksheet.title = str(n_year) + '年'
         worksheet['B4'] = str(n_year) + '年(' + str( n_year - 1911 ) + '年)' 
+        worksheet['D2'] = g_project_no
+        worksheet['D3'] = g_project_name
+        worksheet['W2'] = g_project_owner
+        worksheet['W3'] = g_project_supervisor
+        worksheet['AF2'] = g_project_designer
+        worksheet['AF3'] = g_project_contractor
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
