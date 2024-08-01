@@ -4,10 +4,7 @@ import LunarCalendar
 import os
 import datetime
 import openpyxl
-from openpyxl.drawing.image import Image
-from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
-from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
-from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
+from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
 
 def func_fill_in_day_each_month( obj_worksheet, n_input_year ):
@@ -69,20 +66,6 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
     input_excel =  os.path.join(Utility.current_dir, 'ExternalData\\ExpectFinishFormTemplate.xlsx')
     output_excel = os.path.join(Utility.parent_dir, 'ExpectFinishFormFinal.xlsx') 
 
-    c2e = cm_to_EMU
-    # Calculated number of cells width or height from cm into EMUs
-    cellh = lambda x: c2e((x * 49.77)/99)
-    cellw = lambda x: c2e((x * (18.65-1.71))/10)
-
-    col_offset = cellw(0.1) #60984
-    row_up_offset = cellh(0.25) #45245
-    row_down_offset = cellh(1) #180981
-
-    p2e = pixels_to_EMU
-
-    whole_size = XDRPositiveSize2D(p2e(30), p2e(30))
-    half_size = XDRPositiveSize2D(p2e(30), p2e(15))
-
     workbook = openpyxl.load_workbook(input_excel)
     worksheet = workbook.active
 
@@ -121,11 +104,11 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
         n_row_for_image = obj_cell_num['RowNum']-1
-        up_marker   = AnchorMarker( col = n_column_for_image, colOff = col_offset, row = n_row_for_image, rowOff = row_up_offset )
+        up_marker   = AnchorMarker( col = n_column_for_image, colOff = Utility.col_offset, row = n_row_for_image, rowOff = Utility.row_up_offset )
 
         #插入開工日icon
         if not b_insert_start_day_icon:
-            Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size )
+            Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, Utility.whole_size )
             b_insert_start_day_icon = True
 
         n_column_for_text = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
@@ -141,24 +124,24 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
         if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if n_weekday == 6:#Sunday
                 if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
                 else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
             else:
                 if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
         elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if n_weekday == 6 or n_weekday == 5:#Sunday Saturday
                 if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
                 else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
             else:
                 if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
         elif e_count_type == ScheduleCount.WorkDay.NO_DAY_OFF:
             if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
 
         if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type ):
             n_expect_total_workdays -= 1
@@ -167,7 +150,7 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
         worksheet[ cell_workdays_from_start ] = n_workdays_from_start
         
         if(n_expect_total_workdays <= 0):
-            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, whole_size )
+            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
             break
 
         obj_date += datetime.timedelta( days = 1 )
@@ -193,4 +176,4 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
 
     pass
 
-# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptisme('2023-01-01', "%Y-%m-%d") )
+# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-01', "%Y-%m-%d") )

@@ -5,10 +5,9 @@ import json
 import os
 import datetime
 import openpyxl
-from openpyxl.drawing.image import Image
-from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
-from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
-from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
+from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
+
+g_DailyReportType = Utility.DailyReportType.TYPE_A
 
 def func_fill_in_day_each_month( worksheet, input_year ):
     first_day = str( input_year ) + '-01-01'
@@ -25,9 +24,77 @@ def func_fill_in_day_each_month( worksheet, input_year ):
 
         obj_cell_num = func_get_cell_num( date_obj )
         column = obj_cell_num['ColumnNum']
-        row = obj_cell_num['RowNum'] + 1
-        cell = Utility.number_to_string(column)+str(row)
-        worksheet[cell] = day
+        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+            n_column_for_image = obj_cell_num['ColumnNum']-1
+            n_row_for_image = obj_cell_num['RowNum']-1
+            up_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_up_offset )
+            if day == 1:
+                Utility.insert_image( worksheet, Utility.image_path_day_01, up_marker, Utility.whole_size )
+            elif day == 2:
+                Utility.insert_image( worksheet, Utility.image_path_day_02, up_marker, Utility.whole_size )
+            elif day == 3:
+                Utility.insert_image( worksheet, Utility.image_path_day_03, up_marker, Utility.whole_size )
+            elif day == 4:
+                Utility.insert_image( worksheet, Utility.image_path_day_04, up_marker, Utility.whole_size )
+            elif day == 5:
+                Utility.insert_image( worksheet, Utility.image_path_day_05, up_marker, Utility.whole_size )
+            elif day == 6:
+                Utility.insert_image( worksheet, Utility.image_path_day_06, up_marker, Utility.whole_size )
+            elif day == 7:
+                Utility.insert_image( worksheet, Utility.image_path_day_07, up_marker, Utility.whole_size )
+            elif day == 8:
+                Utility.insert_image( worksheet, Utility.image_path_day_08, up_marker, Utility.whole_size )
+            elif day == 9:
+                Utility.insert_image( worksheet, Utility.image_path_day_09, up_marker, Utility.whole_size )
+            elif day == 10:
+                Utility.insert_image( worksheet, Utility.image_path_day_10, up_marker, Utility.whole_size )
+            elif day == 11:
+                Utility.insert_image( worksheet, Utility.image_path_day_11, up_marker, Utility.whole_size )
+            elif day == 12:
+                Utility.insert_image( worksheet, Utility.image_path_day_12, up_marker, Utility.whole_size )
+            elif day == 13:
+                Utility.insert_image( worksheet, Utility.image_path_day_13, up_marker, Utility.whole_size )
+            elif day == 14:
+                Utility.insert_image( worksheet, Utility.image_path_day_14, up_marker, Utility.whole_size )
+            elif day == 15:
+                Utility.insert_image( worksheet, Utility.image_path_day_15, up_marker, Utility.whole_size )
+            elif day == 16:
+                Utility.insert_image( worksheet, Utility.image_path_day_16, up_marker, Utility.whole_size )
+            elif day == 17:
+                Utility.insert_image( worksheet, Utility.image_path_day_17, up_marker, Utility.whole_size )
+            elif day == 18:
+                Utility.insert_image( worksheet, Utility.image_path_day_18, up_marker, Utility.whole_size )
+            elif day == 19:
+                Utility.insert_image( worksheet, Utility.image_path_day_19, up_marker, Utility.whole_size )
+            elif day == 20:
+                Utility.insert_image( worksheet, Utility.image_path_day_20, up_marker, Utility.whole_size )
+            elif day == 21:
+                Utility.insert_image( worksheet, Utility.image_path_day_21, up_marker, Utility.whole_size )
+            elif day == 22:
+                Utility.insert_image( worksheet, Utility.image_path_day_22, up_marker, Utility.whole_size )
+            elif day == 23:
+                Utility.insert_image( worksheet, Utility.image_path_day_23, up_marker, Utility.whole_size )
+            elif day == 24:
+                Utility.insert_image( worksheet, Utility.image_path_day_24, up_marker, Utility.whole_size )
+            elif day == 25:
+                Utility.insert_image( worksheet, Utility.image_path_day_25, up_marker, Utility.whole_size )
+            elif day == 26:
+                Utility.insert_image( worksheet, Utility.image_path_day_26, up_marker, Utility.whole_size )
+            elif day == 27:
+                Utility.insert_image( worksheet, Utility.image_path_day_27, up_marker, Utility.whole_size )            
+            elif day == 28:
+                Utility.insert_image( worksheet, Utility.image_path_day_28, up_marker, Utility.whole_size )
+            elif day == 29:
+                Utility.insert_image( worksheet, Utility.image_path_day_29, up_marker, Utility.whole_size )
+            elif day == 30:
+                Utility.insert_image( worksheet, Utility.image_path_day_30, up_marker, Utility.whole_size )
+            elif day == 31:
+                Utility.insert_image( worksheet, Utility.image_path_day_31, up_marker, Utility.whole_size )        
+        elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+            row = obj_cell_num['RowNum'] + 1
+            cell = Utility.number_to_string(column)+str(row)
+            worksheet[cell] = day
+
         date_obj += datetime.timedelta(days=1)
 
 def func_get_cell_num( obj_date ):
@@ -35,7 +102,13 @@ def func_get_cell_num( obj_date ):
     weekday = ( obj_date.weekday() + 2 ) % 7 
     if weekday == 0:
         weekday += 7
-    row_num = 4 + month * 4
+
+    row_num = None
+    if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+        row_num = 8 + month * 3
+    elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+        row_num = 7 + month * 4
+    
     week_num = func_get_week_num( obj_date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
 
@@ -71,22 +144,12 @@ def func_find_weather_data_by_date( weather_report_date, obj_date ):
 def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date ):
     LunarCalendar.func_load_lunar_holiday_data()
     json_file_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
-    input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar.xlsx')
+    input_excel =  None
+    if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+        input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_A.xlsx')
+    elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+        input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_B.xlsx')
     output_excel = os.path.join( Utility.parent_dir, 'DailyReportFinal.xlsx') 
-
-    c2e = cm_to_EMU
-    # Calculated number of cells width or height from cm into EMUs
-    cellh = lambda x: c2e((x * 49.77)/99)
-    cellw = lambda x: c2e((x * (18.65-1.71))/10)
-
-    col_offset = cellw(0.1) #60984
-    row_up_offset = cellh(0.25) #45245
-    row_down_offset = cellh(1) #180981
-
-    p2e = pixels_to_EMU
-
-    whole_size = XDRPositiveSize2D(p2e(30), p2e(30))
-    half_size = XDRPositiveSize2D(p2e(30), p2e(15))
 
     workbook = openpyxl.load_workbook(input_excel)
     worksheet = workbook.active
@@ -113,9 +176,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
 
-    n_lastyear = 0
-    worksheet_index = 0
-
     obj_date = obj_start_date
     n_workdays_from_start = 0
 
@@ -126,24 +186,25 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
         n_row_for_image = obj_cell_num['RowNum']-1
-        up_marker = AnchorMarker( col=n_column_for_image, colOff=col_offset, row=n_row_for_image, rowOff=row_up_offset )
-        down_marker = AnchorMarker( col=n_column_for_image, colOff=col_offset, row=n_row_for_image, rowOff=row_down_offset )
-
-        if year != n_lastyear:
-            worksheet = workbook.worksheets[ worksheet_index ]
-            func_fill_in_day_each_month( worksheet, year )
-            n_lastyear = year
-            worksheet_index += 1
+        up_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_up_offset )
+        down_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_down_offset )
 
         n_column_for_text = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
 
         str_lunar_reason = LunarCalendar.func_get_lunar_reason( obj_date )
         if str_lunar_reason != None:
-            n_row_for_note = obj_cell_num['RowNum']+2
+            if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+                n_row_for_note = obj_cell_num['RowNum'] + 1
+            elif  g_DailyReportType == Utility.DailyReportType.TYPE_B:
+                n_row_for_note = obj_cell_num['RowNum'] + 2
             cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
             worksheet[ cell_note ] = str_lunar_reason
 
-        n_row_workdays_from_start = obj_cell_num['RowNum']+3
+        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+            n_row_workdays_from_start = obj_cell_num['RowNum'] + 2
+        elif  g_DailyReportType == Utility.DailyReportType.TYPE_B:
+            n_row_workdays_from_start = obj_cell_num['RowNum'] + 3
+
         cell_workdays_from_start = Utility.number_to_string( n_column_for_text ) + str( n_row_workdays_from_start )
 
         if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_Weekday, e_count_type ):
@@ -164,66 +225,71 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
         if weather_data and obj_date <= obj_current_date:
             if weather_data["morning_weather"] == 0:#晴天
-                Utility.insert_image( worksheet, Utility.image_path_sun_up, up_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_sun_up, up_marker, Utility.half_size )
             elif weather_data["morning_weather"] == 1:#雨天
-                Utility.insert_image( worksheet, Utility.image_path_rain_up, up_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_rain_up, up_marker, Utility.half_size )
             elif weather_data["morning_weather"] == 2:#豪雨
-                Utility.insert_image( worksheet, Utility.image_path_heavyrain_up, up_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_heavyrain_up, up_marker, Utility.half_size )
             elif weather_data["morning_weather"] == 3:#颱風
-                Utility.insert_image( worksheet, Utility.image_path_typhoon_up, up_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_typhoon_up, up_marker, Utility.half_size )
             elif weather_data["morning_weather"] == 4:#酷熱
-                Utility.insert_image( worksheet, Utility.image_path_hot_up, up_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_hot_up, up_marker, Utility.half_size )
 
             if weather_data["afternoon_weather"] == 0:#晴天
-                Utility.insert_image( worksheet, Utility.image_path_sun_down, down_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_sun_down, down_marker, Utility.half_size )
             elif weather_data["afternoon_weather"] == 1:#雨天
-                Utility.insert_image( worksheet, Utility.image_path_rain_down, down_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_rain_down, down_marker, Utility.half_size )
             elif weather_data["afternoon_weather"] == 2:#豪雨
-                Utility.insert_image( worksheet, Utility.image_path_heavyrain_down, down_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_heavyrain_down, down_marker, Utility.half_size )
             elif weather_data["afternoon_weather"] == 3:#颱風
-                Utility.insert_image( worksheet, Utility.image_path_typhoon_down, down_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_typhoon_down, down_marker, Utility.half_size )
             elif weather_data["afternoon_weather"] == 4:#酷熱
-                Utility.insert_image( worksheet, Utility.image_path_hot_down, down_marker, half_size )
+                Utility.insert_image( worksheet, Utility.image_path_hot_down, down_marker, Utility.half_size )
 
         if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
             if n_Weekday == 6:#Sunday
                 if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
                 else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
             else:
                 if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
         elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
             if n_Weekday == 6 or n_Weekday == 5:#Sunday Saturday
                 if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
                 else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
             else:
                 if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
         elif e_count_type == ScheduleCount.WorkDay.NO_DAY_OFF:
             if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, whole_size )
+                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
 
         if obj_date == obj_real_finish_date['ExpectFinishDate']:
-            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, whole_size )
+            Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
 
         if obj_date == obj_real_finish_date['RealFinishDate']:
-            Utility.insert_image( worksheet, Utility.image_path_real_finish_day, up_marker, whole_size )
+            Utility.insert_image( worksheet, Utility.image_path_real_finish_day, up_marker, Utility.whole_size )
             break
 
         obj_date += datetime.timedelta(days=1)
-
 
 
     worksheet = workbook.worksheets[0]
     obj_cell_num = func_get_cell_num( obj_start_date )
     column = obj_cell_num['ColumnNum']-1
     row = obj_cell_num['RowNum']-1
-    up_marker = AnchorMarker(col=column, colOff=col_offset, row=row, rowOff=row_up_offset)
-    Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, whole_size)
+    up_marker = AnchorMarker(col=column, colOff=Utility.col_offset, row=row, rowOff=Utility.row_up_offset)
+    Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, Utility.whole_size)
+
+    worksheet_index = 0
+    for n_year in range( n_start_year, n_end_year + 1 ):
+        worksheet = workbook.worksheets[ worksheet_index ]
+        func_fill_in_day_each_month( worksheet, n_year )
+        worksheet_index += 1
 
     any_serial_num = False
     serial_number = 1
@@ -251,4 +317,4 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     pass
 
 
-# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 30, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
+# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
