@@ -7,7 +7,7 @@ import datetime
 import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
-g_DailyReportType = Utility.DailyReportType.TYPE_A
+g_DailyReportType = Utility.DailyReportType.TYPE_B
 
 def func_fill_in_day_each_month( worksheet, input_year ):
     first_day = str( input_year ) + '-01-01'
@@ -105,9 +105,9 @@ def func_get_cell_num( obj_date ):
 
     row_num = None
     if g_DailyReportType == Utility.DailyReportType.TYPE_A:
-        row_num = 8 + month * 3
+        row_num = 7 + month * 3
     elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
-        row_num = 7 + month * 4
+        row_num = 6 + month * 4
     
     week_num = func_get_week_num( obj_date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
@@ -317,4 +317,4 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     pass
 
 
-# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
+func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
