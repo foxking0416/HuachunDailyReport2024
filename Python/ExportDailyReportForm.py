@@ -113,9 +113,9 @@ def func_get_cell_num( obj_date ):
 
     row_num = None
     if g_DailyReportType == Utility.DailyReportType.TYPE_A:
-        row_num = 7 + month * 3
+        row_num = 5 + month * 3
     elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
-        row_num = 6 + month * 4
+        row_num = 4 + month * 4
     
     week_num = func_get_week_num( obj_date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
@@ -181,11 +181,17 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         worksheet.title = str(n_year) + '年'
         worksheet['B4'] = str(n_year) + '年(' + str( n_year - 1911 ) + '年)' 
         worksheet['D2'] = g_project_no
+        worksheet['AP2'] = g_project_no
         worksheet['D3'] = g_project_name
-        worksheet['W2'] = g_project_owner
-        worksheet['W3'] = g_project_supervisor
+        worksheet['AP3'] = g_project_name
+        worksheet['V2'] = g_project_owner
+        worksheet['BD2'] = g_project_owner
+        worksheet['V3'] = g_project_supervisor
+        worksheet['BD3'] = g_project_supervisor
         worksheet['AF2'] = g_project_designer
+        worksheet['BM2'] = g_project_designer
         worksheet['AF3'] = g_project_contractor
+        worksheet['BM3'] = g_project_contractor
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -331,4 +337,4 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     pass
 
 
-func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
+# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
