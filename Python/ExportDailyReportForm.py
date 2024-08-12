@@ -195,14 +195,39 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
     with open(json_file_path,'r', encoding='utf-8') as f:
         data = json.load(f)
+    #TODO 可以把json檔案做排序
 
     obj_date = obj_start_date
     n_workdays_from_start = 0
+
+    n_calendar_days_each_month = 0
+    last_month = 0
+    last_year = 0
+    worksheet_index = -1
+
 
     while( True ):
         weather_data = func_find_weather_data_by_date( data, obj_date )
         n_Weekday = obj_date.weekday()
         year = obj_date.year
+        if year != last_year:
+            worksheet_index += 1
+            last_year = year
+        worksheet = workbook.worksheets[ worksheet_index ]
+        month = obj_date.month
+
+        str_cell_calendar_days_each_month = None
+        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+            str_cell_calendar_days_each_month = 'AM' + str( 5 + month * 3 )
+        elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+            str_cell_calendar_days_each_month = 'AM' + str( 4 + month * 4 )
+
+        obj_date_add_1 = obj_date + datetime.timedelta(days=1)
+        n_calendar_days_each_month += 1
+        if obj_date.month != obj_date_add_1.month:
+            worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
+            n_calendar_days_each_month = 0
+
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
         n_row_for_image = obj_cell_num['RowNum']-1
@@ -293,6 +318,8 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
         if obj_date == obj_real_finish_date['RealFinishDate']:
             Utility.insert_image( worksheet, Utility.image_path_real_finish_day, up_marker, Utility.whole_size )
+            if n_calendar_days_each_month != 0:
+                worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
             break
 
         obj_date += datetime.timedelta(days=1)
