@@ -143,7 +143,10 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             if obj_date in arr_const_holiday:
                     Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
 
-        if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type ):
+        b_is_weekend = [False]
+        b_is_holiday = [False]
+        b_is_make_up_workday = [False]
+        if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
             n_expect_total_workdays -= 1
             n_workdays_from_start += 1
 

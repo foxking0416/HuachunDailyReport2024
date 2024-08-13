@@ -202,6 +202,12 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
     n_calendar_days_each_month = 0
     n_calendar_days_accumulate = 0
+    n_weekend_days_each_month = 0
+    n_weekend_days_accumulate = 0
+    n_holiday_days_each_month = 0
+    n_holiday_days_accumulate = 0
+    n_no_count_days_each_month = 0
+    n_no_count_days_accumulate = 0
     last_month = 0
     last_year = 0
     worksheet_index = -1
@@ -216,23 +222,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             last_year = year
         worksheet = workbook.worksheets[ worksheet_index ]
         month = obj_date.month
-
-        str_cell_calendar_days_each_month = None
-        str_cell_calendar_days_accumulate = None
-        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
-            str_cell_calendar_days_each_month = 'AM' + str( 5 + month * 3 )
-            str_cell_calendar_days_accumulate = 'AM' + str( 6 + month * 3 )
-        elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
-            str_cell_calendar_days_each_month = 'AM' + str( 4 + month * 4 )
-            str_cell_calendar_days_accumulate = 'AM' + str( 5 + month * 4 )
-
-        obj_date_add_1 = obj_date + datetime.timedelta(days=1)
-        n_calendar_days_each_month += 1
-        n_calendar_days_accumulate += 1
-        if obj_date.month != obj_date_add_1.month:
-            worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
-            worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
-            n_calendar_days_each_month = 0
 
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
@@ -258,7 +247,11 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
         cell_workdays_from_start = Utility.number_to_string( n_column_for_text ) + str( n_row_workdays_from_start )
 
-        if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_Weekday, e_count_type ):
+        b_is_weekend = [False]
+        b_is_holiday = [False]
+        b_is_make_up_workday = [False]
+        b_is_work_day = ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_Weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday )
+        if b_is_work_day:
             if weather_data and obj_date <= obj_current_date:
                 if obj_date in dict_weather_related_holiday:
                     if dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
@@ -297,36 +290,81 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             elif weather_data["afternoon_weather"] == 4:#酷熱
                 Utility.insert_image( worksheet, Utility.image_path_hot_down, down_marker, Utility.half_size )
 
-        if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
-            if n_Weekday == 6:#Sunday
-                if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
-                else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-            else:
-                if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-        elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
-            if n_Weekday == 6 or n_Weekday == 5:#Sunday Saturday
-                if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
-                else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-            else:
-                if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-        elif e_count_type == ScheduleCount.WorkDay.NO_DAY_OFF:
-            if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
+        if b_is_weekend[0] or b_is_holiday[0]:
+            Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
+        elif b_is_make_up_workday[0]:
+            Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
 
         if obj_date == obj_real_finish_date['ExpectFinishDate']:
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
+
+        str_cell_calendar_days_each_month = None
+        str_cell_calendar_days_accumulate = None
+        str_cell_weekend_days_each_month = None
+        str_cell_weekend_days_accumulate = None
+        str_cell_holiday_days_each_month = None
+        str_cell_holiday_days_accumulate = None
+        str_cell_no_count_days_each_month = None
+        str_cell_no_count_days_accumulate = None
+        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+            str_cell_calendar_days_each_month = 'AM' + str( 5 + month * 3 )
+            str_cell_calendar_days_accumulate = 'AM' + str( 6 + month * 3 )
+            str_cell_weekend_days_each_month = 'AN' + str( 5 + month * 3 )
+            str_cell_weekend_days_accumulate = 'AN' + str( 6 + month * 3 )
+            str_cell_holiday_days_each_month = 'AO' + str( 5 + month * 3 )
+            str_cell_holiday_days_accumulate = 'AO' + str( 6 + month * 3 )
+            str_cell_no_count_days_each_month = 'AP' + str( 5 + month * 3 )
+            str_cell_no_count_days_accumulate = 'AP' + str( 6 + month * 3 )
+        elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+            str_cell_calendar_days_each_month = 'AM' + str( 4 + month * 4 )
+            str_cell_calendar_days_accumulate = 'AM' + str( 5 + month * 4 )
+            str_cell_weekend_days_each_month = 'AN' + str( 4 + month * 4 )
+            str_cell_weekend_days_accumulate = 'AN' + str( 5 + month * 4 )
+            str_cell_holiday_days_each_month = 'AO' + str( 4 + month * 4 )
+            str_cell_holiday_days_accumulate = 'AO' + str( 5 + month * 4 )
+            str_cell_no_count_days_each_month = 'AP' + str( 4 + month * 4 )
+            str_cell_no_count_days_accumulate = 'AP' + str( 5 + month * 4 )
+
+        obj_date_add_1 = obj_date + datetime.timedelta(days=1)
+        n_calendar_days_each_month += 1
+        n_calendar_days_accumulate += 1
+
+        if b_is_weekend[0]:
+            n_weekend_days_each_month += 1
+            n_weekend_days_accumulate += 1
+        if b_is_holiday[0]:
+            n_holiday_days_each_month += 1
+            n_holiday_days_accumulate += 1
+        if not b_is_work_day:
+            n_no_count_days_each_month += 1
+            n_no_count_days_accumulate += 1
+
+
+        if obj_date.month != obj_date_add_1.month:
+            worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
+            worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
+            worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month
+            worksheet[ str_cell_weekend_days_accumulate ] = n_weekend_days_accumulate
+            worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month
+            worksheet[ str_cell_holiday_days_accumulate ] = n_holiday_days_accumulate
+            worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month
+            worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
+            n_calendar_days_each_month = 0
+            n_weekend_days_each_month = 0
+            n_holiday_days_each_month = 0
+            n_no_count_days_each_month = 0
 
         if obj_date == obj_real_finish_date['RealFinishDate']:
             Utility.insert_image( worksheet, Utility.image_path_real_finish_day, up_marker, Utility.whole_size )
             if n_calendar_days_each_month != 0:
                 worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
+                worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month
+                worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month
+                worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month
             worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
+            worksheet[ str_cell_weekend_days_accumulate ] = n_weekend_days_accumulate
+            worksheet[ str_cell_holiday_days_accumulate ] = n_holiday_days_accumulate
+            worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
             break
 
         obj_date += datetime.timedelta(days=1)
@@ -344,6 +382,10 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         worksheet = workbook.worksheets[ worksheet_index ]
         func_fill_in_day_each_month( worksheet, n_year )
         worksheet_index += 1
+
+    #填入當月天數及固定因素
+
+
 
     any_serial_num = False
     serial_number = 1
@@ -371,4 +413,4 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     pass
 
 
-# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-03', "%Y-%m-%d"), datetime.datetime.strptime('2023-01-16', "%Y-%m-%d") )
+func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 411, datetime.datetime.strptime('2023-01-06', "%Y-%m-%d"), datetime.datetime.strptime('2023-03-16', "%Y-%m-%d") )

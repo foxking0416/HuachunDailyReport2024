@@ -110,21 +110,43 @@ def func_load_json_extend_data(dict_extend_data):
 
 
 #根據固定因素判斷是否為工作日
-def func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type ):
-    if obj_date in arr_const_holiday :
-        return False
-    elif obj_date in arr_const_workday:
-        return True
+def func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+    b_is_weekend[0] = False
+    b_is_holiday[0] = False
+    b_is_make_up_workday[0] = False
+    if n_weekday == Weekday.SUNDAY.value:
+        if e_count_type == WorkDay.ONE_DAY_OFF or e_count_type == WorkDay.TWO_DAY_OFF:
+            if obj_date in arr_const_workday:
+                b_is_make_up_workday[0] = True
+                return True
+            else:
+                b_is_weekend[0] = True
+                return False
+        elif obj_date in arr_const_holiday:
+            b_is_holiday[0] = True
+            return False
+        else:
+            return True
+    elif n_weekday == Weekday.SATURDAY.value:
+        if e_count_type == WorkDay.TWO_DAY_OFF:
+            if obj_date in arr_const_workday:
+                b_is_make_up_workday[0] = True
+                return True
+            else:
+                b_is_weekend[0] = True
+                return False
+        elif obj_date in arr_const_holiday:
+            b_is_holiday[0] = True
+            return False
+        else:
+            return True
     else:
-        #周休一日
-        if e_count_type == WorkDay.ONE_DAY_OFF and n_weekday != Weekday.SUNDAY.value:
+        if obj_date in arr_const_holiday:
+            b_is_holiday[0] = True
+            return False
+        else:
             return True
-        #周休二日
-        elif e_count_type == WorkDay.TWO_DAY_OFF and n_weekday != Weekday.SATURDAY.value and n_weekday != Weekday.SUNDAY.value:
-            return True
-        #沒周休
-        elif e_count_type == WorkDay.NO_DAY_OFF:
-            return True
+        
 
 def func_count_expect_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, arr_const_holiday, arr_const_workday ):
     obj_expect_end_date = obj_start_date
@@ -132,7 +154,10 @@ def func_count_expect_finish_date( e_count_type, n_expect_total_workdays, obj_st
     while( True ):
         n_weekday = obj_expect_end_date.weekday()
 
-        if func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_expect_end_date, n_weekday, e_count_type ):
+        b_is_weekend = [False]
+        b_is_holiday = [False]
+        b_is_make_up_workday = [False]
+        if func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_expect_end_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
             n_expect_total_workdays -= 1
 
         if( n_expect_total_workdays <= 0 ):
@@ -194,7 +219,10 @@ def func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_star
     while( True ):
         n_weekday = obj_real_end_date.weekday()
 
-        if func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_real_end_date, n_weekday, e_count_type ):
+        b_is_weekend = [False]
+        b_is_holiday = [False]
+        b_is_make_up_workday = [False]
+        if func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_real_end_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
             if obj_real_end_date <= obj_today_date:
                 if obj_real_end_date in dict_weather_related_holiday:
                     if dict_weather_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
