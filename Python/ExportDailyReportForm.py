@@ -143,15 +143,15 @@ def func_get_week_num( obj_date ):
     
     return week_num
 
-def func_find_weather_data_by_date( weather_report_date, obj_date ):        
-    for entry in weather_report_date:
+def func_find_daily_data_by_date( daily_report_date, obj_date ):        
+    for entry in daily_report_date:
         if entry["date"] == obj_date.strftime("%Y-%m-%d"):
             return entry
     return None
 
 def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date ):
     LunarCalendar.func_load_lunar_holiday_data()
-    json_file_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
+    json_file_daily_report_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
     input_excel =  None
     if g_DailyReportType == Utility.DailyReportType.TYPE_A:
         input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_A.xlsx')
@@ -193,7 +193,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         worksheet['AF3'] = g_project_contractor
         worksheet['BM3'] = g_project_contractor
 
-    with open(json_file_path,'r', encoding='utf-8') as f:
+    with open(json_file_daily_report_path,'r', encoding='utf-8') as f:
         data = json.load(f)
     #TODO 可以把json檔案做排序
 
@@ -208,13 +208,64 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     n_holiday_days_accumulate = 0
     n_no_count_days_each_month = 0
     n_no_count_days_accumulate = 0
+    f_sun_days_each_month = 0
+    f_sun_days_accumulate = 0
+    f_rain_days_each_month = 0
+    f_rain_days_accumulate = 0
+    f_rain_days_no_count_each_month = 0
+    f_rain_days_no_count_accumulate = 0
+    f_heavy_rain_days_each_month = 0
+    f_heavy_rain_days_accumulate = 0
+    f_heavy_rain_days_no_count_each_month = 0
+    f_heavy_rain_days_no_count_accumulate = 0
+    f_typhoon_days_each_month = 0
+    f_typhoon_days_accumulate = 0
+    f_typhoon_days_no_count_each_month = 0
+    f_typhoon_days_no_count_accumulate = 0
+    f_hot_days_each_month = 0
+    f_hot_days_accumulate = 0
+    f_hot_days_no_count_each_month = 0
+    f_hot_days_no_count_accumulate = 0
+    f_muddy_days_each_month = 0
+    f_muddy_days_accumulate = 0
+    f_muddy_days_no_count_each_month = 0
+    f_muddy_days_no_count_accumulate = 0
+    f_weather_other_days_each_month = 0
+    f_weather_other_days_accumulate = 0
+    f_weather_other_days_no_count_each_month = 0
+    f_weather_other_days_no_count_accumulate = 0
+    f_weather_no_count_days_each_month = 0
+    f_weather_no_count_days_accumulate = 0
+
+    f_suspend_work_days_each_month = 0
+    f_suspend_work_days_accumulate = 0
+    f_suspend_work_days_no_count_each_month = 0
+    f_suspend_work_days_no_count_accumulate = 0
+    f_power_off_days_each_month = 0
+    f_power_off_days_accumulate = 0
+    f_power_off_days_no_count_each_month = 0
+    f_power_off_days_no_count_accumulate = 0
+    f_human_other_days_each_month = 0
+    f_human_other_days_accumulate = 0
+    f_human_other_days_no_count_each_month = 0
+    f_human_other_days_no_count_accumulate = 0
+    f_human_no_count_days_each_month = 0
+    f_human_no_count_days_accumulate = 0
+
+
     last_month = 0
     last_year = 0
     worksheet_index = -1
 
+    dict_morning_weather_condition_setting = {}
+    dict_afternoon_weather_condition_setting = {}
+    dict_morning_human_condition_setting = {}
+    dict_afternoon_human_condition_setting = {}
+    ScheduleCount.func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                                         dict_morning_human_condition_setting, dict_afternoon_human_condition_setting )
 
     while( True ):
-        weather_data = func_find_weather_data_by_date( data, obj_date )
+        daily_data = func_find_daily_data_by_date( data, obj_date )
         n_Weekday = obj_date.weekday()
         year = obj_date.year
         if year != last_year:
@@ -252,7 +303,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         b_is_make_up_workday = [False]
         b_is_work_day = ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_Weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday )
         if b_is_work_day:
-            if weather_data and obj_date <= obj_current_date:
+            if daily_data and obj_date <= obj_current_date:
                 if obj_date in dict_weather_related_holiday:
                     if dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
                         pass
@@ -266,29 +317,146 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 n_workdays_from_start += 1
 
         worksheet[ cell_workdays_from_start ] = n_workdays_from_start
+        #計算A欄
+        n_calendar_days_each_month += 1
+        n_calendar_days_accumulate += 1
 
-        if weather_data and obj_date <= obj_current_date:
-            if weather_data["morning_weather"] == 0:#晴天
-                Utility.insert_image( worksheet, Utility.image_path_sun_up, up_marker, Utility.half_size )
-            elif weather_data["morning_weather"] == 1:#雨天
-                Utility.insert_image( worksheet, Utility.image_path_rain_up, up_marker, Utility.half_size )
-            elif weather_data["morning_weather"] == 2:#豪雨
-                Utility.insert_image( worksheet, Utility.image_path_heavyrain_up, up_marker, Utility.half_size )
-            elif weather_data["morning_weather"] == 3:#颱風
-                Utility.insert_image( worksheet, Utility.image_path_typhoon_up, up_marker, Utility.half_size )
-            elif weather_data["morning_weather"] == 4:#酷熱
-                Utility.insert_image( worksheet, Utility.image_path_hot_up, up_marker, Utility.half_size )
+        if b_is_weekend[0]:#計算B1欄
+            n_weekend_days_each_month += 1
+            n_weekend_days_accumulate += 1
+        if b_is_holiday[0]:#計算B2欄
+            n_holiday_days_each_month += 1
+            n_holiday_days_accumulate += 1
+        if not b_is_work_day:#計算B0欄
+            n_no_count_days_each_month += 1
+            n_no_count_days_accumulate += 1
 
-            if weather_data["afternoon_weather"] == 0:#晴天
-                Utility.insert_image( worksheet, Utility.image_path_sun_down, down_marker, Utility.half_size )
-            elif weather_data["afternoon_weather"] == 1:#雨天
-                Utility.insert_image( worksheet, Utility.image_path_rain_down, down_marker, Utility.half_size )
-            elif weather_data["afternoon_weather"] == 2:#豪雨
-                Utility.insert_image( worksheet, Utility.image_path_heavyrain_down, down_marker, Utility.half_size )
-            elif weather_data["afternoon_weather"] == 3:#颱風
-                Utility.insert_image( worksheet, Utility.image_path_typhoon_down, down_marker, Utility.half_size )
-            elif weather_data["afternoon_weather"] == 4:#酷熱
-                Utility.insert_image( worksheet, Utility.image_path_hot_down, down_marker, Utility.half_size )
+        if daily_data and obj_date <= obj_current_date:
+            if daily_data["morning_weather"] == ScheduleCount.Weather.SUN:#晴天
+                Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
+                f_sun_days_each_month += 0.5
+                f_sun_days_accumulate += 0.5
+            elif daily_data["morning_weather"] == ScheduleCount.Weather.RAIN:#雨天
+                Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
+                f_rain_days_each_month += 0.5
+                f_rain_days_accumulate += 0.5
+            elif daily_data["morning_weather"] == ScheduleCount.Weather.HEAVY_RAIN:#豪雨
+                Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
+                f_heavy_rain_days_each_month += 0.5
+                f_heavy_rain_days_accumulate += 0.5
+            elif daily_data["morning_weather"] == ScheduleCount.Weather.TYPHOON:#颱風
+                Utility.insert_image( worksheet, Utility.image_path_typhoon_up,       up_marker, Utility.half_size )
+                f_typhoon_days_each_month += 0.5
+                f_typhoon_days_accumulate += 0.5
+            elif daily_data["morning_weather"] == ScheduleCount.Weather.HOT:#酷熱
+                Utility.insert_image( worksheet, Utility.image_path_hot_up,           up_marker, Utility.half_size )
+                f_hot_days_each_month += 0.5
+                f_hot_days_accumulate += 0.5
+            elif daily_data["morning_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
+                Utility.insert_image( worksheet, Utility.image_path_muddy_up,         up_marker, Utility.half_size )
+                f_muddy_days_each_month += 0.5
+                f_muddy_days_accumulate += 0.5
+            elif daily_data["morning_weather"] == ScheduleCount.Weather.OTHER:#其他
+                Utility.insert_image( worksheet, Utility.image_path_weather_other_up, up_marker, Utility.half_size )
+                f_weather_other_days_each_month += 0.5
+                f_weather_other_days_accumulate += 0.5
+
+            if daily_data["afternoon_weather"] == ScheduleCount.Weather.SUN:#晴天
+                Utility.insert_image( worksheet, Utility.image_path_sun_down,         down_marker, Utility.half_size )
+                f_sun_days_each_month += 0.5
+                f_sun_days_accumulate += 0.5
+            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.RAIN:#雨天
+                Utility.insert_image( worksheet, Utility.image_path_rain_down,        down_marker, Utility.half_size )
+                f_rain_days_each_month += 0.5
+                f_rain_days_accumulate += 0.5
+            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.HEAVY_RAIN:#豪雨
+                Utility.insert_image( worksheet, Utility.image_path_heavyrain_down,   down_marker, Utility.half_size )
+                f_heavy_rain_days_each_month += 0.5
+                f_heavy_rain_days_accumulate += 0.5
+            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.TYPHOON:#颱風
+                Utility.insert_image( worksheet, Utility.image_path_typhoon_down,     down_marker, Utility.half_size )
+                f_typhoon_days_each_month += 0.5
+                f_typhoon_days_accumulate += 0.5
+            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.HOT:#酷熱
+                Utility.insert_image( worksheet, Utility.image_path_hot_down,         down_marker, Utility.half_size )
+                f_hot_days_each_month += 0.5
+                f_hot_days_accumulate += 0.5
+            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
+                Utility.insert_image( worksheet, Utility.image_path_muddy_up,         down_marker, Utility.half_size )
+                f_muddy_days_each_month += 0.5
+                f_muddy_days_accumulate += 0.5
+            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.OTHER:#其他
+                Utility.insert_image( worksheet, Utility.image_path_weather_other_up, down_marker, Utility.half_size )
+                f_weather_other_days_each_month += 0.5
+                f_weather_other_days_accumulate += 0.5
+
+            if daily_data["morning_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
+                # Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
+                f_suspend_work_days_each_month += 0.5
+                f_suspend_work_days_accumulate += 0.5
+            elif daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
+                # Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
+                f_power_off_days_each_month += 0.5
+                f_power_off_days_accumulate += 0.5
+            elif daily_data["morning_human"] == ScheduleCount.Human.OTHER:#其他
+                # Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
+                f_human_other_days_each_month += 0.5
+                f_human_other_days_accumulate += 0.5
+
+            if daily_data["afternoon_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
+                # Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
+                f_suspend_work_days_each_month += 0.5
+                f_suspend_work_days_accumulate += 0.5
+            elif daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
+                # Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
+                f_power_off_days_each_month += 0.5
+                f_power_off_days_accumulate += 0.5
+            elif daily_data["afternoon_human"] == ScheduleCount.Human.OTHER:#其他
+                # Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
+                f_human_other_days_each_month += 0.5
+                f_human_other_days_accumulate += 0.5
+
+            dict_return_weather = {}
+            dict_return_human = {}
+            ScheduleCount.func_condition_no_count( dict_morning_weather_condition_setting,
+                                                   dict_afternoon_weather_condition_setting,
+                                                   dict_morning_human_condition_setting,
+                                                   dict_afternoon_human_condition_setting,
+                                                   daily_data["morning_weather"],
+                                                   daily_data["afternoon_weather"],
+                                                   daily_data["morning_human"],
+                                                   daily_data["afternoon_human"],
+                                                   dict_return_weather,
+                                                   dict_return_human )
+            #計算C1到C7的不計欄位
+            f_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.RAIN ]
+            f_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.RAIN ]
+            f_heavy_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
+            f_heavy_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
+            f_typhoon_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.TYPHOON ]
+            f_typhoon_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.TYPHOON ]
+            f_hot_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HOT ]
+            f_hot_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.HOT ]
+            f_muddy_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
+            f_muddy_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
+            f_weather_other_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.OTHER ]
+            f_weather_other_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.OTHER ]
+            #計算C0
+            f_weather_no_count_days_each_month += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
+            f_weather_no_count_days_accumulate += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
+
+            #計算D1到D3的不計欄位
+            f_suspend_work_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
+            f_suspend_work_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
+            f_power_off_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
+            f_power_off_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
+            f_human_other_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.OTHER ]
+            f_human_other_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.OTHER ]
+            #計算D0
+            f_human_no_count_days_each_month += dict_return_human[ ScheduleCount.Human.TOTAL ]
+            f_human_no_count_days_accumulate += dict_return_human[ ScheduleCount.Human.TOTAL ]
+
+
 
         if b_is_weekend[0] or b_is_holiday[0]:
             Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
@@ -298,73 +466,310 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         if obj_date == obj_real_finish_date['ExpectFinishDate']:
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
 
-        str_cell_calendar_days_each_month = None
-        str_cell_calendar_days_accumulate = None
-        str_cell_weekend_days_each_month = None
-        str_cell_weekend_days_accumulate = None
-        str_cell_holiday_days_each_month = None
-        str_cell_holiday_days_accumulate = None
-        str_cell_no_count_days_each_month = None
-        str_cell_no_count_days_accumulate = None
+        str_cell_calendar_days_each_month = None #天數(每月) A 欄位"AM"
+        str_cell_calendar_days_accumulate = None #天數(累計) A 欄位"AM"
+        str_cell_weekend_days_each_month = None #星期例假(每月) B1 欄位"AN"
+        str_cell_weekend_days_accumulate = None #星期例假(累計) B1 欄位"AN"
+        str_cell_holiday_days_each_month = None #國定例假(每月) B2 欄位"AO"
+        str_cell_holiday_days_accumulate = None #國定例假(累計) B2 欄位"AO"
+        str_cell_no_count_days_each_month = None #不計工期(每月) B3
+        str_cell_no_count_days_accumulate = None #不計工期(累計) B3
+        str_cell_sun_days_each_month = None #晴天(每月) C1
+        str_cell_sun_days_accumulate = None #晴天(累計) C1
+        str_cell_rain_days_each_month = None #雨天(每月) C2
+        str_cell_rain_days_accumulate = None #雨天(累計) C2
+        str_cell_rain_days_no_count_each_month = None #雨天不計(每月) C2
+        str_cell_rain_days_no_count_accumulate = None #雨天不計(累計) C2
+        str_cell_heavy_rain_days_each_month = None #豪雨(每月) C3
+        str_cell_heavy_rain_days_accumulate = None #豪雨(累計) C3
+        str_cell_heavy_rain_days_no_count_each_month = None #豪雨不計(每月) C3
+        str_cell_heavy_rain_days_no_count_accumulate = None #豪雨不計(累計) C3
+        str_cell_typhoon_days_each_month = None #颱風(每月) C4
+        str_cell_typhoon_days_accumulate = None #颱風(累計) C4
+        str_cell_typhoon_days_no_count_each_month = None #颱風不計(每月) C4
+        str_cell_typhoon_days_no_count_accumulate = None #颱風不計(累計) C4
+        str_cell_hot_days_each_month = None #酷熱(每月) C5
+        str_cell_hot_days_accumulate = None #酷熱(累計) C5
+        str_cell_hot_days_no_count_each_month = None #酷熱不計(每月) C5
+        str_cell_hot_days_no_count_accumulate = None #酷熱不計(累計) C5
+        str_cell_muddy_days_each_month = None #雨後泥濘(每月) C6
+        str_cell_muddy_days_accumulate = None #雨後泥濘(累計) C6
+        str_cell_muddy_days_no_count_each_month = None #雨後泥濘不計(每月) C6
+        str_cell_muddy_days_no_count_accumulate = None #雨後泥濘不計(累計) C6
+        str_cell_weather_other_days_each_month = None #天候其他(每月) C7
+        str_cell_weather_other_days_accumulate = None #天候其他(累計) C7
+        str_cell_weather_other_days_no_count_each_month = None #天候其他不計(每月) C7
+        str_cell_weather_other_days_no_count_accumulate = None #天候其他不計(累計) C7
+        str_cell_weather_no_count_days_each_month = None #天候不計工期(每月) C0
+        str_cell_weather_no_count_days_accumulate = None #天候不計工期(累計) C0
+
+        str_cell_suspend_work_days_each_month = None
+        str_cell_suspend_work_days_accumulate = None
+        str_cell_suspend_work_days_no_count_each_month = None
+        str_cell_suspend_work_days_no_count_accumulate = None
+        str_cell_power_off_days_each_month = None
+        str_cell_power_off_days_accumulate = None
+        str_cell_power_off_days_no_count_each_month = None
+        str_cell_power_off_days_no_count_accumulate = None
+        str_cell_human_other_days_each_month = None
+        str_cell_human_other_days_accumulate = None
+        str_cell_human_other_days_no_count_each_month = None
+        str_cell_human_other_days_no_count_accumulate = None
+        str_cell_human_no_count_days_each_month = None
+        str_cell_human_no_count_days_accumulate = None
+
+        str_cell_contract_days = None
+        str_cell_total_work_days_no_count = None
+
         if g_DailyReportType == Utility.DailyReportType.TYPE_A:
-            str_cell_calendar_days_each_month = 'AM' + str( 5 + month * 3 )
-            str_cell_calendar_days_accumulate = 'AM' + str( 6 + month * 3 )
-            str_cell_weekend_days_each_month = 'AN' + str( 5 + month * 3 )
-            str_cell_weekend_days_accumulate = 'AN' + str( 6 + month * 3 )
-            str_cell_holiday_days_each_month = 'AO' + str( 5 + month * 3 )
-            str_cell_holiday_days_accumulate = 'AO' + str( 6 + month * 3 )
-            str_cell_no_count_days_each_month = 'AP' + str( 5 + month * 3 )
-            str_cell_no_count_days_accumulate = 'AP' + str( 6 + month * 3 )
+            str_cell_calendar_days_each_month               = 'AM' + str( 5 + month * 3 )
+            str_cell_calendar_days_accumulate               = 'AM' + str( 6 + month * 3 )
+            str_cell_weekend_days_each_month                = 'AN' + str( 5 + month * 3 )
+            str_cell_weekend_days_accumulate                = 'AN' + str( 6 + month * 3 )
+            str_cell_holiday_days_each_month                = 'AO' + str( 5 + month * 3 )
+            str_cell_holiday_days_accumulate                = 'AO' + str( 6 + month * 3 )
+            str_cell_no_count_days_each_month               = 'AP' + str( 5 + month * 3 )
+            str_cell_no_count_days_accumulate               = 'AP' + str( 6 + month * 3 )
+            str_cell_sun_days_each_month                    = 'AQ' + str( 5 + month * 3 )
+            str_cell_sun_days_accumulate                    = 'AQ' + str( 6 + month * 3 )
+            str_cell_rain_days_each_month                   = 'AR' + str( 5 + month * 3 )
+            str_cell_rain_days_accumulate                   = 'AR' + str( 6 + month * 3 )
+            str_cell_rain_days_no_count_each_month          = 'AS' + str( 5 + month * 3 )
+            str_cell_rain_days_no_count_accumulate          = 'AS' + str( 6 + month * 3 )
+            str_cell_heavy_rain_days_each_month             = 'AT' + str( 5 + month * 3 )
+            str_cell_heavy_rain_days_accumulate             = 'AT' + str( 6 + month * 3 )
+            str_cell_heavy_rain_days_no_count_each_month    = 'AU' + str( 5 + month * 3 )
+            str_cell_heavy_rain_days_no_count_accumulate    = 'AU' + str( 6 + month * 3 )
+            str_cell_typhoon_days_each_month                = 'AV' + str( 5 + month * 3 )
+            str_cell_typhoon_days_accumulate                = 'AV' + str( 6 + month * 3 )
+            str_cell_typhoon_days_no_count_each_month       = 'AW' + str( 5 + month * 3 )
+            str_cell_typhoon_days_no_count_accumulate       = 'AW' + str( 6 + month * 3 )
+            str_cell_hot_days_each_month                    = 'AX' + str( 5 + month * 3 )
+            str_cell_hot_days_accumulate                    = 'AX' + str( 6 + month * 3 )
+            str_cell_hot_days_no_count_each_month           = 'AY' + str( 5 + month * 3 )
+            str_cell_hot_days_no_count_accumulate           = 'AY' + str( 6 + month * 3 )
+            str_cell_muddy_days_each_month                  = 'AZ' + str( 5 + month * 3 )
+            str_cell_muddy_days_accumulate                  = 'AZ' + str( 6 + month * 3 )
+            str_cell_muddy_days_no_count_each_month         = 'BA' + str( 5 + month * 3 )
+            str_cell_muddy_days_no_count_accumulate         = 'BA' + str( 6 + month * 3 )
+            str_cell_weather_other_days_each_month          = 'BB' + str( 5 + month * 3 )
+            str_cell_weather_other_days_accumulate          = 'BB' + str( 6 + month * 3 )
+            str_cell_weather_other_days_no_count_each_month = 'BC' + str( 5 + month * 3 )
+            str_cell_weather_other_days_no_count_accumulate = 'BC' + str( 6 + month * 3 )
+            str_cell_weather_no_count_days_each_month       = 'BD' + str( 5 + month * 3 )
+            str_cell_weather_no_count_days_accumulate       = 'BD' + str( 6 + month * 3 )
+            str_cell_suspend_work_days_each_month           = 'BE' + str( 5 + month * 3 )
+            str_cell_suspend_work_days_accumulate           = 'BE' + str( 6 + month * 3 )
+            str_cell_suspend_work_days_no_count_each_month  = 'BF' + str( 5 + month * 3 )
+            str_cell_suspend_work_days_no_count_accumulate  = 'BF' + str( 6 + month * 3 )
+            str_cell_power_off_days_each_month              = 'BG' + str( 5 + month * 3 )
+            str_cell_power_off_days_accumulate              = 'BG' + str( 6 + month * 3 )
+            str_cell_power_off_days_no_count_each_month     = 'BH' + str( 5 + month * 3 )
+            str_cell_power_off_days_no_count_accumulate     = 'BH' + str( 6 + month * 3 )
+            str_cell_human_other_days_each_month            = 'BI' + str( 5 + month * 3 )
+            str_cell_human_other_days_accumulate            = 'BI' + str( 6 + month * 3 )
+            str_cell_human_other_days_no_count_each_month   = 'BJ' + str( 5 + month * 3 )
+            str_cell_human_other_days_no_count_accumulate   = 'BJ' + str( 6 + month * 3 )
+            str_cell_human_no_count_days_each_month         = 'BK' + str( 5 + month * 3 )
+            str_cell_human_no_count_days_accumulate         = 'BK' + str( 6 + month * 3 )
         elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
-            str_cell_calendar_days_each_month = 'AM' + str( 4 + month * 4 )
-            str_cell_calendar_days_accumulate = 'AM' + str( 5 + month * 4 )
-            str_cell_weekend_days_each_month = 'AN' + str( 4 + month * 4 )
-            str_cell_weekend_days_accumulate = 'AN' + str( 5 + month * 4 )
-            str_cell_holiday_days_each_month = 'AO' + str( 4 + month * 4 )
-            str_cell_holiday_days_accumulate = 'AO' + str( 5 + month * 4 )
-            str_cell_no_count_days_each_month = 'AP' + str( 4 + month * 4 )
-            str_cell_no_count_days_accumulate = 'AP' + str( 5 + month * 4 )
+            str_cell_calendar_days_each_month               = 'AM' + str( 4 + month * 4 )
+            str_cell_calendar_days_accumulate               = 'AM' + str( 5 + month * 4 )
+            str_cell_weekend_days_each_month                = 'AN' + str( 4 + month * 4 )
+            str_cell_weekend_days_accumulate                = 'AN' + str( 5 + month * 4 )
+            str_cell_holiday_days_each_month                = 'AO' + str( 4 + month * 4 )
+            str_cell_holiday_days_accumulate                = 'AO' + str( 5 + month * 4 )
+            str_cell_no_count_days_each_month               = 'AP' + str( 4 + month * 4 )
+            str_cell_no_count_days_accumulate               = 'AP' + str( 5 + month * 4 )
+            str_cell_sun_days_each_month                    = 'AQ' + str( 4 + month * 4 )
+            str_cell_sun_days_accumulate                    = 'AQ' + str( 5 + month * 4 )
+            str_cell_rain_days_each_month                   = 'AR' + str( 4 + month * 4 )
+            str_cell_rain_days_accumulate                   = 'AR' + str( 5 + month * 4 )
+            str_cell_rain_days_no_count_each_month          = 'AS' + str( 4 + month * 4 )
+            str_cell_rain_days_no_count_accumulate          = 'AS' + str( 5 + month * 4 )
+            str_cell_heavy_rain_days_each_month             = 'AT' + str( 4 + month * 4 )
+            str_cell_heavy_rain_days_accumulate             = 'AT' + str( 5 + month * 4 )
+            str_cell_heavy_rain_days_no_count_each_month    = 'AU' + str( 4 + month * 4 )
+            str_cell_heavy_rain_days_no_count_accumulate    = 'AU' + str( 5 + month * 4 )
+            str_cell_typhoon_days_each_month                = 'AV' + str( 4 + month * 4 )
+            str_cell_typhoon_days_accumulate                = 'AV' + str( 5 + month * 4 )
+            str_cell_typhoon_days_no_count_each_month       = 'AW' + str( 4 + month * 4 )
+            str_cell_typhoon_days_no_count_accumulate       = 'AW' + str( 5 + month * 4 )
+            str_cell_hot_days_each_month                    = 'AX' + str( 4 + month * 4 )
+            str_cell_hot_days_accumulate                    = 'AX' + str( 5 + month * 4 )
+            str_cell_hot_days_no_count_each_month           = 'AY' + str( 4 + month * 4 )
+            str_cell_hot_days_no_count_accumulate           = 'AY' + str( 5 + month * 4 )
+            str_cell_muddy_days_each_month                  = 'AZ' + str( 4 + month * 4 )
+            str_cell_muddy_days_accumulate                  = 'AZ' + str( 5 + month * 4 )
+            str_cell_muddy_days_no_count_each_month         = 'BA' + str( 4 + month * 4 )
+            str_cell_muddy_days_no_count_accumulate         = 'BA' + str( 5 + month * 4 )
+            str_cell_weather_other_days_each_month          = 'BB' + str( 4 + month * 4 )
+            str_cell_weather_other_days_accumulate          = 'BB' + str( 5 + month * 4 )
+            str_cell_weather_other_days_no_count_each_month = 'BC' + str( 4 + month * 4 )
+            str_cell_weather_other_days_no_count_accumulate = 'BC' + str( 5 + month * 4 )
+            str_cell_weather_no_count_days_each_month       = 'BD' + str( 4 + month * 4 )
+            str_cell_weather_no_count_days_accumulate       = 'BD' + str( 5 + month * 4 )
+            str_cell_suspend_work_days_each_month           = 'BE' + str( 4 + month * 4 )
+            str_cell_suspend_work_days_accumulate           = 'BE' + str( 5 + month * 4 )
+            str_cell_suspend_work_days_no_count_each_month  = 'BF' + str( 4 + month * 4 )
+            str_cell_suspend_work_days_no_count_accumulate  = 'BF' + str( 5 + month * 4 )
+            str_cell_power_off_days_each_month              = 'BG' + str( 4 + month * 4 )
+            str_cell_power_off_days_accumulate              = 'BG' + str( 5 + month * 4 )
+            str_cell_power_off_days_no_count_each_month     = 'BH' + str( 4 + month * 4 )
+            str_cell_power_off_days_no_count_accumulate     = 'BH' + str( 5 + month * 4 )
+            str_cell_human_other_days_each_month            = 'BI' + str( 4 + month * 4 )
+            str_cell_human_other_days_accumulate            = 'BI' + str( 5 + month * 4 )
+            str_cell_human_other_days_no_count_each_month   = 'BJ' + str( 4 + month * 4 )
+            str_cell_human_other_days_no_count_accumulate   = 'BJ' + str( 5 + month * 4 )
+            str_cell_human_no_count_days_each_month         = 'BK' + str( 4 + month * 4 )
+            str_cell_human_no_count_days_accumulate         = 'BK' + str( 5 + month * 4 )
 
         obj_date_add_1 = obj_date + datetime.timedelta(days=1)
-        n_calendar_days_each_month += 1
-        n_calendar_days_accumulate += 1
 
-        if b_is_weekend[0]:
-            n_weekend_days_each_month += 1
-            n_weekend_days_accumulate += 1
-        if b_is_holiday[0]:
-            n_holiday_days_each_month += 1
-            n_holiday_days_accumulate += 1
-        if not b_is_work_day:
-            n_no_count_days_each_month += 1
-            n_no_count_days_accumulate += 1
-
-
+        #填入晴天/雨天/...停工/停電等欄位數值
         if obj_date.month != obj_date_add_1.month:
-            worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
-            worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
-            worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month
-            worksheet[ str_cell_weekend_days_accumulate ] = n_weekend_days_accumulate
-            worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month
-            worksheet[ str_cell_holiday_days_accumulate ] = n_holiday_days_accumulate
-            worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month
-            worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
+            #固定因素
+            worksheet[ str_cell_calendar_days_each_month ]               = n_calendar_days_each_month
+            worksheet[ str_cell_calendar_days_accumulate ]               = n_calendar_days_accumulate
+            worksheet[ str_cell_weekend_days_each_month ]                = n_weekend_days_each_month
+            worksheet[ str_cell_weekend_days_accumulate ]                = n_weekend_days_accumulate
+            worksheet[ str_cell_holiday_days_each_month ]                = n_holiday_days_each_month
+            worksheet[ str_cell_holiday_days_accumulate ]                = n_holiday_days_accumulate
+            worksheet[ str_cell_no_count_days_each_month ]               = n_no_count_days_each_month
+            worksheet[ str_cell_no_count_days_accumulate ]               = n_no_count_days_accumulate
+            #變動因素(天候)
+            worksheet[ str_cell_sun_days_each_month ]                    = f_sun_days_each_month
+            worksheet[ str_cell_sun_days_accumulate ]                    = f_sun_days_accumulate
+            worksheet[ str_cell_rain_days_each_month ]                   = f_rain_days_each_month
+            worksheet[ str_cell_rain_days_accumulate ]                   = f_rain_days_accumulate
+            worksheet[ str_cell_rain_days_no_count_each_month ]          = f_rain_days_no_count_each_month
+            worksheet[ str_cell_rain_days_no_count_accumulate ]          = f_rain_days_no_count_accumulate
+            worksheet[ str_cell_heavy_rain_days_each_month ]             = f_heavy_rain_days_each_month
+            worksheet[ str_cell_heavy_rain_days_accumulate ]             = f_heavy_rain_days_accumulate
+            worksheet[ str_cell_heavy_rain_days_no_count_each_month ]    = f_heavy_rain_days_no_count_each_month
+            worksheet[ str_cell_heavy_rain_days_no_count_accumulate ]    = f_heavy_rain_days_no_count_accumulate
+            worksheet[ str_cell_typhoon_days_each_month ]                = f_typhoon_days_each_month
+            worksheet[ str_cell_typhoon_days_accumulate ]                = f_typhoon_days_accumulate
+            worksheet[ str_cell_typhoon_days_no_count_each_month ]       = f_typhoon_days_no_count_each_month
+            worksheet[ str_cell_typhoon_days_no_count_accumulate ]       = f_typhoon_days_no_count_accumulate
+            worksheet[ str_cell_hot_days_each_month ]                    = f_hot_days_each_month
+            worksheet[ str_cell_hot_days_accumulate ]                    = f_hot_days_accumulate
+            worksheet[ str_cell_hot_days_no_count_each_month ]           = f_hot_days_no_count_each_month
+            worksheet[ str_cell_hot_days_no_count_accumulate ]           = f_hot_days_no_count_accumulate
+            worksheet[ str_cell_muddy_days_each_month ]                  = f_muddy_days_each_month
+            worksheet[ str_cell_muddy_days_accumulate ]                  = f_muddy_days_accumulate
+            worksheet[ str_cell_muddy_days_no_count_each_month ]         = f_muddy_days_no_count_each_month
+            worksheet[ str_cell_muddy_days_no_count_accumulate ]         = f_muddy_days_no_count_accumulate
+            worksheet[ str_cell_weather_other_days_each_month ]          = f_weather_other_days_each_month
+            worksheet[ str_cell_weather_other_days_accumulate ]          = f_weather_other_days_accumulate
+            worksheet[ str_cell_weather_other_days_no_count_each_month ] = f_weather_other_days_no_count_each_month
+            worksheet[ str_cell_weather_other_days_no_count_accumulate ] = f_weather_other_days_no_count_accumulate
+            worksheet[ str_cell_weather_no_count_days_each_month ]       = f_weather_no_count_days_each_month
+            worksheet[ str_cell_weather_no_count_days_accumulate ]       = f_weather_no_count_days_accumulate
+            #變動因素(人為)
+            worksheet[ str_cell_suspend_work_days_each_month ]           = f_suspend_work_days_each_month
+            worksheet[ str_cell_suspend_work_days_accumulate ]           = f_suspend_work_days_accumulate
+            worksheet[ str_cell_suspend_work_days_no_count_each_month ]  = f_suspend_work_days_no_count_each_month
+            worksheet[ str_cell_suspend_work_days_no_count_accumulate ]  = f_suspend_work_days_no_count_accumulate
+            worksheet[ str_cell_power_off_days_each_month ]              = f_power_off_days_each_month
+            worksheet[ str_cell_power_off_days_accumulate ]              = f_power_off_days_accumulate
+            worksheet[ str_cell_power_off_days_no_count_each_month ]     = f_power_off_days_no_count_each_month
+            worksheet[ str_cell_power_off_days_no_count_accumulate ]     = f_power_off_days_no_count_accumulate
+            worksheet[ str_cell_human_other_days_each_month ]            = f_human_other_days_each_month
+            worksheet[ str_cell_human_other_days_accumulate ]            = f_human_other_days_accumulate
+            worksheet[ str_cell_human_other_days_no_count_each_month ]   = f_human_other_days_no_count_each_month
+            worksheet[ str_cell_human_other_days_no_count_accumulate ]   = f_human_other_days_no_count_accumulate
+            worksheet[ str_cell_human_no_count_days_each_month ]         = f_human_no_count_days_each_month
+            worksheet[ str_cell_human_no_count_days_accumulate ]         = f_human_no_count_days_accumulate
+
             n_calendar_days_each_month = 0
             n_weekend_days_each_month = 0
             n_holiday_days_each_month = 0
             n_no_count_days_each_month = 0
 
+            f_sun_days_each_month = 0
+            f_rain_days_each_month = 0
+            f_rain_days_no_count_each_month = 0
+            f_heavy_rain_days_each_month = 0
+            f_heavy_rain_days_no_count_each_month = 0
+            f_typhoon_days_each_month = 0
+            f_typhoon_days_no_count_each_month = 0
+            f_hot_days_each_month = 0
+            f_hot_days_no_count_each_month = 0
+            f_muddy_days_each_month = 0
+            f_muddy_days_no_count_each_month = 0
+            f_weather_other_days_each_month = 0
+            f_weather_other_days_no_count_each_month = 0
+            f_weather_no_count_days_each_month = 0
+
+            f_suspend_work_days_each_month = 0
+            f_suspend_work_days_no_count_each_month = 0
+            f_power_off_days_each_month = 0
+            f_power_off_days_no_count_each_month = 0
+            f_human_other_days_each_month = 0
+            f_human_other_days_no_count_each_month = 0
+            f_human_no_count_days_each_month = 0
+
+
         if obj_date == obj_real_finish_date['RealFinishDate']:
             Utility.insert_image( worksheet, Utility.image_path_real_finish_day, up_marker, Utility.whole_size )
             if n_calendar_days_each_month != 0:
-                worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
-                worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month
-                worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month
-                worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month
+                #固定因素
+                worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month #A
+                worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month #B1
+                worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month #B2
+                worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month #B0
+                #變動因素(天候)
+                worksheet[ str_cell_sun_days_each_month ]                    = f_sun_days_each_month #C1
+                worksheet[ str_cell_rain_days_each_month ]                   = f_rain_days_each_month #C2
+                worksheet[ str_cell_rain_days_no_count_each_month ]          = f_rain_days_no_count_each_month #C2
+                worksheet[ str_cell_heavy_rain_days_each_month ]             = f_heavy_rain_days_each_month #C3
+                worksheet[ str_cell_heavy_rain_days_no_count_each_month ]    = f_heavy_rain_days_no_count_each_month #C3
+                worksheet[ str_cell_typhoon_days_each_month ]                = f_typhoon_days_each_month #C4
+                worksheet[ str_cell_typhoon_days_no_count_each_month ]       = f_typhoon_days_no_count_each_month #C4
+                worksheet[ str_cell_hot_days_each_month ]                    = f_hot_days_each_month #C5
+                worksheet[ str_cell_hot_days_no_count_each_month ]           = f_hot_days_no_count_each_month #C5
+                worksheet[ str_cell_muddy_days_each_month ]                  = f_muddy_days_each_month #C6
+                worksheet[ str_cell_muddy_days_no_count_each_month ]         = f_muddy_days_no_count_each_month #C6
+                worksheet[ str_cell_weather_other_days_each_month ]          = f_weather_other_days_each_month #C7
+                worksheet[ str_cell_weather_other_days_no_count_each_month ] = f_weather_other_days_no_count_each_month #C7
+                worksheet[ str_cell_weather_no_count_days_each_month ]       = f_weather_no_count_days_each_month #C0
+                #變動因素(人為)
+                worksheet[ str_cell_suspend_work_days_each_month ]           = f_suspend_work_days_each_month
+                worksheet[ str_cell_suspend_work_days_no_count_each_month ]  = f_suspend_work_days_no_count_each_month
+                worksheet[ str_cell_power_off_days_each_month ]              = f_power_off_days_each_month
+                worksheet[ str_cell_power_off_days_no_count_each_month ]     = f_power_off_days_no_count_each_month
+                worksheet[ str_cell_human_other_days_each_month ]            = f_human_other_days_each_month
+                worksheet[ str_cell_human_other_days_no_count_each_month ]   = f_human_other_days_no_count_each_month
+                worksheet[ str_cell_human_no_count_days_each_month ]         = f_human_no_count_days_each_month
+            #固定因素
             worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
             worksheet[ str_cell_weekend_days_accumulate ] = n_weekend_days_accumulate
             worksheet[ str_cell_holiday_days_accumulate ] = n_holiday_days_accumulate
             worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
+            #變動因素(天候)
+            worksheet[ str_cell_sun_days_accumulate ]                    = f_sun_days_accumulate
+            worksheet[ str_cell_rain_days_accumulate ]                   = f_rain_days_accumulate
+            worksheet[ str_cell_rain_days_no_count_accumulate ]          = f_rain_days_no_count_accumulate
+            worksheet[ str_cell_heavy_rain_days_accumulate ]             = f_heavy_rain_days_accumulate
+            worksheet[ str_cell_heavy_rain_days_no_count_accumulate ]    = f_heavy_rain_days_no_count_accumulate
+            worksheet[ str_cell_typhoon_days_accumulate ]                = f_typhoon_days_accumulate
+            worksheet[ str_cell_typhoon_days_no_count_accumulate ]       = f_typhoon_days_no_count_accumulate
+            worksheet[ str_cell_hot_days_accumulate ]                    = f_hot_days_accumulate
+            worksheet[ str_cell_hot_days_no_count_accumulate ]           = f_hot_days_no_count_accumulate
+            worksheet[ str_cell_muddy_days_accumulate ]                  = f_muddy_days_accumulate
+            worksheet[ str_cell_muddy_days_no_count_accumulate ]         = f_muddy_days_no_count_accumulate
+            worksheet[ str_cell_weather_other_days_accumulate ]          = f_weather_other_days_accumulate
+            worksheet[ str_cell_weather_other_days_no_count_accumulate ] = f_weather_other_days_no_count_accumulate
+            worksheet[ str_cell_weather_no_count_days_accumulate ]       = f_weather_no_count_days_accumulate
+            #變動因素(人為)
+            worksheet[ str_cell_suspend_work_days_accumulate ]           = f_suspend_work_days_accumulate
+            worksheet[ str_cell_suspend_work_days_no_count_accumulate ]  = f_suspend_work_days_no_count_accumulate
+            worksheet[ str_cell_power_off_days_accumulate ]              = f_power_off_days_accumulate
+            worksheet[ str_cell_power_off_days_no_count_accumulate ]     = f_power_off_days_no_count_accumulate
+            worksheet[ str_cell_human_other_days_accumulate ]            = f_human_other_days_accumulate
+            worksheet[ str_cell_human_other_days_no_count_accumulate ]   = f_human_other_days_no_count_accumulate
+            worksheet[ str_cell_human_no_count_days_accumulate ]         = f_human_no_count_days_accumulate
             break
 
         obj_date += datetime.timedelta(days=1)
@@ -413,4 +818,4 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     pass
 
 
-func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 411, datetime.datetime.strptime('2023-01-06', "%Y-%m-%d"), datetime.datetime.strptime('2023-03-16', "%Y-%m-%d") )
+func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 411, datetime.datetime.strptime('2023-01-06', "%Y-%m-%d"), datetime.datetime.strptime('2023-11-16', "%Y-%m-%d") )

@@ -22,5 +22,18 @@
     "weather_condition":4,
     "morning_nocount":0,
 	"afternoon_nocount":0
+  },
+  {
+	"_comment":"雨後泥濘",
+    "weather_condition":5,
+    "morning_nocount":0,
+	"afternoon_nocount":0
+  },
+  {
+	"_comment":"其他",
+    "weather_condition":6,
+    "morning_nocount":0,
+	"afternoon_nocount":0
   }
+  
 ]

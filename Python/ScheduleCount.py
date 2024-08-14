@@ -2,6 +2,24 @@ import json
 import os
 import datetime
 from enum import Enum
+from enum import IntEnum
+
+class Weather(IntEnum):
+    SUN = 0
+    RAIN = 1
+    HEAVY_RAIN = 2
+    TYPHOON = 3
+    HOT = 4
+    MUDDY = 5
+    OTHER = 6
+    TOTAL = 7
+
+class Human(IntEnum):
+    NONE = 0
+    SUSPEND_WORK = 1
+    POWER_OFF = 2
+    OTHER = 3
+    TOTAL = 4
 
 class WorkDay(Enum):
     ONE_DAY_OFF = 0
@@ -39,42 +57,57 @@ def func_load_json_holiday_data( arr_const_holiday, arr_const_workday ):
             arr_const_workday.append( datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d") )
 
 
-# 從 ConditionSetting.json 的檔案讀取每日資料
-def func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting ):
+# 從 WeatherConditionSetting.json / HumanConditionSetting.json 的檔案讀取每日資料
+def func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                           dict_morning_human_condition_setting, dict_afternoon_human_condition_setting ):
     current_dir = os.path.dirname( __file__ )
-    json_file_path = os.path.join( current_dir, 'ExternalData\\ConditionSetting.json' )
+    json_file_path = os.path.join( current_dir, 'ExternalData\\WeatherConditionSetting.json' )
     with open( json_file_path,'r', encoding='utf-8' ) as f:
-        data = json.load( f )
+        weather_data = json.load( f )
 
-    for item in data:
+    for item in weather_data:
         weather_condition = item[ "weather_condition" ]
         dict_morning_weather_condition_setting[ weather_condition ] = item[ "morning_nocount" ]
         dict_afternoon_weather_condition_setting[ weather_condition ] = item[ "afternoon_nocount" ]
+
+    json_file_path = os.path.join( current_dir, 'ExternalData\\HumanConditionSetting.json' )
+    with open( json_file_path,'r', encoding='utf-8' ) as f:
+        human_data = json.load( f )
+
+    for item in human_data:
+        human_condition = item[ "human_condition" ]
+        dict_morning_human_condition_setting[ human_condition ] = item[ "morning_nocount" ]
+        dict_afternoon_human_condition_setting[ human_condition ] = item[ "afternoon_nocount" ]
 
 # 從 DailyReport.json 的檔案讀取每日資料
 def func_load_json_daily_report_data( dict_weather_related_holiday ):
 
     dict_morning_weather_condition_setting = {}
     dict_afternoon_weather_condition_setting = {}
-    func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting )
+    dict_morning_human_condition_setting = {}
+    dict_afternoon_human_condition_setting = {}
+    func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting, 
+                                           dict_morning_human_condition_setting, dict_afternoon_human_condition_setting )
 
     current_dir = os.path.dirname( __file__ )
     json_file_path = os.path.join( current_dir, 'ExternalData\\DailyReport.json' )
 
     with open( json_file_path,'r', encoding='utf-8' ) as f:
-        data = json.load( f )
+        daily_report_data = json.load( f )
 
-    for item in data:
+    for item in daily_report_data:
         obj_date = datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d")
 
         n_morning_weather = item["morning_weather"]
-        n_morning_other = item["morning_other"]
         n_afternoon_weather = item["afternoon_weather"]
-        n_afternoon_other = item["afternoon_other"]
+        n_morning_human = item["morning_human"]
+        n_afternoon_human = item["afternoon_human"]
         f_nocount = 0
-        if( n_morning_weather != 0 or n_morning_other != 0 ):
+        if( n_morning_weather != Weather.SUN or n_morning_human != Human.NONE ):
             if n_morning_weather in dict_morning_weather_condition_setting:
-                f_morning_nocount = dict_morning_weather_condition_setting[ n_morning_weather ]
+                f_morning_weather_nocount = dict_morning_weather_condition_setting[ n_morning_weather ]
+                f_morning_human_nocount = dict_morning_human_condition_setting[ n_morning_human ]
+                f_morning_nocount = max( f_morning_weather_nocount, f_morning_human_nocount )
 
                 if f_morning_nocount == 1:
                     dict_weather_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
@@ -82,9 +115,11 @@ def func_load_json_daily_report_data( dict_weather_related_holiday ):
                 elif f_morning_nocount == 0.5:
                     f_nocount = 0.5
 
-        if( n_afternoon_weather != 0 or n_afternoon_other != 0 ):
+        if( n_afternoon_weather != Weather.SUN or n_afternoon_human != Human.NONE ):
             if n_afternoon_weather in dict_afternoon_weather_condition_setting:
-                f_afternoon_nocount = dict_afternoon_weather_condition_setting[ n_afternoon_weather ]
+                f_afternoon_weather_nocount = dict_afternoon_weather_condition_setting[ n_afternoon_weather ]
+                f_afternoon_human_nocount = dict_afternoon_human_condition_setting[ n_afternoon_human ]
+                f_afternoon_nocount = max( f_afternoon_weather_nocount, f_afternoon_human_nocount )
 
                 if f_afternoon_nocount == 1:
                     dict_weather_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
@@ -96,6 +131,74 @@ def func_load_json_daily_report_data( dict_weather_related_holiday ):
             dict_weather_related_holiday[ obj_date ] = CountWorkingDay.COUNT_HALF_DAY
         elif f_nocount == 1:
             dict_weather_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
+
+def func_condition_no_count( dict_morning_weather_condition_setting, 
+                             dict_afternoon_weather_condition_setting, 
+                             dict_morning_human_condition_setting, 
+                             dict_afternoon_human_condition_setting, 
+                             n_morning_weather, 
+                             n_afternoon_weather, 
+                             n_morning_human, 
+                             n_afternoon_human,
+                             dict_return_weather,
+                             dict_return_human ):
+
+    dict_return_weather[ Weather.RAIN ] = 0
+    dict_return_weather[ Weather.HEAVY_RAIN ] = 0
+    dict_return_weather[ Weather.TYPHOON ] = 0
+    dict_return_weather[ Weather.HOT ] = 0
+    dict_return_weather[ Weather.MUDDY ] = 0
+    dict_return_weather[ Weather.OTHER ] = 0
+    dict_return_weather[ Weather.TOTAL ] = 0
+
+    dict_return_human[ Human.SUSPEND_WORK ] = 0
+    dict_return_human[ Human.POWER_OFF ] = 0
+    dict_return_human[ Human.OTHER ] = 0
+    dict_return_human[ Human.TOTAL ] = 0
+
+    if n_morning_weather != Weather.SUN:
+        if n_morning_weather in dict_morning_weather_condition_setting:
+            f_morning_nocount = dict_morning_weather_condition_setting[ n_morning_weather ]
+
+            if f_morning_nocount == 1:
+                dict_return_weather[ n_morning_weather ] = 1
+                dict_return_weather[ Weather.TOTAL ] = 1
+            elif f_morning_nocount == 0.5:
+                dict_return_weather[ n_morning_weather ] += 0.5
+                dict_return_weather[ Weather.TOTAL ] += 0.5
+
+    if n_afternoon_weather != Weather.SUN:
+        if n_afternoon_weather in dict_afternoon_weather_condition_setting:
+            f_afternoon_nocount = dict_afternoon_weather_condition_setting[ n_afternoon_weather ]
+
+            if f_afternoon_nocount == 1:
+                dict_return_weather[ n_afternoon_weather ] = 1
+                dict_return_weather[ Weather.TOTAL ] = 1
+            elif f_afternoon_nocount == 0.5:
+                dict_return_weather[ n_afternoon_weather ] += 0.5
+                dict_return_weather[ Weather.TOTAL ] += 0.5
+
+    if n_morning_human != Human.NONE:
+        if n_morning_human in dict_morning_human_condition_setting:
+            f_morning_nocount = dict_morning_human_condition_setting[ n_morning_human ]
+
+            if f_morning_nocount == 1:
+                dict_return_human[ n_morning_human ] = 1
+                dict_return_human[ Human.TOTAL ] = 1
+            elif f_morning_nocount == 0.5:
+                dict_return_human[ n_morning_human ] += 0.5
+                dict_return_human[ Human.TOTAL ] += 0.5
+
+    if n_afternoon_human != Human.NONE:
+        if n_afternoon_human in dict_afternoon_human_condition_setting:
+            f_afternoon_nocount = dict_afternoon_human_condition_setting[ n_afternoon_human ]
+
+            if f_afternoon_nocount == 1:
+                dict_return_human[ n_afternoon_human ] = 1
+                dict_return_human[ Human.TOTAL ] = 1
+            elif f_afternoon_nocount == 0.5:
+                dict_return_human[ n_afternoon_human ] += 0.5
+                dict_return_human[ Human.TOTAL ] += 0.5
 
 # 從 ExtendData.json 的檔案讀取每日資料
 def func_load_json_extend_data(dict_extend_data):

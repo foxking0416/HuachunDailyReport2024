@@ -1,0 +1,27 @@
+[
+  {
+	"_comment":"無",
+    "human_condition":0,
+    "morning_nocount":0,
+	"afternoon_nocount":0
+  },
+  {
+	"_comment":"停工",
+    "human_condition":1,
+    "morning_nocount":1,
+	"afternoon_nocount":0.5
+  },
+  {
+	"_comment":"停電",
+    "human_condition":2,
+    "morning_nocount":1,
+	"afternoon_nocount":0.5
+  },
+  {
+	"_comment":"其他",
+    "human_condition":3,
+    "morning_nocount":0.5,
+	"afternoon_nocount":0.5
+  }
+  
+]
