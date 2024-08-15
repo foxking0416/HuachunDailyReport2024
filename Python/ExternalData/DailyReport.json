@@ -505,7 +505,7 @@
   },
   {
     "date":"2023-03-14",
-    "morning_weather":0,
+    "morning_weather":2,
     "afternoon_weather":0,
 	"morning_human":0,
     "afternoon_human":0
@@ -514,14 +514,14 @@
     "date":"2023-03-15",
     "morning_weather":0,
     "afternoon_weather":0,
-	"morning_human":0,
+	"morning_human":1,
     "afternoon_human":0
   },
   {
     "date":"2023-03-16",
     "morning_weather":0,
     "afternoon_weather":0,
-	"morning_human":0,
+	"morning_human":2,
     "afternoon_human":0
   },
   {
@@ -589,7 +589,7 @@
   },
   {
     "date":"2023-03-26",
-    "morning_weather":0,
+    "morning_weather":2,
     "afternoon_weather":0,
 	"morning_human":0,
     "afternoon_human":0
