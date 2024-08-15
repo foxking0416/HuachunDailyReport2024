@@ -720,6 +720,12 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             worksheet[ str_cell_holiday_days_accumulate ]                = n_holiday_days_accumulate
             worksheet[ str_cell_no_count_days_each_month ]               = n_no_count_days_each_month
             worksheet[ str_cell_no_count_days_accumulate ]               = n_no_count_days_accumulate
+            n_calendar_days_each_month = 0
+            n_weekend_days_each_month = 0
+            n_holiday_days_each_month = 0
+            n_no_count_days_each_month = 0
+
+        if ( obj_date.month != obj_date_add_1.month and obj_date <= obj_current_date ) or obj_date == obj_current_date:
             #變動因素(天候)
             worksheet[ str_cell_sun_days_each_month ]                    = f_sun_days_each_month
             worksheet[ str_cell_sun_days_accumulate ]                    = f_sun_days_accumulate
@@ -777,11 +783,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             worksheet[ str_cell_calendar_days_used_accumulate ]          = f_calendar_days_used_accumulate #使用天數(累計) F2
             worksheet[ str_cell_rest_calendar_days ]                     = f_rest_calendar_days #剩餘天數 F3 
 
-            n_calendar_days_each_month = 0
-            n_weekend_days_each_month = 0
-            n_holiday_days_each_month = 0
-            n_no_count_days_each_month = 0
-
             f_sun_days_each_month = 0
             f_rain_days_each_month = 0
             f_rain_days_no_count_each_month = 0
@@ -818,72 +819,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month #B1
                 worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month #B2
                 worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month #B0
-                #變動因素(天候)
-                worksheet[ str_cell_sun_days_each_month ]                    = f_sun_days_each_month #C1
-                worksheet[ str_cell_rain_days_each_month ]                   = f_rain_days_each_month #C2
-                worksheet[ str_cell_rain_days_no_count_each_month ]          = f_rain_days_no_count_each_month #C2
-                worksheet[ str_cell_heavy_rain_days_each_month ]             = f_heavy_rain_days_each_month #C3
-                worksheet[ str_cell_heavy_rain_days_no_count_each_month ]    = f_heavy_rain_days_no_count_each_month #C3
-                worksheet[ str_cell_typhoon_days_each_month ]                = f_typhoon_days_each_month #C4
-                worksheet[ str_cell_typhoon_days_no_count_each_month ]       = f_typhoon_days_no_count_each_month #C4
-                worksheet[ str_cell_hot_days_each_month ]                    = f_hot_days_each_month #C5
-                worksheet[ str_cell_hot_days_no_count_each_month ]           = f_hot_days_no_count_each_month #C5
-                worksheet[ str_cell_muddy_days_each_month ]                  = f_muddy_days_each_month #C6
-                worksheet[ str_cell_muddy_days_no_count_each_month ]         = f_muddy_days_no_count_each_month #C6
-                worksheet[ str_cell_weather_other_days_each_month ]          = f_weather_other_days_each_month #C7
-                worksheet[ str_cell_weather_other_days_no_count_each_month ] = f_weather_other_days_no_count_each_month #C7
-                worksheet[ str_cell_weather_no_count_days_each_month ]       = f_weather_no_count_days_each_month #C0
-                #變動因素(人為)
-                worksheet[ str_cell_suspend_work_days_each_month ]           = f_suspend_work_days_each_month
-                worksheet[ str_cell_suspend_work_days_no_count_each_month ]  = f_suspend_work_days_no_count_each_month
-                worksheet[ str_cell_power_off_days_each_month ]              = f_power_off_days_each_month
-                worksheet[ str_cell_power_off_days_no_count_each_month ]     = f_power_off_days_no_count_each_month
-                worksheet[ str_cell_human_other_days_each_month ]            = f_human_other_days_each_month
-                worksheet[ str_cell_human_other_days_no_count_each_month ]   = f_human_other_days_no_count_each_month
-                worksheet[ str_cell_human_no_count_days_each_month ]         = f_human_no_count_days_each_month
-
-
-            # worksheet[ str_cell_total_work_days_days ]                   = n_total_work_days #合約工期 E1
-            # worksheet[ str_cell_work_days_no_count_each_month ]          = f_work_days_no_count_each_month #不計工期(每月) E0
-            # worksheet[ str_cell_work_days_no_count_accumulate ]          = f_work_days_no_count_accumulate #不計工期(累計) E0
-            # worksheet[ str_cell_work_days_used_each_month ]              = f_work_days_used_each_month #使用工期(每月) E2
-            # worksheet[ str_cell_work_days_used_accumulate ]              = f_work_days_used_accumulate #使用工期(累計) E2
-            # worksheet[ str_cell_rest_work_days ]                         = f_rest_work_days #剩餘工期 E3
-        
-            # worksheet[ str_cell_total_calendar_days ]                    = f_total_calendar_days #總天數 F1
-            # worksheet[ str_cell_calendar_days_used_each_month ]          = f_calendar_days_used_each_month #使用天數(每月) F2
-            # worksheet[ str_cell_calendar_days_used_accumulate ]          = f_calendar_days_used_accumulate #使用天數(累計) F2
-            # worksheet[ str_cell_rest_calendar_days ]                     = f_rest_calendar_days #剩餘天數 F3 
-
-
-            #固定因素
-            worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
-            worksheet[ str_cell_weekend_days_accumulate ] = n_weekend_days_accumulate
-            worksheet[ str_cell_holiday_days_accumulate ] = n_holiday_days_accumulate
-            worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
-            #變動因素(天候)
-            worksheet[ str_cell_sun_days_accumulate ]                    = f_sun_days_accumulate
-            worksheet[ str_cell_rain_days_accumulate ]                   = f_rain_days_accumulate
-            worksheet[ str_cell_rain_days_no_count_accumulate ]          = f_rain_days_no_count_accumulate
-            worksheet[ str_cell_heavy_rain_days_accumulate ]             = f_heavy_rain_days_accumulate
-            worksheet[ str_cell_heavy_rain_days_no_count_accumulate ]    = f_heavy_rain_days_no_count_accumulate
-            worksheet[ str_cell_typhoon_days_accumulate ]                = f_typhoon_days_accumulate
-            worksheet[ str_cell_typhoon_days_no_count_accumulate ]       = f_typhoon_days_no_count_accumulate
-            worksheet[ str_cell_hot_days_accumulate ]                    = f_hot_days_accumulate
-            worksheet[ str_cell_hot_days_no_count_accumulate ]           = f_hot_days_no_count_accumulate
-            worksheet[ str_cell_muddy_days_accumulate ]                  = f_muddy_days_accumulate
-            worksheet[ str_cell_muddy_days_no_count_accumulate ]         = f_muddy_days_no_count_accumulate
-            worksheet[ str_cell_weather_other_days_accumulate ]          = f_weather_other_days_accumulate
-            worksheet[ str_cell_weather_other_days_no_count_accumulate ] = f_weather_other_days_no_count_accumulate
-            worksheet[ str_cell_weather_no_count_days_accumulate ]       = f_weather_no_count_days_accumulate
-            #變動因素(人為)
-            worksheet[ str_cell_suspend_work_days_accumulate ]           = f_suspend_work_days_accumulate
-            worksheet[ str_cell_suspend_work_days_no_count_accumulate ]  = f_suspend_work_days_no_count_accumulate
-            worksheet[ str_cell_power_off_days_accumulate ]              = f_power_off_days_accumulate
-            worksheet[ str_cell_power_off_days_no_count_accumulate ]     = f_power_off_days_no_count_accumulate
-            worksheet[ str_cell_human_other_days_accumulate ]            = f_human_other_days_accumulate
-            worksheet[ str_cell_human_other_days_no_count_accumulate ]   = f_human_other_days_no_count_accumulate
-            worksheet[ str_cell_human_no_count_days_accumulate ]         = f_human_no_count_days_accumulate
             break
 
         obj_date += datetime.timedelta(days=1)
