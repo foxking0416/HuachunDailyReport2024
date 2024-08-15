@@ -8,6 +8,7 @@ import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
 g_DailyReportType = Utility.DailyReportType.TYPE_A
+g_draw_triangle_for_weekend = False
 
 g_project_no = "Avenger001" #案號
 g_project_name = "鋼鐵人的基地興建工程" #工程名稱
@@ -192,6 +193,32 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         worksheet['BM2'] = g_project_designer
         worksheet['AF3'] = g_project_contractor
         worksheet['BM3'] = g_project_contractor
+
+        arr_sunday_column = ['B', 'I', 'P', 'W', 'AD', 'AK']
+        arr_saturday_column = ['H', 'O', 'V', 'AC', 'AJ']
+        if not g_draw_triangle_for_weekend:
+            if e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF or e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
+                for column in arr_sunday_column:
+                    str_fill_cell = column + str( 6 )
+                    worksheet[str_fill_cell].fill = Utility.fill_green
+                    for i in range( 36 ):
+                        str_fill_cell = column + str( i + 8 )
+                        worksheet[str_fill_cell].fill = Utility.fill_green
+                if e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
+                    for column in arr_saturday_column:
+                        str_fill_cell = column + str( 6 )
+                        worksheet[str_fill_cell].fill = Utility.fill_green
+                        for i in range( 36 ):
+                            str_fill_cell = column + str( i + 8 )
+                            worksheet[str_fill_cell].fill = Utility.fill_green
+        else:
+            for column in arr_sunday_column:
+                str_fill_cell = column + str( 6 )
+                worksheet[str_fill_cell].fill = Utility.fill_green
+            for column in arr_saturday_column:
+                str_fill_cell = column + str( 6 )
+                worksheet[str_fill_cell].fill = Utility.fill_yellow
+
 
     with open(json_file_daily_report_path,'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -510,7 +537,10 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             # f_rest_calendar_days = 0 #F3
 
 
-        if b_is_weekend[0] or b_is_holiday[0]:
+        if b_is_weekend[0]:
+            if g_draw_triangle_for_weekend:
+                Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
+        elif b_is_holiday[0]:
             Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
         elif b_is_make_up_workday[0]:
             Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
