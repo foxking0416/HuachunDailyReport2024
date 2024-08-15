@@ -395,37 +395,37 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 f_hot_days_each_month += 0.5
                 f_hot_days_accumulate += 0.5
             elif daily_data["afternoon_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
-                Utility.insert_image( worksheet, Utility.image_path_muddy_up,         down_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_muddy_down,       down_marker, Utility.half_size )
                 f_muddy_days_each_month += 0.5
                 f_muddy_days_accumulate += 0.5
             elif daily_data["afternoon_weather"] == ScheduleCount.Weather.OTHER:#其他
-                Utility.insert_image( worksheet, Utility.image_path_weather_other_up, down_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_weather_other_down, down_marker, Utility.half_size )
                 f_weather_other_days_each_month += 0.5
                 f_weather_other_days_accumulate += 0.5
 
             if daily_data["morning_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                # Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_suspend_work_up,   up_marker, Utility.half_size )
                 f_suspend_work_days_each_month += 0.5
                 f_suspend_work_days_accumulate += 0.5
             elif daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
-                # Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_power_off_up,      up_marker, Utility.half_size )
                 f_power_off_days_each_month += 0.5
                 f_power_off_days_accumulate += 0.5
             elif daily_data["morning_human"] == ScheduleCount.Human.OTHER:#其他
-                # Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_human_other_up,    up_marker, Utility.half_size )
                 f_human_other_days_each_month += 0.5
                 f_human_other_days_accumulate += 0.5
 
             if daily_data["afternoon_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                # Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_suspend_work_down, down_marker, Utility.half_size )
                 f_suspend_work_days_each_month += 0.5
                 f_suspend_work_days_accumulate += 0.5
             elif daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
-                # Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_power_off_down,    down_marker, Utility.half_size )
                 f_power_off_days_each_month += 0.5
                 f_power_off_days_accumulate += 0.5
             elif daily_data["afternoon_human"] == ScheduleCount.Human.OTHER:#其他
-                # Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
+                Utility.insert_image( worksheet, Utility.image_path_human_other_down,  down_marker, Utility.half_size )
                 f_human_other_days_each_month += 0.5
                 f_human_other_days_accumulate += 0.5
 

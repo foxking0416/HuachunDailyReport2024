@@ -359,7 +359,7 @@
   {
     "date":"2023-02-21",
     "morning_weather":0,
-    "afternoon_weather":0,
+    "afternoon_weather":5,
 	"morning_human":0,
     "afternoon_human":0
   },
