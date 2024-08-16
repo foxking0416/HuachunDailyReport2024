@@ -80,7 +80,7 @@ def func_load_json_condition_setting_data( dict_morning_weather_condition_settin
         dict_afternoon_human_condition_setting[ human_condition ] = item[ "afternoon_nocount" ]
 
 # 從 DailyReport.json 的檔案讀取每日資料
-def func_load_json_daily_report_data( dict_weather_related_holiday ):
+def func_load_json_daily_report_data( dict_weather_and_human_related_holiday ):
 
     dict_morning_weather_condition_setting = {}
     dict_afternoon_weather_condition_setting = {}
@@ -104,33 +104,41 @@ def func_load_json_daily_report_data( dict_weather_related_holiday ):
         n_afternoon_human = item["afternoon_human"]
         f_nocount = 0
         if( n_morning_weather != Weather.SUN or n_morning_human != Human.NONE ):
+            f_morning_weather_nocount = 0
+            f_morning_human_nocount = 0
             if n_morning_weather in dict_morning_weather_condition_setting:
                 f_morning_weather_nocount = dict_morning_weather_condition_setting[ n_morning_weather ]
+            if n_morning_human in dict_morning_human_condition_setting:
                 f_morning_human_nocount = dict_morning_human_condition_setting[ n_morning_human ]
-                f_morning_nocount = max( f_morning_weather_nocount, f_morning_human_nocount )
+            f_morning_nocount = max( f_morning_weather_nocount, f_morning_human_nocount )
 
-                if f_morning_nocount == 1:
-                    dict_weather_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
-                    continue
-                elif f_morning_nocount == 0.5:
-                    f_nocount = 0.5
+            if f_morning_nocount == 1:
+                dict_weather_and_human_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
+                continue
+            elif f_morning_nocount == 0.5:
+                f_nocount = 0.5
 
         if( n_afternoon_weather != Weather.SUN or n_afternoon_human != Human.NONE ):
+            f_afternoon_weather_nocount = 0
+            f_afternoon_human_nocount = 0
             if n_afternoon_weather in dict_afternoon_weather_condition_setting:
                 f_afternoon_weather_nocount = dict_afternoon_weather_condition_setting[ n_afternoon_weather ]
+            if n_afternoon_human in dict_afternoon_human_condition_setting:
                 f_afternoon_human_nocount = dict_afternoon_human_condition_setting[ n_afternoon_human ]
-                f_afternoon_nocount = max( f_afternoon_weather_nocount, f_afternoon_human_nocount )
+            f_afternoon_nocount = max( f_afternoon_weather_nocount, f_afternoon_human_nocount )
 
-                if f_afternoon_nocount == 1:
-                    dict_weather_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
-                    continue
-                elif f_afternoon_nocount == 0.5:
-                    f_nocount += 0.5
+            if f_afternoon_nocount == 1:
+                dict_weather_and_human_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
+                continue
+            elif f_afternoon_nocount == 0.5:
+                f_nocount += 0.5
 
         if f_nocount == 0.5:
-            dict_weather_related_holiday[ obj_date ] = CountWorkingDay.COUNT_HALF_DAY
+            dict_weather_and_human_related_holiday[ obj_date ] = CountWorkingDay.COUNT_HALF_DAY
         elif f_nocount == 1:
-            dict_weather_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
+            dict_weather_and_human_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
+
+    return daily_report_data
 
 def func_condition_no_count( dict_morning_weather_condition_setting, 
                              dict_afternoon_weather_condition_setting, 
@@ -281,9 +289,9 @@ def func_count_expect_finish_date( e_count_type, n_expect_total_workdays, obj_st
 # obj_today_date 今天日期，如 '2023-01-01'
 # arr_const_holiday 固定因素放假日
 # arr_const_workday 固定因素補班日
-# dict_weather_related_holiday 因為天氣停工資料
+# dict_weather_and_human_related_holiday 因為天氣停工資料
 # dict_extend_data 追加工期資料
-def func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_today_date, arr_const_holiday, arr_const_workday, dict_weather_related_holiday, dict_extend_data ):
+def func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_today_date, arr_const_holiday, arr_const_workday, dict_weather_and_human_related_holiday, dict_extend_data ):
     obj_real_end_date = obj_start_date 
     obj_expect_end_date = obj_start_date
     n_real_rest_workdays = n_expect_total_workdays
@@ -327,10 +335,10 @@ def func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_star
         b_is_make_up_workday = [False]
         if func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_real_end_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
             if obj_real_end_date <= obj_today_date:
-                if obj_real_end_date in dict_weather_related_holiday:
-                    if dict_weather_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
+                if obj_real_end_date in dict_weather_and_human_related_holiday:
+                    if dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
                         pass
-                    elif dict_weather_related_holiday[ obj_real_end_date ] == CountWorkingDay.COUNT_HALF_DAY:
+                    elif dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.COUNT_HALF_DAY:
                         n_past_workdays += 0.5
                         n_real_rest_workdays -= 0.5
                     else:

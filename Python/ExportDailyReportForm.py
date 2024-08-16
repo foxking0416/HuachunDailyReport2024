@@ -153,7 +153,6 @@ def func_find_daily_data_by_date( daily_report_date, obj_date ):
 
 def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date ):
     LunarCalendar.func_load_lunar_holiday_data()
-    json_file_daily_report_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
     input_excel =  None
     if g_daily_report_type == Utility.DailyReportType.TYPE_A:
         input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_A.xlsx')
@@ -168,11 +167,11 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     arr_const_workday = []
     ScheduleCount.func_load_json_holiday_data( arr_const_holiday,arr_const_workday )
 
-    dict_weather_related_holiday = {}
-    ScheduleCount.func_load_json_daily_report_data( dict_weather_related_holiday )
+    dict_weather_and_human_related_holiday = {}
+    daily_report_data = ScheduleCount.func_load_json_daily_report_data( dict_weather_and_human_related_holiday )
     dict_extend_data = {}
     ScheduleCount.func_load_json_extend_data( dict_extend_data )
-    obj_real_finish_date = ScheduleCount.func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date, arr_const_holiday, arr_const_workday, dict_weather_related_holiday, dict_extend_data )
+    obj_real_finish_date = ScheduleCount.func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date, arr_const_holiday, arr_const_workday, dict_weather_and_human_related_holiday, dict_extend_data )
 
     dict_morning_weather_condition_setting = {}
     dict_afternoon_weather_condition_setting = {}
@@ -229,8 +228,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 worksheet[str_fill_cell].fill = Utility.fill_yellow
 
 
-    with open(json_file_daily_report_path,'r', encoding='utf-8') as f:
-        data = json.load(f)
+
     #TODO 可以把json檔案做排序
 
     # region 定義計算各種天數的參數
@@ -306,7 +304,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     # endregion
 
     while( True ):
-        daily_data = func_find_daily_data_by_date( data, obj_date )
+        daily_data = func_find_daily_data_by_date( daily_report_data, obj_date )
         n_weekday = obj_date.weekday()
         n_year = obj_date.year
         if n_year != n_last_year:
@@ -315,6 +313,9 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             n_last_year = n_year
 
         month = obj_date.month
+
+
+
 
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
@@ -346,10 +347,10 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         b_is_work_day = ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday )
         if b_is_work_day:
             if daily_data and obj_date <= obj_current_date:
-                if obj_date in dict_weather_related_holiday:
-                    if dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
+                if obj_date in dict_weather_and_human_related_holiday:
+                    if dict_weather_and_human_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
                         pass
-                    elif dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.COUNT_HALF_DAY:
+                    elif dict_weather_and_human_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.COUNT_HALF_DAY:
                         n_workdays_from_start += 0.5
                     else:
                         n_workdays_from_start += 1
@@ -509,11 +510,11 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
 
             if b_is_work_day:
-                if obj_date in dict_weather_related_holiday:
-                    if dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
+                if obj_date in dict_weather_and_human_related_holiday:
+                    if dict_weather_and_human_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.NO_COUNT:
                         f_work_days_no_count_each_month += 1
                         f_work_days_no_count_accumulate += 1
-                    elif dict_weather_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.COUNT_HALF_DAY:
+                    elif dict_weather_and_human_related_holiday[ obj_date ] == ScheduleCount.CountWorkingDay.COUNT_HALF_DAY:
                         f_work_days_no_count_each_month += 0.5
                         f_work_days_no_count_accumulate += 0.5
                         f_work_days_used_each_month += 0.5
