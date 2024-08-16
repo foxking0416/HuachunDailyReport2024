@@ -29,10 +29,73 @@ def func_fill_in_day_each_month( obj_worksheet, n_input_year ):
         n_day = obj_date.day
 
         obj_cell_num = func_get_cell_num( obj_date )
-        n_column = obj_cell_num['ColumnNum']
-        n_row = obj_cell_num['RowNum']
-        str_cell = Utility.number_to_string( n_column ) + str( n_row )
-        obj_worksheet[str_cell] = n_day
+        n_column_for_image = obj_cell_num['ColumnNum']-1
+        n_row_for_image = obj_cell_num['RowNum']-1
+        up_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_up_offset )
+        if n_day == 1:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_01, up_marker, Utility.whole_size )
+        elif n_day == 2:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_02, up_marker, Utility.whole_size )
+        elif n_day == 3:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_03, up_marker, Utility.whole_size )
+        elif n_day == 4:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_04, up_marker, Utility.whole_size )
+        elif n_day == 5:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_05, up_marker, Utility.whole_size )
+        elif n_day == 6:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_06, up_marker, Utility.whole_size )
+        elif n_day == 7:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_07, up_marker, Utility.whole_size )
+        elif n_day == 8:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_08, up_marker, Utility.whole_size )
+        elif n_day == 9:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_09, up_marker, Utility.whole_size )
+        elif n_day == 10:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_10, up_marker, Utility.whole_size )
+        elif n_day == 11:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_11, up_marker, Utility.whole_size )
+        elif n_day == 12:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_12, up_marker, Utility.whole_size )
+        elif n_day == 13:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_13, up_marker, Utility.whole_size )
+        elif n_day == 14:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_14, up_marker, Utility.whole_size )
+        elif n_day == 15:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_15, up_marker, Utility.whole_size )
+        elif n_day == 16:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_16, up_marker, Utility.whole_size )
+        elif n_day == 17:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_17, up_marker, Utility.whole_size )
+        elif n_day == 18:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_18, up_marker, Utility.whole_size )
+        elif n_day == 19:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_19, up_marker, Utility.whole_size )
+        elif n_day == 20:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_20, up_marker, Utility.whole_size )
+        elif n_day == 21:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_21, up_marker, Utility.whole_size )
+        elif n_day == 22:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_22, up_marker, Utility.whole_size )
+        elif n_day == 23:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_23, up_marker, Utility.whole_size )
+        elif n_day == 24:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_24, up_marker, Utility.whole_size )
+        elif n_day == 25:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_25, up_marker, Utility.whole_size )
+        elif n_day == 26:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_26, up_marker, Utility.whole_size )
+        elif n_day == 27:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_27, up_marker, Utility.whole_size )            
+        elif n_day == 28:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_28, up_marker, Utility.whole_size )
+        elif n_day == 29:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_29, up_marker, Utility.whole_size )
+        elif n_day == 30:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_30, up_marker, Utility.whole_size )
+        elif n_day == 31:
+            Utility.insert_image( obj_worksheet, Utility.image_path_day_31, up_marker, Utility.whole_size )      
+        # str_cell = Utility.number_to_string( n_column ) + str( n_row )
+        # obj_worksheet[str_cell] = n_day
         obj_date += datetime.timedelta( days = 1 )
 
 def func_get_cell_num( obj_date ):
@@ -148,7 +211,6 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             worksheet = workbook.worksheets[ n_worksheet_index ]
             n_worksheet_index += 1
             n_last_year = n_year
-            func_fill_in_day_each_month( worksheet, n_year )
 
         month = obj_date.month
 
@@ -238,8 +300,6 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             n_holiday_days_each_month = 0
             n_no_count_days_each_month = 0
 
-
-
         if(n_expect_total_workdays <= 0):
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
             if n_calendar_days_each_month != 0:
@@ -255,6 +315,12 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             break
 
         obj_date += datetime.timedelta( days = 1 )
+
+    n_worksheet_index = 0
+    for n_year in range( n_start_year, n_end_year + 1 ):
+        worksheet = workbook.worksheets[ n_worksheet_index ]
+        func_fill_in_day_each_month( worksheet, n_year )
+        n_worksheet_index += 1
 
     any_serial_num = False
     serial_number = 1
