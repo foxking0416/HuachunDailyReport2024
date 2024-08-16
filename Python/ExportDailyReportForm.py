@@ -7,7 +7,7 @@ import datetime
 import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
-g_DailyReportType = Utility.DailyReportType.TYPE_A
+g_daily_report_type = Utility.DailyReportType.TYPE_A
 g_draw_triangle_for_weekend = False
 
 g_project_no = "Avenger001" #案號
@@ -33,7 +33,7 @@ def func_fill_in_day_each_month( worksheet, input_year ):
 
         obj_cell_num = func_get_cell_num( date_obj )
         column = obj_cell_num['ColumnNum']
-        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+        if g_daily_report_type == Utility.DailyReportType.TYPE_A:
             n_column_for_image = obj_cell_num['ColumnNum']-1
             n_row_for_image = obj_cell_num['RowNum']-1
             up_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_up_offset )
@@ -99,7 +99,7 @@ def func_fill_in_day_each_month( worksheet, input_year ):
                 Utility.insert_image( worksheet, Utility.image_path_day_30, up_marker, Utility.whole_size )
             elif day == 31:
                 Utility.insert_image( worksheet, Utility.image_path_day_31, up_marker, Utility.whole_size )        
-        elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+        elif g_daily_report_type == Utility.DailyReportType.TYPE_B:
             row = obj_cell_num['RowNum'] + 1
             cell = Utility.number_to_string(column)+str(row)
             worksheet[cell] = day
@@ -113,21 +113,21 @@ def func_get_cell_num( obj_date ):
         weekday += 7
 
     row_num = None
-    if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+    if g_daily_report_type == Utility.DailyReportType.TYPE_A:
         row_num = 5 + month * 3
-    elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+    elif g_daily_report_type == Utility.DailyReportType.TYPE_B:
         row_num = 4 + month * 4
     
     week_num = func_get_week_num( obj_date )
     column_num = 1 + ( week_num - 1 ) * 7 + weekday
 
 
-    returnValue = {}
-    returnValue['WeekNum'] = week_num
-    returnValue['RowNum'] = row_num
-    returnValue['ColumnNum'] = column_num
-    returnValue['ColumnString'] = Utility.number_to_string( column_num )
-    return returnValue
+    return_value = {}
+    return_value['WeekNum'] = week_num
+    return_value['RowNum'] = row_num
+    return_value['ColumnNum'] = column_num
+    return_value['ColumnString'] = Utility.number_to_string( column_num )
+    return return_value
 
 def func_get_week_num( obj_date ):
     day = obj_date.day
@@ -154,9 +154,9 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     LunarCalendar.func_load_lunar_holiday_data()
     json_file_daily_report_path = os.path.join( Utility.current_dir, 'ExternalData\\DailyReport.json')
     input_excel =  None
-    if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+    if g_daily_report_type == Utility.DailyReportType.TYPE_A:
         input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_A.xlsx')
-    elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+    elif g_daily_report_type == Utility.DailyReportType.TYPE_B:
         input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_B.xlsx')
     output_excel = os.path.join( Utility.parent_dir, 'DailyReportFinal.xlsx') 
 
@@ -173,9 +173,16 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     ScheduleCount.func_load_json_extend_data( dict_extend_data )
     obj_real_finish_date = ScheduleCount.func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date, arr_const_holiday, arr_const_workday, dict_weather_related_holiday, dict_extend_data )
 
+    dict_morning_weather_condition_setting = {}
+    dict_afternoon_weather_condition_setting = {}
+    dict_morning_human_condition_setting = {}
+    dict_afternoon_human_condition_setting = {}
+    ScheduleCount.func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                                         dict_morning_human_condition_setting, dict_afternoon_human_condition_setting )
+
     n_start_year = obj_start_date.year
     n_end_year = obj_real_finish_date['RealFinishDate'].year
-    #先看有多少年的資料，建立所需worksheet
+    #先看有多少年的資料，建立所需worksheet，並且做填色
     for n_year in range( n_start_year, n_end_year + 1 ):
         if n_year != n_start_year:
             worksheet = workbook.copy_worksheet( worksheet )
@@ -194,6 +201,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         worksheet['AF3'] = g_project_contractor
         worksheet['BM3'] = g_project_contractor
 
+        #填色
         arr_sunday_column = ['B', 'I', 'P', 'W', 'AD', 'AK']
         arr_saturday_column = ['H', 'O', 'V', 'AC', 'AJ']
         if not g_draw_triangle_for_weekend:
@@ -224,6 +232,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         data = json.load(f)
     #TODO 可以把json檔案做排序
 
+    # region 定義計算各種天數的參數
     obj_date = obj_start_date
     n_workdays_from_start = 0
 
@@ -291,27 +300,18 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     f_calendar_days_used_accumulate = 0 #F2
     f_rest_calendar_days = 0 #F3
 
-
-
-    last_month = 0
-    last_year = 0
-    worksheet_index = -1
-
-    dict_morning_weather_condition_setting = {}
-    dict_afternoon_weather_condition_setting = {}
-    dict_morning_human_condition_setting = {}
-    dict_afternoon_human_condition_setting = {}
-    ScheduleCount.func_load_json_condition_setting_data( dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
-                                                         dict_morning_human_condition_setting, dict_afternoon_human_condition_setting )
+    n_last_year = 0
+    n_worksheet_index = -1
+    # endregion
 
     while( True ):
         daily_data = func_find_daily_data_by_date( data, obj_date )
         n_Weekday = obj_date.weekday()
         year = obj_date.year
-        if year != last_year:
-            worksheet_index += 1
-            last_year = year
-        worksheet = workbook.worksheets[ worksheet_index ]
+        if year != n_last_year:
+            n_worksheet_index += 1
+            n_last_year = year
+        worksheet = workbook.worksheets[ n_worksheet_index ]
         month = obj_date.month
 
         obj_cell_num = func_get_cell_num( obj_date )
@@ -324,16 +324,16 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
         str_lunar_reason = LunarCalendar.func_get_lunar_reason( obj_date )
         if str_lunar_reason != None:
-            if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+            if g_daily_report_type == Utility.DailyReportType.TYPE_A:
                 n_row_for_note = obj_cell_num['RowNum'] + 1
-            elif  g_DailyReportType == Utility.DailyReportType.TYPE_B:
+            elif  g_daily_report_type == Utility.DailyReportType.TYPE_B:
                 n_row_for_note = obj_cell_num['RowNum'] + 2
             cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
             worksheet[ cell_note ] = str_lunar_reason
 
-        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+        if g_daily_report_type == Utility.DailyReportType.TYPE_A:
             n_row_workdays_from_start = obj_cell_num['RowNum'] + 2
-        elif  g_DailyReportType == Utility.DailyReportType.TYPE_B:
+        elif  g_daily_report_type == Utility.DailyReportType.TYPE_B:
             n_row_workdays_from_start = obj_cell_num['RowNum'] + 3
 
         cell_workdays_from_start = Utility.number_to_string( n_column_for_text ) + str( n_row_workdays_from_start )
@@ -614,7 +614,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
 
 
-        if g_DailyReportType == Utility.DailyReportType.TYPE_A:
+        if g_daily_report_type == Utility.DailyReportType.TYPE_A:
             str_cell_calendar_days_each_month               = 'AM' + str( 5 + month * 3 )
             str_cell_calendar_days_accumulate               = 'AM' + str( 6 + month * 3 )
             str_cell_weekend_days_each_month                = 'AN' + str( 5 + month * 3 )
@@ -675,7 +675,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             str_cell_calendar_days_used_each_month          = 'BQ' + str( 5 + month * 3 )
             str_cell_calendar_days_used_accumulate          = 'BQ' + str( 6 + month * 3 )
             str_cell_rest_calendar_days                     = 'BR' + str( 5 + month * 3 )
-        elif g_DailyReportType == Utility.DailyReportType.TYPE_B:
+        elif g_daily_report_type == Utility.DailyReportType.TYPE_B:
             str_cell_calendar_days_each_month               = 'AM' + str( 4 + month * 4 )
             str_cell_calendar_days_accumulate               = 'AM' + str( 5 + month * 4 )
             str_cell_weekend_days_each_month                = 'AN' + str( 4 + month * 4 )
@@ -861,11 +861,11 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     up_marker = AnchorMarker(col=column, colOff=Utility.col_offset, row=row, rowOff=Utility.row_up_offset)
     Utility.insert_image( worksheet, Utility.image_path_start_day, up_marker, Utility.whole_size)
 
-    worksheet_index = 0
+    n_worksheet_index = 0
     for n_year in range( n_start_year, n_end_year + 1 ):
-        worksheet = workbook.worksheets[ worksheet_index ]
+        worksheet = workbook.worksheets[ n_worksheet_index ]
         func_fill_in_day_each_month( worksheet, n_year )
-        worksheet_index += 1
+        n_worksheet_index += 1
 
     #填入當月天數及固定因素
 
