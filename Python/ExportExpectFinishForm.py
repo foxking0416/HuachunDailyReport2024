@@ -6,6 +6,14 @@ import datetime
 import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
+g_draw_triangle_for_weekend = False
+
+g_project_no = "Avenger001" #案號
+g_project_name = "鋼鐵人的基地興建工程" #工程名稱
+g_project_owner = "神盾局" #業主
+g_project_supervisor = "復仇者聯盟" #監造單位
+g_project_designer = "東尼史塔克" #設計單位
+g_project_contractor = "賈維斯" #承攬廠商 
 
 def func_fill_in_day_each_month( obj_worksheet, n_input_year ):
     str_first_day = str( n_input_year ) + '-01-01'
@@ -84,22 +92,65 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             worksheet = workbook.copy_worksheet( worksheet )
         worksheet.title = str(n_year) + '年'
         worksheet['B4'] = str(n_year) + '年(' + str( n_year - 1911 ) + '年)' 
+        worksheet['D2'] = g_project_no
+        worksheet['D3'] = g_project_name
+        worksheet['V2'] = g_project_owner
+        worksheet['V3'] = g_project_supervisor
+        worksheet['AH2'] = g_project_designer
+        worksheet['AH3'] = g_project_contractor
+
+        #填色
+        arr_sunday_column = ['B', 'I', 'P', 'W', 'AD', 'AK']
+        arr_saturday_column = ['H', 'O', 'V', 'AC', 'AJ']
+        if not g_draw_triangle_for_weekend:
+            if e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF or e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
+                for column in arr_sunday_column:
+                    str_fill_cell = column + str( 6 )
+                    worksheet[str_fill_cell].fill = Utility.fill_green
+                    for i in range( 36 ):
+                        str_fill_cell = column + str( i + 8 )
+                        worksheet[str_fill_cell].fill = Utility.fill_green
+                if e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
+                    for column in arr_saturday_column:
+                        str_fill_cell = column + str( 6 )
+                        worksheet[str_fill_cell].fill = Utility.fill_green
+                        for i in range( 36 ):
+                            str_fill_cell = column + str( i + 8 )
+                            worksheet[str_fill_cell].fill = Utility.fill_green
+        else:
+            for column in arr_sunday_column:
+                str_fill_cell = column + str( 6 )
+                worksheet[str_fill_cell].fill = Utility.fill_green
+            for column in arr_saturday_column:
+                str_fill_cell = column + str( 6 )
+                worksheet[str_fill_cell].fill = Utility.fill_yellow
 
     obj_date = obj_start_date
-    n_lastyear = 0
-    n_worksheet_index = 0
     n_workdays_from_start = 0
+
+    n_calendar_days_each_month = 0
+    n_calendar_days_accumulate = 0
+    n_weekend_days_each_month = 0
+    n_weekend_days_accumulate = 0
+    n_holiday_days_each_month = 0
+    n_holiday_days_accumulate = 0
+    n_no_count_days_each_month = 0
+    n_no_count_days_accumulate = 0
+
+    n_last_year = 0
+    n_worksheet_index = 0
     b_insert_start_day_icon = False
 
     while( True ):
         n_weekday = obj_date.weekday()
         n_year = obj_date.year
-
-        if n_year != n_lastyear:
+        if n_year != n_last_year:
             worksheet = workbook.worksheets[ n_worksheet_index ]
-            func_fill_in_day_each_month( worksheet, n_year )
-            n_lastyear = n_year
             n_worksheet_index += 1
+            n_last_year = n_year
+            func_fill_in_day_each_month( worksheet, n_year )
+
+        month = obj_date.month
 
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
@@ -121,39 +172,86 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
             cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
             worksheet[ cell_note ] = str_lunar_reason
 
-        if e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
-            if n_weekday == 6:#Sunday
-                if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
-                else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-            else:
-                if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-        elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
-            if n_weekday == 6 or n_weekday == 5:#Sunday Saturday
-                if obj_date in arr_const_workday:
-                    Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
-                else:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-            else:
-                if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
-        elif e_count_type == ScheduleCount.WorkDay.NO_DAY_OFF:
-            if obj_date in arr_const_holiday:
-                    Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
 
         b_is_weekend = [False]
         b_is_holiday = [False]
         b_is_make_up_workday = [False]
-        if ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+        b_is_work_day = ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday )
+        if b_is_work_day:
             n_expect_total_workdays -= 1
             n_workdays_from_start += 1
 
         worksheet[ cell_workdays_from_start ] = n_workdays_from_start
+        #計算A欄
+        n_calendar_days_each_month += 1
+        n_calendar_days_accumulate += 1
+
+        if b_is_weekend[0]:#計算B1欄
+            n_weekend_days_each_month += 1
+            n_weekend_days_accumulate += 1
+        if b_is_holiday[0]:#計算B2欄
+            n_holiday_days_each_month += 1
+            n_holiday_days_accumulate += 1
+        if not b_is_work_day:#計算B0欄
+            n_no_count_days_each_month += 1
+            n_no_count_days_accumulate += 1
         
+        if b_is_weekend[0]:
+            if g_draw_triangle_for_weekend:
+                Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
+        elif b_is_holiday[0]:
+            Utility.insert_image( worksheet, Utility.image_path_holiday, up_marker, Utility.whole_size )
+        elif b_is_make_up_workday[0]:
+            Utility.insert_image( worksheet, Utility.image_path_workday, up_marker, Utility.whole_size )
+
+        str_cell_calendar_days_each_month = None #天數(每月) A 欄位"AM"
+        str_cell_calendar_days_accumulate = None #天數(累計) A 欄位"AM"
+        str_cell_weekend_days_each_month = None #星期例假(每月) B1 欄位"AN"
+        str_cell_weekend_days_accumulate = None #星期例假(累計) B1 欄位"AN"
+        str_cell_holiday_days_each_month = None #國定例假(每月) B2 欄位"AO"
+        str_cell_holiday_days_accumulate = None #國定例假(累計) B2 欄位"AO"
+        str_cell_no_count_days_each_month = None #不計工期(每月) B3
+        str_cell_no_count_days_accumulate = None #不計工期(累計) B3
+
+        str_cell_calendar_days_each_month = 'AM' + str( 5 + month * 3 )
+        str_cell_calendar_days_accumulate = 'AM' + str( 6 + month * 3 )
+        str_cell_weekend_days_each_month  = 'AN' + str( 5 + month * 3 )
+        str_cell_weekend_days_accumulate  = 'AN' + str( 6 + month * 3 )
+        str_cell_holiday_days_each_month  = 'AO' + str( 5 + month * 3 )
+        str_cell_holiday_days_accumulate  = 'AO' + str( 6 + month * 3 )
+        str_cell_no_count_days_each_month = 'AP' + str( 5 + month * 3 )
+        str_cell_no_count_days_accumulate = 'AP' + str( 6 + month * 3 )
+
+        obj_date_add_1 = obj_date + datetime.timedelta(days=1)
+
+        if obj_date.month != obj_date_add_1.month:
+            worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
+            worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
+            worksheet[ str_cell_weekend_days_each_month ]  = n_weekend_days_each_month
+            worksheet[ str_cell_weekend_days_accumulate ]  = n_weekend_days_accumulate
+            worksheet[ str_cell_holiday_days_each_month ]  = n_holiday_days_each_month
+            worksheet[ str_cell_holiday_days_accumulate ]  = n_holiday_days_accumulate
+            worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month
+            worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
+            n_calendar_days_each_month = 0
+            n_weekend_days_each_month = 0
+            n_holiday_days_each_month = 0
+            n_no_count_days_each_month = 0
+
+
+
         if(n_expect_total_workdays <= 0):
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
+            if n_calendar_days_each_month != 0:
+                #固定因素
+                worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month #A
+                worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
+                worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month #B1
+                worksheet[ str_cell_weekend_days_accumulate ]  = n_weekend_days_accumulate
+                worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month #B2
+                worksheet[ str_cell_holiday_days_accumulate ]  = n_holiday_days_accumulate
+                worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month #B0
+                worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
             break
 
         obj_date += datetime.timedelta( days = 1 )
@@ -179,4 +277,4 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
 
     pass
 
-# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 60, datetime.datetime.strptime('2023-01-01', "%Y-%m-%d") )
+func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 300, datetime.datetime.strptime('2023-01-01', "%Y-%m-%d") )
