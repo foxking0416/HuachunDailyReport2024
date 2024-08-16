@@ -79,6 +79,9 @@ def func_load_json_condition_setting_data( dict_morning_weather_condition_settin
         dict_morning_human_condition_setting[ human_condition ] = item[ "morning_nocount" ]
         dict_afternoon_human_condition_setting[ human_condition ] = item[ "afternoon_nocount" ]
 
+def sort_by_date(item):
+    return item['date']
+
 # 從 DailyReport.json 的檔案讀取每日資料
 def func_load_json_daily_report_data( dict_weather_and_human_related_holiday ):
 
@@ -94,6 +97,8 @@ def func_load_json_daily_report_data( dict_weather_and_human_related_holiday ):
 
     with open( json_file_path,'r', encoding='utf-8' ) as f:
         daily_report_data = json.load( f )
+
+    daily_report_data.sort(key=sort_by_date)
 
     for item in daily_report_data:
         obj_date = datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d")
