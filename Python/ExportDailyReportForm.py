@@ -8,7 +8,7 @@ import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
 g_daily_report_type = Utility.DailyReportType.TYPE_A
-g_draw_triangle_for_weekend = False
+g_draw_triangle_for_weekend = True
 
 g_project_no = "Avenger001" #案號
 g_project_name = "鋼鐵人的基地興建工程" #工程名稱
@@ -745,14 +745,14 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         #填入晴天/雨天/...停工/停電等欄位數值
         if obj_date.month != obj_date_add_1.month:
             #固定因素
-            worksheet[ str_cell_calendar_days_each_month ]               = n_calendar_days_each_month
-            worksheet[ str_cell_calendar_days_accumulate ]               = n_calendar_days_accumulate
-            worksheet[ str_cell_weekend_days_each_month ]                = n_weekend_days_each_month
-            worksheet[ str_cell_weekend_days_accumulate ]                = n_weekend_days_accumulate
-            worksheet[ str_cell_holiday_days_each_month ]                = n_holiday_days_each_month
-            worksheet[ str_cell_holiday_days_accumulate ]                = n_holiday_days_accumulate
-            worksheet[ str_cell_no_count_days_each_month ]               = n_no_count_days_each_month
-            worksheet[ str_cell_no_count_days_accumulate ]               = n_no_count_days_accumulate
+            worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month
+            worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
+            worksheet[ str_cell_weekend_days_each_month ]  = n_weekend_days_each_month
+            worksheet[ str_cell_weekend_days_accumulate ]  = n_weekend_days_accumulate
+            worksheet[ str_cell_holiday_days_each_month ]  = n_holiday_days_each_month
+            worksheet[ str_cell_holiday_days_accumulate ]  = n_holiday_days_accumulate
+            worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month
+            worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
             n_calendar_days_each_month = 0
             n_weekend_days_each_month = 0
             n_holiday_days_each_month = 0
@@ -849,9 +849,13 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             if n_calendar_days_each_month != 0:
                 #固定因素
                 worksheet[ str_cell_calendar_days_each_month ] = n_calendar_days_each_month #A
-                worksheet[ str_cell_weekend_days_each_month ] = n_weekend_days_each_month #B1
-                worksheet[ str_cell_holiday_days_each_month ] = n_holiday_days_each_month #B2
+                worksheet[ str_cell_calendar_days_accumulate ] = n_calendar_days_accumulate
+                worksheet[ str_cell_weekend_days_each_month ]  = n_weekend_days_each_month #B1
+                worksheet[ str_cell_weekend_days_accumulate ]  = n_weekend_days_accumulate
+                worksheet[ str_cell_holiday_days_each_month ]  = n_holiday_days_each_month #B2
+                worksheet[ str_cell_holiday_days_accumulate ]  = n_holiday_days_accumulate
                 worksheet[ str_cell_no_count_days_each_month ] = n_no_count_days_each_month #B0
+                worksheet[ str_cell_no_count_days_accumulate ] = n_no_count_days_accumulate
             break
 
         obj_date += datetime.timedelta(days=1)
