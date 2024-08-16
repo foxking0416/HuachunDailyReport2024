@@ -19,90 +19,91 @@ g_project_contractor = "賈維斯" #承攬廠商
 
 
 def func_fill_in_day_each_month( worksheet, input_year ):
-    first_day = str( input_year ) + '-01-01'
-    date_obj = datetime.datetime.strptime( first_day, "%Y-%m-%d" )  
+    str_first_day = str( input_year ) + '-01-01'
+    date_obj = datetime.datetime.strptime( str_first_day, "%Y-%m-%d" )  
     b_is_leap_year = ( input_year % 4 == 0 )
 
     if b_is_leap_year:
-        days_a_year = 366
+        n_days_a_year = 366
     else:
-        days_a_year = 365
+        n_days_a_year = 365
 
-    for i in range( days_a_year ):
-        day = date_obj.day
+    for i in range( n_days_a_year ):
+        n_day = date_obj.day
 
         obj_cell_num = func_get_cell_num( date_obj )
-        column = obj_cell_num['ColumnNum']
+        
         if g_daily_report_type == Utility.DailyReportType.TYPE_A:
             n_column_for_image = obj_cell_num['ColumnNum']-1
             n_row_for_image = obj_cell_num['RowNum']-1
             up_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_up_offset )
-            if day == 1:
+            if n_day == 1:
                 Utility.insert_image( worksheet, Utility.image_path_day_01, up_marker, Utility.whole_size )
-            elif day == 2:
+            elif n_day == 2:
                 Utility.insert_image( worksheet, Utility.image_path_day_02, up_marker, Utility.whole_size )
-            elif day == 3:
+            elif n_day == 3:
                 Utility.insert_image( worksheet, Utility.image_path_day_03, up_marker, Utility.whole_size )
-            elif day == 4:
+            elif n_day == 4:
                 Utility.insert_image( worksheet, Utility.image_path_day_04, up_marker, Utility.whole_size )
-            elif day == 5:
+            elif n_day == 5:
                 Utility.insert_image( worksheet, Utility.image_path_day_05, up_marker, Utility.whole_size )
-            elif day == 6:
+            elif n_day == 6:
                 Utility.insert_image( worksheet, Utility.image_path_day_06, up_marker, Utility.whole_size )
-            elif day == 7:
+            elif n_day == 7:
                 Utility.insert_image( worksheet, Utility.image_path_day_07, up_marker, Utility.whole_size )
-            elif day == 8:
+            elif n_day == 8:
                 Utility.insert_image( worksheet, Utility.image_path_day_08, up_marker, Utility.whole_size )
-            elif day == 9:
+            elif n_day == 9:
                 Utility.insert_image( worksheet, Utility.image_path_day_09, up_marker, Utility.whole_size )
-            elif day == 10:
+            elif n_day == 10:
                 Utility.insert_image( worksheet, Utility.image_path_day_10, up_marker, Utility.whole_size )
-            elif day == 11:
+            elif n_day == 11:
                 Utility.insert_image( worksheet, Utility.image_path_day_11, up_marker, Utility.whole_size )
-            elif day == 12:
+            elif n_day == 12:
                 Utility.insert_image( worksheet, Utility.image_path_day_12, up_marker, Utility.whole_size )
-            elif day == 13:
+            elif n_day == 13:
                 Utility.insert_image( worksheet, Utility.image_path_day_13, up_marker, Utility.whole_size )
-            elif day == 14:
+            elif n_day == 14:
                 Utility.insert_image( worksheet, Utility.image_path_day_14, up_marker, Utility.whole_size )
-            elif day == 15:
+            elif n_day == 15:
                 Utility.insert_image( worksheet, Utility.image_path_day_15, up_marker, Utility.whole_size )
-            elif day == 16:
+            elif n_day == 16:
                 Utility.insert_image( worksheet, Utility.image_path_day_16, up_marker, Utility.whole_size )
-            elif day == 17:
+            elif n_day == 17:
                 Utility.insert_image( worksheet, Utility.image_path_day_17, up_marker, Utility.whole_size )
-            elif day == 18:
+            elif n_day == 18:
                 Utility.insert_image( worksheet, Utility.image_path_day_18, up_marker, Utility.whole_size )
-            elif day == 19:
+            elif n_day == 19:
                 Utility.insert_image( worksheet, Utility.image_path_day_19, up_marker, Utility.whole_size )
-            elif day == 20:
+            elif n_day == 20:
                 Utility.insert_image( worksheet, Utility.image_path_day_20, up_marker, Utility.whole_size )
-            elif day == 21:
+            elif n_day == 21:
                 Utility.insert_image( worksheet, Utility.image_path_day_21, up_marker, Utility.whole_size )
-            elif day == 22:
+            elif n_day == 22:
                 Utility.insert_image( worksheet, Utility.image_path_day_22, up_marker, Utility.whole_size )
-            elif day == 23:
+            elif n_day == 23:
                 Utility.insert_image( worksheet, Utility.image_path_day_23, up_marker, Utility.whole_size )
-            elif day == 24:
+            elif n_day == 24:
                 Utility.insert_image( worksheet, Utility.image_path_day_24, up_marker, Utility.whole_size )
-            elif day == 25:
+            elif n_day == 25:
                 Utility.insert_image( worksheet, Utility.image_path_day_25, up_marker, Utility.whole_size )
-            elif day == 26:
+            elif n_day == 26:
                 Utility.insert_image( worksheet, Utility.image_path_day_26, up_marker, Utility.whole_size )
-            elif day == 27:
+            elif n_day == 27:
                 Utility.insert_image( worksheet, Utility.image_path_day_27, up_marker, Utility.whole_size )            
-            elif day == 28:
+            elif n_day == 28:
                 Utility.insert_image( worksheet, Utility.image_path_day_28, up_marker, Utility.whole_size )
-            elif day == 29:
+            elif n_day == 29:
                 Utility.insert_image( worksheet, Utility.image_path_day_29, up_marker, Utility.whole_size )
-            elif day == 30:
+            elif n_day == 30:
                 Utility.insert_image( worksheet, Utility.image_path_day_30, up_marker, Utility.whole_size )
-            elif day == 31:
+            elif n_day == 31:
                 Utility.insert_image( worksheet, Utility.image_path_day_31, up_marker, Utility.whole_size )        
         elif g_daily_report_type == Utility.DailyReportType.TYPE_B:
-            row = obj_cell_num['RowNum'] + 1
-            cell = Utility.number_to_string(column)+str(row)
-            worksheet[cell] = day
+            n_column = obj_cell_num['ColumnNum']
+            n_row = obj_cell_num['RowNum'] + 1
+            str_cell = Utility.number_to_string( n_column )+str( n_row )
+            worksheet[str_cell] = n_day
 
         date_obj += datetime.timedelta(days=1)
 
@@ -301,17 +302,18 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     f_rest_calendar_days = 0 #F3
 
     n_last_year = 0
-    n_worksheet_index = -1
+    n_worksheet_index = 0
     # endregion
 
     while( True ):
         daily_data = func_find_daily_data_by_date( data, obj_date )
-        n_Weekday = obj_date.weekday()
-        year = obj_date.year
-        if year != n_last_year:
+        n_weekday = obj_date.weekday()
+        n_year = obj_date.year
+        if n_year != n_last_year:
+            worksheet = workbook.worksheets[ n_worksheet_index ]
             n_worksheet_index += 1
-            n_last_year = year
-        worksheet = workbook.worksheets[ n_worksheet_index ]
+            n_last_year = n_year
+
         month = obj_date.month
 
         obj_cell_num = func_get_cell_num( obj_date )
@@ -341,7 +343,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         b_is_weekend = [False]
         b_is_holiday = [False]
         b_is_make_up_workday = [False]
-        b_is_work_day = ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_Weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday )
+        b_is_work_day = ScheduleCount.func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_weekday, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday )
         if b_is_work_day:
             if daily_data and obj_date <= obj_current_date:
                 if obj_date in dict_weather_related_holiday:
@@ -548,6 +550,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         if obj_date == obj_real_finish_date['ExpectFinishDate']:
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
 
+        # region 定義要填入的欄位
         str_cell_calendar_days_each_month = None #天數(每月) A 欄位"AM"
         str_cell_calendar_days_accumulate = None #天數(累計) A 欄位"AM"
         str_cell_weekend_days_each_month = None #星期例假(每月) B1 欄位"AN"
@@ -611,7 +614,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         str_cell_calendar_days_used_each_month = None #使用天數(每月) F2
         str_cell_calendar_days_used_accumulate = None #使用天數(累計) F2
         str_cell_rest_calendar_days = None #剩餘天數 F3 
-
+        # endregion
 
 
         if g_daily_report_type == Utility.DailyReportType.TYPE_A:
@@ -880,12 +883,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         serial_number += 1
         any_serial_num = True
 
-    # serial_number = 1
-    # filename, extension = os.path.splitext(output_pdf)
-    # while os.path.exists(output_pdf):
-    #     # 如果文件已经存在，则添加流水号并重新检查
-    #     output_pdf = f"{filename}_{serial_number}{extension}"
-    #     serial_number += 1
     if any_serial_num:
         serial_number -= 1
         output_pdf = f"{filename}_{serial_number}{'.pdf'}"
