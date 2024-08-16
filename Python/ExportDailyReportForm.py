@@ -374,130 +374,133 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             n_no_count_days_each_month += 1
             n_no_count_days_accumulate += 1
 
-        if daily_data and obj_date <= obj_current_date:
-            if daily_data["morning_weather"] == ScheduleCount.Weather.SUN:#晴天
-                Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
-                f_sun_days_each_month += 0.5
-                f_sun_days_accumulate += 0.5
-            elif daily_data["morning_weather"] == ScheduleCount.Weather.RAIN:#雨天
-                Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
-                f_rain_days_each_month += 0.5
-                f_rain_days_accumulate += 0.5
-            elif daily_data["morning_weather"] == ScheduleCount.Weather.HEAVY_RAIN:#豪雨
-                Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
-                f_heavy_rain_days_each_month += 0.5
-                f_heavy_rain_days_accumulate += 0.5
-            elif daily_data["morning_weather"] == ScheduleCount.Weather.TYPHOON:#颱風
-                Utility.insert_image( worksheet, Utility.image_path_typhoon_up,       up_marker, Utility.half_size )
-                f_typhoon_days_each_month += 0.5
-                f_typhoon_days_accumulate += 0.5
-            elif daily_data["morning_weather"] == ScheduleCount.Weather.HOT:#酷熱
-                Utility.insert_image( worksheet, Utility.image_path_hot_up,           up_marker, Utility.half_size )
-                f_hot_days_each_month += 0.5
-                f_hot_days_accumulate += 0.5
-            elif daily_data["morning_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
-                Utility.insert_image( worksheet, Utility.image_path_muddy_up,         up_marker, Utility.half_size )
-                f_muddy_days_each_month += 0.5
-                f_muddy_days_accumulate += 0.5
-            elif daily_data["morning_weather"] == ScheduleCount.Weather.OTHER:#其他
-                Utility.insert_image( worksheet, Utility.image_path_weather_other_up, up_marker, Utility.half_size )
-                f_weather_other_days_each_month += 0.5
-                f_weather_other_days_accumulate += 0.5
+        if obj_date <= obj_current_date:
+            if not daily_data:
+                Utility.insert_image( worksheet, Utility.image_path_no_data, up_marker, Utility.whole_size )
+            else:
+                if daily_data["morning_weather"] == ScheduleCount.Weather.SUN:#晴天
+                    Utility.insert_image( worksheet, Utility.image_path_sun_up,           up_marker, Utility.half_size )
+                    f_sun_days_each_month += 0.5
+                    f_sun_days_accumulate += 0.5
+                elif daily_data["morning_weather"] == ScheduleCount.Weather.RAIN:#雨天
+                    Utility.insert_image( worksheet, Utility.image_path_rain_up,          up_marker, Utility.half_size )
+                    f_rain_days_each_month += 0.5
+                    f_rain_days_accumulate += 0.5
+                elif daily_data["morning_weather"] == ScheduleCount.Weather.HEAVY_RAIN:#豪雨
+                    Utility.insert_image( worksheet, Utility.image_path_heavyrain_up,     up_marker, Utility.half_size )
+                    f_heavy_rain_days_each_month += 0.5
+                    f_heavy_rain_days_accumulate += 0.5
+                elif daily_data["morning_weather"] == ScheduleCount.Weather.TYPHOON:#颱風
+                    Utility.insert_image( worksheet, Utility.image_path_typhoon_up,       up_marker, Utility.half_size )
+                    f_typhoon_days_each_month += 0.5
+                    f_typhoon_days_accumulate += 0.5
+                elif daily_data["morning_weather"] == ScheduleCount.Weather.HOT:#酷熱
+                    Utility.insert_image( worksheet, Utility.image_path_hot_up,           up_marker, Utility.half_size )
+                    f_hot_days_each_month += 0.5
+                    f_hot_days_accumulate += 0.5
+                elif daily_data["morning_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
+                    Utility.insert_image( worksheet, Utility.image_path_muddy_up,         up_marker, Utility.half_size )
+                    f_muddy_days_each_month += 0.5
+                    f_muddy_days_accumulate += 0.5
+                elif daily_data["morning_weather"] == ScheduleCount.Weather.OTHER:#其他
+                    Utility.insert_image( worksheet, Utility.image_path_weather_other_up, up_marker, Utility.half_size )
+                    f_weather_other_days_each_month += 0.5
+                    f_weather_other_days_accumulate += 0.5
 
-            if daily_data["afternoon_weather"] == ScheduleCount.Weather.SUN:#晴天
-                Utility.insert_image( worksheet, Utility.image_path_sun_down,         down_marker, Utility.half_size )
-                f_sun_days_each_month += 0.5
-                f_sun_days_accumulate += 0.5
-            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.RAIN:#雨天
-                Utility.insert_image( worksheet, Utility.image_path_rain_down,        down_marker, Utility.half_size )
-                f_rain_days_each_month += 0.5
-                f_rain_days_accumulate += 0.5
-            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.HEAVY_RAIN:#豪雨
-                Utility.insert_image( worksheet, Utility.image_path_heavyrain_down,   down_marker, Utility.half_size )
-                f_heavy_rain_days_each_month += 0.5
-                f_heavy_rain_days_accumulate += 0.5
-            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.TYPHOON:#颱風
-                Utility.insert_image( worksheet, Utility.image_path_typhoon_down,     down_marker, Utility.half_size )
-                f_typhoon_days_each_month += 0.5
-                f_typhoon_days_accumulate += 0.5
-            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.HOT:#酷熱
-                Utility.insert_image( worksheet, Utility.image_path_hot_down,         down_marker, Utility.half_size )
-                f_hot_days_each_month += 0.5
-                f_hot_days_accumulate += 0.5
-            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
-                Utility.insert_image( worksheet, Utility.image_path_muddy_down,       down_marker, Utility.half_size )
-                f_muddy_days_each_month += 0.5
-                f_muddy_days_accumulate += 0.5
-            elif daily_data["afternoon_weather"] == ScheduleCount.Weather.OTHER:#其他
-                Utility.insert_image( worksheet, Utility.image_path_weather_other_down, down_marker, Utility.half_size )
-                f_weather_other_days_each_month += 0.5
-                f_weather_other_days_accumulate += 0.5
+                if daily_data["afternoon_weather"] == ScheduleCount.Weather.SUN:#晴天
+                    Utility.insert_image( worksheet, Utility.image_path_sun_down,         down_marker, Utility.half_size )
+                    f_sun_days_each_month += 0.5
+                    f_sun_days_accumulate += 0.5
+                elif daily_data["afternoon_weather"] == ScheduleCount.Weather.RAIN:#雨天
+                    Utility.insert_image( worksheet, Utility.image_path_rain_down,        down_marker, Utility.half_size )
+                    f_rain_days_each_month += 0.5
+                    f_rain_days_accumulate += 0.5
+                elif daily_data["afternoon_weather"] == ScheduleCount.Weather.HEAVY_RAIN:#豪雨
+                    Utility.insert_image( worksheet, Utility.image_path_heavyrain_down,   down_marker, Utility.half_size )
+                    f_heavy_rain_days_each_month += 0.5
+                    f_heavy_rain_days_accumulate += 0.5
+                elif daily_data["afternoon_weather"] == ScheduleCount.Weather.TYPHOON:#颱風
+                    Utility.insert_image( worksheet, Utility.image_path_typhoon_down,     down_marker, Utility.half_size )
+                    f_typhoon_days_each_month += 0.5
+                    f_typhoon_days_accumulate += 0.5
+                elif daily_data["afternoon_weather"] == ScheduleCount.Weather.HOT:#酷熱
+                    Utility.insert_image( worksheet, Utility.image_path_hot_down,         down_marker, Utility.half_size )
+                    f_hot_days_each_month += 0.5
+                    f_hot_days_accumulate += 0.5
+                elif daily_data["afternoon_weather"] == ScheduleCount.Weather.MUDDY:#雨後泥濘
+                    Utility.insert_image( worksheet, Utility.image_path_muddy_down,       down_marker, Utility.half_size )
+                    f_muddy_days_each_month += 0.5
+                    f_muddy_days_accumulate += 0.5
+                elif daily_data["afternoon_weather"] == ScheduleCount.Weather.OTHER:#其他
+                    Utility.insert_image( worksheet, Utility.image_path_weather_other_down, down_marker, Utility.half_size )
+                    f_weather_other_days_each_month += 0.5
+                    f_weather_other_days_accumulate += 0.5
 
-            if daily_data["morning_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                Utility.insert_image( worksheet, Utility.image_path_suspend_work_up,   up_marker, Utility.half_size )
-                f_suspend_work_days_each_month += 0.5
-                f_suspend_work_days_accumulate += 0.5
-            elif daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
-                Utility.insert_image( worksheet, Utility.image_path_power_off_up,      up_marker, Utility.half_size )
-                f_power_off_days_each_month += 0.5
-                f_power_off_days_accumulate += 0.5
-            elif daily_data["morning_human"] == ScheduleCount.Human.OTHER:#其他
-                Utility.insert_image( worksheet, Utility.image_path_human_other_up,    up_marker, Utility.half_size )
-                f_human_other_days_each_month += 0.5
-                f_human_other_days_accumulate += 0.5
+                if daily_data["morning_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
+                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_up,   up_marker, Utility.half_size )
+                    f_suspend_work_days_each_month += 0.5
+                    f_suspend_work_days_accumulate += 0.5
+                elif daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
+                    Utility.insert_image( worksheet, Utility.image_path_power_off_up,      up_marker, Utility.half_size )
+                    f_power_off_days_each_month += 0.5
+                    f_power_off_days_accumulate += 0.5
+                elif daily_data["morning_human"] == ScheduleCount.Human.OTHER:#其他
+                    Utility.insert_image( worksheet, Utility.image_path_human_other_up,    up_marker, Utility.half_size )
+                    f_human_other_days_each_month += 0.5
+                    f_human_other_days_accumulate += 0.5
 
-            if daily_data["afternoon_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                Utility.insert_image( worksheet, Utility.image_path_suspend_work_down, down_marker, Utility.half_size )
-                f_suspend_work_days_each_month += 0.5
-                f_suspend_work_days_accumulate += 0.5
-            elif daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
-                Utility.insert_image( worksheet, Utility.image_path_power_off_down,    down_marker, Utility.half_size )
-                f_power_off_days_each_month += 0.5
-                f_power_off_days_accumulate += 0.5
-            elif daily_data["afternoon_human"] == ScheduleCount.Human.OTHER:#其他
-                Utility.insert_image( worksheet, Utility.image_path_human_other_down,  down_marker, Utility.half_size )
-                f_human_other_days_each_month += 0.5
-                f_human_other_days_accumulate += 0.5
+                if daily_data["afternoon_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
+                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_down, down_marker, Utility.half_size )
+                    f_suspend_work_days_each_month += 0.5
+                    f_suspend_work_days_accumulate += 0.5
+                elif daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
+                    Utility.insert_image( worksheet, Utility.image_path_power_off_down,    down_marker, Utility.half_size )
+                    f_power_off_days_each_month += 0.5
+                    f_power_off_days_accumulate += 0.5
+                elif daily_data["afternoon_human"] == ScheduleCount.Human.OTHER:#其他
+                    Utility.insert_image( worksheet, Utility.image_path_human_other_down,  down_marker, Utility.half_size )
+                    f_human_other_days_each_month += 0.5
+                    f_human_other_days_accumulate += 0.5
 
-            dict_return_weather = {}
-            dict_return_human = {}
-            ScheduleCount.func_condition_no_count( dict_morning_weather_condition_setting,
-                                                   dict_afternoon_weather_condition_setting,
-                                                   dict_morning_human_condition_setting,
-                                                   dict_afternoon_human_condition_setting,
-                                                   daily_data["morning_weather"],
-                                                   daily_data["afternoon_weather"],
-                                                   daily_data["morning_human"],
-                                                   daily_data["afternoon_human"],
-                                                   dict_return_weather,
-                                                   dict_return_human )
-            #計算C1到C7的不計欄位
-            f_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.RAIN ]
-            f_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.RAIN ]
-            f_heavy_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
-            f_heavy_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
-            f_typhoon_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.TYPHOON ]
-            f_typhoon_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.TYPHOON ]
-            f_hot_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HOT ]
-            f_hot_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.HOT ]
-            f_muddy_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
-            f_muddy_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
-            f_weather_other_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.OTHER ]
-            f_weather_other_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.OTHER ]
-            #計算C0
-            f_weather_no_count_days_each_month += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
-            f_weather_no_count_days_accumulate += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
+                dict_return_weather = {}
+                dict_return_human = {}
+                ScheduleCount.func_condition_no_count( dict_morning_weather_condition_setting,
+                                                    dict_afternoon_weather_condition_setting,
+                                                    dict_morning_human_condition_setting,
+                                                    dict_afternoon_human_condition_setting,
+                                                    daily_data["morning_weather"],
+                                                    daily_data["afternoon_weather"],
+                                                    daily_data["morning_human"],
+                                                    daily_data["afternoon_human"],
+                                                    dict_return_weather,
+                                                    dict_return_human )
+                #計算C1到C7的不計欄位
+                f_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.RAIN ]
+                f_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.RAIN ]
+                f_heavy_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
+                f_heavy_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
+                f_typhoon_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.TYPHOON ]
+                f_typhoon_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.TYPHOON ]
+                f_hot_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HOT ]
+                f_hot_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.HOT ]
+                f_muddy_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
+                f_muddy_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
+                f_weather_other_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.OTHER ]
+                f_weather_other_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.OTHER ]
+                #計算C0
+                f_weather_no_count_days_each_month += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
+                f_weather_no_count_days_accumulate += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
 
-            #計算D1到D3的不計欄位
-            f_suspend_work_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
-            f_suspend_work_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
-            f_power_off_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
-            f_power_off_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
-            f_human_other_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.OTHER ]
-            f_human_other_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.OTHER ]
-            #計算D0
-            f_human_no_count_days_each_month += dict_return_human[ ScheduleCount.Human.TOTAL ]
-            f_human_no_count_days_accumulate += dict_return_human[ ScheduleCount.Human.TOTAL ]
+                #計算D1到D3的不計欄位
+                f_suspend_work_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
+                f_suspend_work_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
+                f_power_off_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
+                f_power_off_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
+                f_human_other_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.OTHER ]
+                f_human_other_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.OTHER ]
+                #計算D0
+                f_human_no_count_days_each_month += dict_return_human[ ScheduleCount.Human.TOTAL ]
+                f_human_no_count_days_accumulate += dict_return_human[ ScheduleCount.Human.TOTAL ]
 
         n_total_work_days = n_expect_total_workdays
 

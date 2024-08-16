@@ -12,6 +12,7 @@ current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
 # json_file_path = os.path.join(current_dir, 'ExternalData\\DailyReport.json')
 
+image_path_no_data            = os.path.join(current_dir, 'ExternalData\\Image\\NoData.png') 
 image_path_holiday            = os.path.join(current_dir, 'ExternalData\\Image\\Holiday.png') 
 image_path_workday            = os.path.join(current_dir, 'ExternalData\\Image\\Workday.png') 
 image_path_start_day          = os.path.join(current_dir, 'ExternalData\\Image\\StartDay.png') 
