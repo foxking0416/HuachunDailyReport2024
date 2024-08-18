@@ -227,6 +227,32 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 str_fill_cell = column + str( 6 )
                 worksheet[str_fill_cell].fill = Utility.fill_yellow
 
+        #將追加工期資料寫進表裡
+        n_extend_times = 0
+        for key, value in dict_extend_data.items():
+            # if n_extend_times > 6:
+                # worksheet.insert_rows(52)
+                # worksheet.row_dimensions[53].height = 27.75
+
+            str_border_cell_1 = 'AX' + str( 46 + n_extend_times )
+            str_border_cell_2 = 'AY' + str( 46 + n_extend_times )
+            str_border_cell_3 = 'AZ' + str( 46 + n_extend_times )
+            str_border_cell_4 = 'BA' + str( 46 + n_extend_times )
+            worksheet[str_border_cell_1].border = Utility.border
+            worksheet[str_border_cell_2].border = Utility.border       
+            worksheet[str_border_cell_3].border = Utility.border
+            worksheet[str_border_cell_4].border = Utility.border
+
+            str_merge_cell = 'AX' + str( 46 + n_extend_times ) + ':BA' + str( 46 + n_extend_times )
+            worksheet.merge_cells( str_merge_cell )
+            obj_extend_start_date = key
+            n_extend_days = value
+            str_extend = str( n_extend_days ) + '天'
+            cell_extend_data = 'AX' + str( 46 + n_extend_times )
+            worksheet[cell_extend_data] = str_extend
+            n_extend_times += 1
+
+
 
 
     #TODO 可以把json檔案做排序

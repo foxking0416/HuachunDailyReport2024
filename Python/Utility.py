@@ -5,7 +5,7 @@ from openpyxl.drawing.image import Image
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
 from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
-from openpyxl.styles import PatternFill
+from openpyxl.styles import PatternFill, Border, Side
 from enum import Enum
 
 current_dir = os.path.dirname(__file__)
@@ -87,6 +87,9 @@ half_size = XDRPositiveSize2D(p2e(30), p2e(15))
 
 fill_yellow = PatternFill(start_color="FFFF99", end_color="FFFF99", fill_type="solid")
 fill_green = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")
+
+thin_side = Side(style='thin', color='000000')  # 黑色细边框
+border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
 
 class DailyReportType(Enum):
     TYPE_A = 0
