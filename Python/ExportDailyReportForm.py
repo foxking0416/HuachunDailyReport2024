@@ -255,7 +255,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
 
 
-    #TODO 可以把json檔案做排序
 
     # region 定義計算各種天數的參數
     obj_date = obj_start_date
@@ -320,10 +319,8 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     f_work_days_used_accumulate = 0 #E2
     f_rest_work_days = 0 #E3
 
-    f_total_calendar_days = 0 #F1
     f_calendar_days_used_each_month = 0 #F2
     f_calendar_days_used_accumulate = 0 #F2
-    f_rest_calendar_days = 0 #F3
 
     n_last_year = 0
     n_worksheet_index = 0
@@ -530,7 +527,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
         n_total_work_days = n_expect_total_workdays
 
-        # f_total_calendar_days = obj_real_finish_date['RealTotalCalendarDays']
         if obj_date <= obj_current_date:
             for key, value in dict_extend_data.items():
                 obj_extend_start_date = key
@@ -563,11 +559,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
             f_calendar_days_used_each_month += 1
             f_calendar_days_used_accumulate += 1
-
-
-            # f_total_calendar_days = 0 #F1
-            # f_rest_calendar_days = 0 #F3
-
 
         if b_is_weekend[0]:
             if g_draw_triangle_for_weekend:
@@ -841,10 +832,11 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             worksheet[ str_cell_work_days_used_accumulate ]              = f_work_days_used_accumulate #使用工期(累計) E2
             worksheet[ str_cell_rest_work_days ]                         = f_rest_work_days #剩餘工期 E3
         
-            worksheet[ str_cell_total_calendar_days ]                    = f_total_calendar_days #總天數 F1
+            temp_real_finish_date = ScheduleCount.func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_date, arr_const_holiday, arr_const_workday, dict_weather_and_human_related_holiday, dict_extend_data )
+            worksheet[ str_cell_total_calendar_days ]                    = temp_real_finish_date['RealTotalCalendarDays'] #總天數 F1
             worksheet[ str_cell_calendar_days_used_each_month ]          = f_calendar_days_used_each_month #使用天數(每月) F2
             worksheet[ str_cell_calendar_days_used_accumulate ]          = f_calendar_days_used_accumulate #使用天數(累計) F2
-            worksheet[ str_cell_rest_calendar_days ]                     = f_rest_calendar_days #剩餘天數 F3 
+            worksheet[ str_cell_rest_calendar_days ]                     = temp_real_finish_date['RealTotalCalendarDays'] - f_calendar_days_used_accumulate #剩餘天數 F3 
 
             f_sun_days_each_month = 0
             f_rain_days_each_month = 0
