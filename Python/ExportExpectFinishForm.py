@@ -30,7 +30,14 @@ def func_set_info( str_project_no, str_project_name, str_project_owner, str_proj
     g_project_designer = str_project_designer
     g_project_contractor = str_project_contractor
 
-    
+def func_set_form_type( str_triangle_for_weekend ):
+    global g_draw_triangle_for_weekend
+
+    if str_triangle_for_weekend == 'true':
+        g_draw_triangle_for_weekend = True
+    else:
+        g_draw_triangle_for_weekend = False
+
 def func_fill_in_day_each_month( obj_worksheet, n_input_year ):
     str_first_day = str( n_input_year ) + '-01-01'
     obj_date = datetime.datetime.strptime( str_first_day, "%Y-%m-%d" )  
@@ -158,7 +165,8 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
 
     arr_const_holiday = []
     arr_const_workday = []
-    ScheduleCount.func_load_json_holiday_data( arr_const_holiday, arr_const_workday )
+    dict_holiday_reason = {}
+    ScheduleCount.func_load_json_holiday_data( arr_const_holiday, arr_const_workday, dict_holiday_reason )
 
     obj_return_value = ScheduleCount.func_count_expect_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, arr_const_holiday, arr_const_workday )
     obj_end_date = obj_return_value['ExpectFinishDate']

@@ -71,6 +71,8 @@ def func_export_daily_eport():
         ExportDailyReportForm.func_set_info( entry_box_info_project_no.get(), entry_box_info_project_name.get(), 
                                              entry_box_info_project_owner.get(), entry_box_info_project_supervisor.get(),
                                              entry_box_info_project_designer.get(), entry_box_info_project_contractor.get() )
+        ExportDailyReportForm.func_set_form_type( radio_var_form_type.get(), radio_var_weekend_present_type.get() )
+
         if radio_var.get() == 'OneDayOff':
             ExportDailyReportForm.func_create_weather_report_form( ScheduleCount.WorkDay.ONE_DAY_OFF, float( spinbox_var_total_work_days.get() ), global_obj_start_date, global_obj_current_date )
         elif radio_var.get() == 'TwoDayOff':
@@ -83,7 +85,8 @@ def func_export_expect_finish_form():
         ExportExpectFinishForm.func_set_info( entry_box_info_project_no.get(), entry_box_info_project_name.get(), 
                                               entry_box_info_project_owner.get(), entry_box_info_project_supervisor.get(),
                                               entry_box_info_project_designer.get(), entry_box_info_project_contractor.get() )
-                
+        ExportExpectFinishForm.func_set_form_type( radio_var_weekend_present_type.get() )
+
         if radio_var.get() == 'OneDayOff':
             ExportExpectFinishForm.func_create_expect_finish_form( ScheduleCount.WorkDay.ONE_DAY_OFF, float( spinbox_var_total_work_days.get() ), global_obj_start_date )
         elif radio_var.get() == 'TwoDayOff':
@@ -120,17 +123,18 @@ label_current_date.pack(side="left",padx=10 )
 label_current_date_value = Label(group_frame_current_date_label, text="?")
 label_current_date_value.pack(side="left")
 
-
+group_frame_count_type = Frame(window)
+group_frame_count_type.pack(anchor="w")
 
 radio_var = StringVar()
-radio_button_no_day_off = Radiobutton(window, text="無周休", variable=radio_var, value="NoDayOff")
-radio_button_no_day_off.pack(padx=10, anchor="w")
+radio_button_no_day_off = Radiobutton(group_frame_count_type, text="無周休", variable=radio_var, value="NoDayOff")
+radio_button_no_day_off.pack(side="left",padx=10, anchor="w")
 
-radio_button_one_day_off = Radiobutton(window, text="周休一日", variable=radio_var, value="OneDayOff")
-radio_button_one_day_off.pack(padx=10, anchor="w")
+radio_button_one_day_off = Radiobutton(group_frame_count_type, text="周休一日", variable=radio_var, value="OneDayOff")
+radio_button_one_day_off.pack(side="left",padx=10, anchor="w")
 
-radio_button_two_day_off = Radiobutton(window, text="周休二日", variable=radio_var, value="TwoDayOff")
-radio_button_two_day_off.pack(padx=10, anchor="w")
+radio_button_two_day_off = Radiobutton(group_frame_count_type, text="周休二日", variable=radio_var, value="TwoDayOff")
+radio_button_two_day_off.pack(side="left",padx=10, anchor="w")
 
 radio_var.set("OneDayOff")
 
@@ -260,7 +264,7 @@ entry_box_info_project_supervisor.insert(0, "復仇者聯盟")
 group_frame_info_project_designer = Frame(window)
 group_frame_info_project_designer.pack(anchor="w")
 
-label_info_project_designer = Label(group_frame_info_project_designer, text="設計單位      ")
+label_info_project_designer = Label(group_frame_info_project_designer, text="設計單位")
 label_info_project_designer.pack(side="left",padx=10)
 
 entry_box_info_project_designer  = Entry(group_frame_info_project_designer, width=20)
@@ -274,6 +278,34 @@ entry_box_info_project_contractor  = Entry(group_frame_info_project_designer, wi
 entry_box_info_project_contractor.pack(side="left",padx=10)
 entry_box_info_project_contractor.insert(0, "賈維斯")
 
+group_frame_form_type = Frame(window)
+group_frame_form_type.pack(anchor="w")
+
+label_form_type = Label(group_frame_form_type, text="表格型式")
+label_form_type.pack(side="left", padx=10)
+
+radio_var_form_type = StringVar()
+radio_button_form_type_A = Radiobutton(group_frame_form_type, text="Type A", variable=radio_var_form_type, value="TypeA")
+radio_button_form_type_A.pack(side="left",padx=10, anchor="w")
+
+radio_button_form_type_B = Radiobutton(group_frame_form_type, text="Type B", variable=radio_var_form_type, value="TypeB")
+radio_button_form_type_B.pack(side="left",padx=10, anchor="w")
+radio_var_form_type.set("TypeA")
+
+
+group_frame_weekend_present_type = Frame(window)
+group_frame_weekend_present_type.pack(anchor="w")
+
+label_weekend_present_type = Label(group_frame_weekend_present_type, text="周末例假日表示型式")
+label_weekend_present_type.pack(side="left", padx=10)
+
+radio_var_weekend_present_type = StringVar()
+radio_button_weekend_present_type_color = Radiobutton(group_frame_weekend_present_type, text="用顏色表示", variable=radio_var_weekend_present_type, value="false")
+radio_button_weekend_present_type_color.pack(side="left",padx=10, anchor="w")
+
+radio_button_weekend_present_type_triangle = Radiobutton(group_frame_weekend_present_type, text="用三角形表示", variable=radio_var_weekend_present_type, value="true")
+radio_button_weekend_present_type_triangle.pack(side="left",padx=10, anchor="w")
+radio_var_weekend_present_type.set("false")
 
 
 group_frame_calculate_export = Frame(window)

@@ -33,6 +33,18 @@ def func_set_info( str_project_no, str_project_name, str_project_owner, str_proj
     g_project_designer = str_project_designer
     g_project_contractor = str_project_contractor
 
+def func_set_form_type( str_form_type, str_triangle_for_weekend ):
+    global g_daily_report_type
+    global g_draw_triangle_for_weekend
+    if str_form_type == 'TypeA':
+        g_daily_report_type = Utility.DailyReportType.TYPE_A
+    elif str_form_type == 'TypeB':
+        g_daily_report_type = Utility.DailyReportType.TYPE_B
+
+    if str_triangle_for_weekend == 'true':
+        g_draw_triangle_for_weekend = True
+    else:
+        g_draw_triangle_for_weekend = False
 
 def func_fill_in_day_each_month( worksheet, input_year ):
     str_first_day = str( input_year ) + '-01-01'
