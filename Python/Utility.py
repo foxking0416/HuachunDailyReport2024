@@ -79,11 +79,13 @@ c2e = cm_to_EMU
 cellh = lambda x: c2e((x * 49.77)/99)
 cellw = lambda x: c2e((x * (18.65-1.71))/10)
 col_offset = cellw(0.1) #60984
+col_offset_human = cellw(0.32) #60984
 row_up_offset = cellh(0.25) #45245
 row_down_offset = cellh(1) #180981
 p2e = pixels_to_EMU
 whole_size = XDRPositiveSize2D(p2e(30), p2e(30))
 half_size = XDRPositiveSize2D(p2e(30), p2e(15))
+quarter_size = XDRPositiveSize2D(p2e(15), p2e(15))
 
 fill_yellow = PatternFill(start_color="FFFF99", end_color="FFFF99", fill_type="solid")
 fill_green = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")

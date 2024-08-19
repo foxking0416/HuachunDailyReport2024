@@ -345,6 +345,8 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         n_row_for_image = obj_cell_num['RowNum']-1
         up_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_up_offset )
         down_marker = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset, row=n_row_for_image, rowOff=Utility.row_down_offset )
+        up_marker_human = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset_human, row=n_row_for_image, rowOff=Utility.row_up_offset )
+        down_marker_human = AnchorMarker( col=n_column_for_image, colOff=Utility.col_offset_human, row=n_row_for_image, rowOff=Utility.row_down_offset )
 
         n_column_for_text = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
 
@@ -460,28 +462,28 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                     f_weather_other_days_accumulate += 0.5
 
                 if daily_data["morning_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_up,   up_marker, Utility.half_size )
+                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_up,   up_marker_human, Utility.quarter_size )
                     f_suspend_work_days_each_month += 0.5
                     f_suspend_work_days_accumulate += 0.5
                 elif daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
-                    Utility.insert_image( worksheet, Utility.image_path_power_off_up,      up_marker, Utility.half_size )
+                    Utility.insert_image( worksheet, Utility.image_path_power_off_up,      up_marker_human, Utility.quarter_size )
                     f_power_off_days_each_month += 0.5
                     f_power_off_days_accumulate += 0.5
                 elif daily_data["morning_human"] == ScheduleCount.Human.OTHER:#其他
-                    Utility.insert_image( worksheet, Utility.image_path_human_other_up,    up_marker, Utility.half_size )
+                    Utility.insert_image( worksheet, Utility.image_path_human_other_up,    up_marker_human, Utility.quarter_size )
                     f_human_other_days_each_month += 0.5
                     f_human_other_days_accumulate += 0.5
 
                 if daily_data["afternoon_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_down, down_marker, Utility.half_size )
+                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_down, down_marker_human, Utility.quarter_size )
                     f_suspend_work_days_each_month += 0.5
                     f_suspend_work_days_accumulate += 0.5
                 elif daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
-                    Utility.insert_image( worksheet, Utility.image_path_power_off_down,    down_marker, Utility.half_size )
+                    Utility.insert_image( worksheet, Utility.image_path_power_off_down,    down_marker_human, Utility.quarter_size )
                     f_power_off_days_each_month += 0.5
                     f_power_off_days_accumulate += 0.5
                 elif daily_data["afternoon_human"] == ScheduleCount.Human.OTHER:#其他
-                    Utility.insert_image( worksheet, Utility.image_path_human_other_down,  down_marker, Utility.half_size )
+                    Utility.insert_image( worksheet, Utility.image_path_human_other_down,  down_marker_human, Utility.quarter_size )
                     f_human_other_days_each_month += 0.5
                     f_human_other_days_accumulate += 0.5
 
