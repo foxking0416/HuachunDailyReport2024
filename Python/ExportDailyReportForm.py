@@ -241,22 +241,27 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             # if n_extend_times > 6:
                 # worksheet.insert_rows(52)
                 # worksheet.row_dimensions[53].height = 27.75
+            n_row_index = 0
+            if g_daily_report_type == Utility.DailyReportType.TYPE_A:
+                n_row_index = 46
+            elif g_daily_report_type == Utility.DailyReportType.TYPE_B:
+                n_row_index = 58
 
-            str_border_cell_1 = 'AX' + str( 46 + n_extend_times )
-            str_border_cell_2 = 'AY' + str( 46 + n_extend_times )
-            str_border_cell_3 = 'AZ' + str( 46 + n_extend_times )
-            str_border_cell_4 = 'BA' + str( 46 + n_extend_times )
+            str_border_cell_1 = 'AX' + str( n_row_index + n_extend_times )
+            str_border_cell_2 = 'AY' + str( n_row_index + n_extend_times )
+            str_border_cell_3 = 'AZ' + str( n_row_index + n_extend_times )
+            str_border_cell_4 = 'BA' + str( n_row_index + n_extend_times )
             worksheet[str_border_cell_1].border = Utility.border
             worksheet[str_border_cell_2].border = Utility.border       
             worksheet[str_border_cell_3].border = Utility.border
             worksheet[str_border_cell_4].border = Utility.border
 
-            str_merge_cell = 'AX' + str( 46 + n_extend_times ) + ':BA' + str( 46 + n_extend_times )
+            str_merge_cell = 'AX' + str( n_row_index + n_extend_times ) + ':BA' + str( n_row_index + n_extend_times )
             worksheet.merge_cells( str_merge_cell )
             obj_extend_start_date = key
             n_extend_days = value
-            str_extend = str( n_extend_days ) + '天'
-            cell_extend_data = 'AX' + str( 46 + n_extend_times )
+            str_extend = key.strftime("%Y/%m/%d") + ': ' + str( n_extend_days ) + '天'
+            cell_extend_data = 'AX' + str( n_row_index + n_extend_times )
             worksheet[cell_extend_data] = str_extend
             n_extend_times += 1
 
@@ -927,4 +932,4 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     pass
 
 
-func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 411, datetime.datetime.strptime('2023-01-06', "%Y-%m-%d"), datetime.datetime.strptime('2023-11-16', "%Y-%m-%d") )
+# func_create_weather_report_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 411, datetime.datetime.strptime('2023-01-06', "%Y-%m-%d"), datetime.datetime.strptime('2023-11-16', "%Y-%m-%d") )

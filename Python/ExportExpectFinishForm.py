@@ -343,4 +343,4 @@ def func_create_expect_finish_form( e_count_type, n_expect_total_workdays, obj_s
 
     pass
 
-func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 300, datetime.datetime.strptime('2023-01-01', "%Y-%m-%d") )
+# func_create_expect_finish_form(ScheduleCount.WorkDay.TWO_DAY_OFF, 300, datetime.datetime.strptime('2023-01-01', "%Y-%m-%d") )
