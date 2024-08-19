@@ -18,6 +18,22 @@ g_project_designer = "東尼史塔克" #設計單位
 g_project_contractor = "賈維斯" #承攬廠商 
 
 
+def func_set_info( str_project_no, str_project_name, str_project_owner, str_project_supervisor, str_project_designer, str_project_contractor ):
+    global g_project_no
+    global g_project_name
+    global g_project_owner
+    global g_project_supervisor
+    global g_project_designer
+    global g_project_contractor
+    
+    g_project_no = str_project_no
+    g_project_name = str_project_name
+    g_project_owner = str_project_owner
+    g_project_supervisor = str_project_supervisor
+    g_project_designer = str_project_designer
+    g_project_contractor = str_project_contractor
+
+
 def func_fill_in_day_each_month( worksheet, input_year ):
     str_first_day = str( input_year ) + '-01-01'
     date_obj = datetime.datetime.strptime( str_first_day, "%Y-%m-%d" )  

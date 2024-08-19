@@ -44,7 +44,8 @@ def func_calculate_schedule():
     arr_const_workday = []
     dict_weather_related_holiday = {}
     dict_extend_data = {}
-    ScheduleCount.func_load_json_holiday_data( arr_const_holiday,arr_const_workday )
+    dict_holiday_reason = {}
+    ScheduleCount.func_load_json_holiday_data( arr_const_holiday,arr_const_workday, dict_holiday_reason )
     ScheduleCount.func_load_json_daily_report_data( dict_weather_related_holiday )
     ScheduleCount.func_load_json_extend_data( dict_extend_data )
     returnValue = None
@@ -67,7 +68,9 @@ def func_calculate_schedule():
 
 def func_export_daily_eport():
     if global_obj_start_date and global_obj_current_date:
-
+        ExportDailyReportForm.func_set_info( entry_box_info_project_no.get(), entry_box_info_project_name.get(), 
+                                             entry_box_info_project_owner.get(), entry_box_info_project_supervisor.get(),
+                                             entry_box_info_project_designer.get(), entry_box_info_project_contractor.get() )
         if radio_var.get() == 'OneDayOff':
             ExportDailyReportForm.func_create_weather_report_form( ScheduleCount.WorkDay.ONE_DAY_OFF, float( spinbox_var_total_work_days.get() ), global_obj_start_date, global_obj_current_date )
         elif radio_var.get() == 'TwoDayOff':
@@ -77,6 +80,10 @@ def func_export_daily_eport():
 
 def func_export_expect_finish_form():
     if global_obj_start_date and global_obj_current_date:
+        ExportExpectFinishForm.func_set_info( entry_box_info_project_no.get(), entry_box_info_project_name.get(), 
+                                              entry_box_info_project_owner.get(), entry_box_info_project_supervisor.get(),
+                                              entry_box_info_project_designer.get(), entry_box_info_project_contractor.get() )
+                
         if radio_var.get() == 'OneDayOff':
             ExportExpectFinishForm.func_create_expect_finish_form( ScheduleCount.WorkDay.ONE_DAY_OFF, float( spinbox_var_total_work_days.get() ), global_obj_start_date )
         elif radio_var.get() == 'TwoDayOff':
@@ -147,12 +154,9 @@ label_expect_finish_date_value = Label(group_frame_expect_finish_date, text="?")
 label_expect_finish_date_value.pack(side="left", padx=10)
 
 
-group_frame_expect_total_calendar_days = Frame(window)
-group_frame_expect_total_calendar_days.pack(anchor="w")
-
-label_expect_total_calendar_days = Label(group_frame_expect_total_calendar_days, text="預計完工天數")
+label_expect_total_calendar_days = Label(group_frame_expect_finish_date, text="預計完工天數")
 label_expect_total_calendar_days.pack(side="left", padx=10)
-label_expect_total_calendar_days_value = Label(group_frame_expect_total_calendar_days, text="?")
+label_expect_total_calendar_days_value = Label(group_frame_expect_finish_date, text="?")
 label_expect_total_calendar_days_value.pack(side="left", padx=10)
 
 
@@ -165,12 +169,9 @@ label_from_start_work_days_value = Label(group_frame_from_start_work_days, text=
 label_from_start_work_days_value.pack(side="left", padx=10)
 
 
-group_frame_from_start_calendar_days = Frame(window)
-group_frame_from_start_calendar_days.pack(anchor="w")
-
-label_from_start_calendar_days = Label(group_frame_from_start_calendar_days, text="開工迄今日曆天數")
+label_from_start_calendar_days = Label(group_frame_from_start_work_days, text="開工迄今日曆天數")
 label_from_start_calendar_days.pack(side="left", padx=10)
-label_from_start_calendar_days_value = Label(group_frame_from_start_calendar_days, text="?")
+label_from_start_calendar_days_value = Label(group_frame_from_start_work_days, text="?")
 label_from_start_calendar_days_value.pack(side="left", padx=10)
 
 
@@ -183,12 +184,9 @@ label_real_finish_date_value = Label(group_frame_real_finish_date, text="?")
 label_real_finish_date_value.pack(side="left", padx=10)
 
 
-group_frame_real_total_calendar_days = Frame(window)
-group_frame_real_total_calendar_days.pack(anchor="w")
-
-label_real_total_calendar_days = Label(group_frame_real_total_calendar_days, text="變動完工天數")
+label_real_total_calendar_days = Label(group_frame_real_finish_date, text="變動完工天數")
 label_real_total_calendar_days.pack(side="left",padx=10)
-label_real_total_calendar_days_value = Label(group_frame_real_total_calendar_days, text="?")
+label_real_total_calendar_days_value = Label(group_frame_real_finish_date, text="?")
 label_real_total_calendar_days_value.pack(side="left", padx=10)
 
 
@@ -201,12 +199,9 @@ label_expect_rest_work_days_value = Label(group_frame_expect_rest_work_days, tex
 label_expect_rest_work_days_value.pack(side="left", padx=10)
 
 
-group_frame_expect_rest_calendar_days = Frame(window)
-group_frame_expect_rest_calendar_days.pack(anchor="w")
-
-label_expect_rest_calendar_days = Label(group_frame_expect_rest_calendar_days, text="預計剩餘天數")
+label_expect_rest_calendar_days = Label(group_frame_expect_rest_work_days, text="預計剩餘天數")
 label_expect_rest_calendar_days.pack(side="left",padx=10)
-label_expect_rest_calendar_days_value = Label(group_frame_expect_rest_calendar_days, text="?")
+label_expect_rest_calendar_days_value = Label(group_frame_expect_rest_work_days, text="?")
 label_expect_rest_calendar_days_value.pack(side="left", padx=10)
 
 
@@ -219,13 +214,67 @@ label_real_rest_work_days_value = Label(group_frame_real_rest_work_days, text="?
 label_real_rest_work_days_value.pack(side="left", padx=10)
 
 
-group_frame_real_rest_calendar_days = Frame(window)
-group_frame_real_rest_calendar_days.pack(anchor="w")
-
-label_real_rest_calendar_days = Label(group_frame_real_rest_calendar_days, text="實際剩餘天數")
+label_real_rest_calendar_days = Label(group_frame_real_rest_work_days, text="實際剩餘天數")
 label_real_rest_calendar_days.pack(side="left",padx=10)
-label_real_rest_calendar_days_value = Label(group_frame_real_rest_calendar_days, text="?")
+label_real_rest_calendar_days_value = Label(group_frame_real_rest_work_days, text="?")
 label_real_rest_calendar_days_value.pack(side="left", padx=10)
+
+
+group_frame_info_project_no = Frame(window)
+group_frame_info_project_no.pack(anchor="w")
+
+label_info_project_no = Label(group_frame_info_project_no, text="案號      ")
+label_info_project_no.pack(side="left",padx=10)
+
+entry_box_info_project_no  = Entry(group_frame_info_project_no, width=20)
+entry_box_info_project_no.pack(side="left",padx=10)
+entry_box_info_project_no.insert(0, "Avenger001")
+
+label_info_project_name = Label(group_frame_info_project_no, text="工程名稱")
+label_info_project_name.pack(side="left",padx=10)
+
+entry_box_info_project_name  = Entry(group_frame_info_project_no, width=20)
+entry_box_info_project_name.pack(side="left",padx=10)
+entry_box_info_project_name.insert(0, "復仇者聯盟總部興建工程")
+
+
+group_frame_info_project_owner = Frame(window)
+group_frame_info_project_owner.pack(anchor="w")
+
+label_info_project_owner = Label(group_frame_info_project_owner, text="業主      ")
+label_info_project_owner.pack(side="left",padx=10)
+
+
+entry_box_info_project_owner  = Entry(group_frame_info_project_owner, width=20)
+entry_box_info_project_owner.pack(side="left",padx=10)
+entry_box_info_project_owner.insert(0, "神盾局")
+
+label_info_project_supervisor = Label(group_frame_info_project_owner, text="監造單位")
+label_info_project_supervisor.pack(side="left",padx=10)
+
+entry_box_info_project_supervisor  = Entry(group_frame_info_project_owner, width=20)
+entry_box_info_project_supervisor.pack(side="left",padx=10)
+entry_box_info_project_supervisor.insert(0, "復仇者聯盟")
+
+
+group_frame_info_project_designer = Frame(window)
+group_frame_info_project_designer.pack(anchor="w")
+
+label_info_project_designer = Label(group_frame_info_project_designer, text="設計單位      ")
+label_info_project_designer.pack(side="left",padx=10)
+
+entry_box_info_project_designer  = Entry(group_frame_info_project_designer, width=20)
+entry_box_info_project_designer.pack(side="left",padx=10)
+entry_box_info_project_designer.insert(0, "東尼史塔克")
+
+label_info_project_supervisor = Label(group_frame_info_project_designer, text="承攬廠商")
+label_info_project_supervisor.pack(side="left",padx=10)
+
+entry_box_info_project_contractor  = Entry(group_frame_info_project_designer, width=20)
+entry_box_info_project_contractor.pack(side="left",padx=10)
+entry_box_info_project_contractor.insert(0, "賈維斯")
+
+
 
 group_frame_calculate_export = Frame(window)
 group_frame_calculate_export.pack(anchor="w")
