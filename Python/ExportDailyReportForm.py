@@ -153,6 +153,7 @@ def func_find_daily_data_by_date( daily_report_date, obj_date ):
 
 def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_start_date, obj_current_date ):
     LunarCalendar.func_load_lunar_holiday_data()
+    LunarCalendar.func_load_solar_holiday_data()
     input_excel =  None
     if g_daily_report_type == Utility.DailyReportType.TYPE_A:
         input_excel =  os.path.join( Utility.current_dir, 'ExternalData\\DailyReportTemplateWithLunar_A.xlsx')
@@ -165,7 +166,8 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
     arr_const_holiday = []
     arr_const_workday = []
-    ScheduleCount.func_load_json_holiday_data( arr_const_holiday,arr_const_workday )
+    dict_holiday_reason = {}
+    ScheduleCount.func_load_json_holiday_data( arr_const_holiday,arr_const_workday, dict_holiday_reason )
 
     dict_weather_and_human_related_holiday = {}
     daily_report_data = ScheduleCount.func_load_json_daily_report_data( dict_weather_and_human_related_holiday )
@@ -258,10 +260,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             worksheet[cell_extend_data] = str_extend
             n_extend_times += 1
 
-
-
-
-
     # region 定義計算各種天數的參數
     obj_date = obj_start_date
     n_workdays_from_start = 0
@@ -343,9 +341,6 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
 
         month = obj_date.month
 
-
-
-
         obj_cell_num = func_get_cell_num( obj_date )
         n_column_for_image = obj_cell_num['ColumnNum']-1
         n_row_for_image = obj_cell_num['RowNum']-1
@@ -357,13 +352,17 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         n_column_for_text = obj_cell_num['ColumnNum']#跟上面的 obj_cell_num['ColumnNum']-1 其實是指向同一個column，只是因為一個是貼圖的AnchorMarker，一個是cell要使用的，兩個api的基準值不一樣
 
         str_lunar_reason = LunarCalendar.func_get_lunar_reason( obj_date )
-        if str_lunar_reason != None:
+        str_solar_reason = LunarCalendar.func_get_solar_reason( obj_date, dict_holiday_reason )
+        if str_lunar_reason != None or str_solar_reason != None:
             if g_daily_report_type == Utility.DailyReportType.TYPE_A:
                 n_row_for_note = obj_cell_num['RowNum'] + 1
             elif  g_daily_report_type == Utility.DailyReportType.TYPE_B:
                 n_row_for_note = obj_cell_num['RowNum'] + 2
             cell_note = Utility.number_to_string( n_column_for_text ) + str( n_row_for_note )
-            worksheet[ cell_note ] = str_lunar_reason
+            if str_solar_reason:
+                worksheet[ cell_note ] = str_solar_reason
+            elif str_lunar_reason:
+                worksheet[ cell_note ] = str_lunar_reason
 
         if g_daily_report_type == Utility.DailyReportType.TYPE_A:
             n_row_workdays_from_start = obj_cell_num['RowNum'] + 2

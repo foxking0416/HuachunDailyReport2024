@@ -41,7 +41,7 @@ class CountWorkingDay(Enum):
     NO_COUNT = 2
 
 # 從 Holiday.json 的檔案讀取補班或放假的資料
-def func_load_json_holiday_data( arr_const_holiday, arr_const_workday ):
+def func_load_json_holiday_data( arr_const_holiday, arr_const_workday, dict_holiday_reason ):
     # 取得目前工作目錄
     current_dir = os.path.dirname( __file__ )
     # 組合JSON檔案的路徑
@@ -53,6 +53,7 @@ def func_load_json_holiday_data( arr_const_holiday, arr_const_workday ):
     for item in data:
         if( item[ "holiday" ] ):
             arr_const_holiday.append( datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d") )
+            dict_holiday_reason[ datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d") ] = item[ 'reason' ]
         if(not item[ "holiday" ]):
             arr_const_workday.append( datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d") )
 
