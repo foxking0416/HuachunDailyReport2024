@@ -200,6 +200,12 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
         worksheet['BM2'] = g_project_designer
         worksheet['AF3'] = g_project_contractor
         worksheet['BM3'] = g_project_contractor
+        if e_count_type == e_count_type == ScheduleCount.WorkDay.NO_DAY_OFF:
+            worksheet['C44'] = '工期計算方式為日曆天，無周休、無國定假日'
+        elif e_count_type == ScheduleCount.WorkDay.ONE_DAY_OFF:
+            worksheet['C44'] = '工期計算方式為工作天，週休一日，國定假日不施工'
+        elif e_count_type == ScheduleCount.WorkDay.TWO_DAY_OFF:
+            worksheet['C44'] = '工期計算方式為工作天，週休二日，國定假日不施工'
 
         #填色
         arr_sunday_column = ['B', 'I', 'P', 'W', 'AD', 'AK']
