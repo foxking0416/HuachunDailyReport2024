@@ -214,6 +214,19 @@ def func_condition_no_count( dict_morning_weather_condition_setting,
                 dict_return_human[ n_afternoon_human ] += 0.5
                 dict_return_human[ Human.TOTAL ] += 0.5
 
+    dict_return_weather[ Weather.RAIN ]       = min( 1, dict_return_weather[ Weather.RAIN ] )
+    dict_return_weather[ Weather.HEAVY_RAIN ] = min( 1, dict_return_weather[ Weather.HEAVY_RAIN ] )
+    dict_return_weather[ Weather.TYPHOON ]    = min( 1, dict_return_weather[ Weather.TYPHOON ] )
+    dict_return_weather[ Weather.HOT ]        = min( 1, dict_return_weather[ Weather.HOT ] )
+    dict_return_weather[ Weather.MUDDY ]      = min( 1, dict_return_weather[ Weather.MUDDY ] )
+    dict_return_weather[ Weather.OTHER ]      = min( 1, dict_return_weather[ Weather.OTHER ] )
+    dict_return_weather[ Weather.TOTAL ]      = min( 1, dict_return_weather[ Weather.TOTAL ] )
+
+    dict_return_human[ Human.SUSPEND_WORK ] = min( 1, dict_return_human[ Human.SUSPEND_WORK ] )
+    dict_return_human[ Human.POWER_OFF ]    = min( 1, dict_return_human[ Human.POWER_OFF ] )
+    dict_return_human[ Human.OTHER ]        = min( 1, dict_return_human[ Human.OTHER ] )
+    dict_return_human[ Human.TOTAL ]        = min( 1, dict_return_human[ Human.TOTAL ] )
+
 # 從 ExtendData.json 的檔案讀取每日資料
 def func_load_json_extend_data(dict_extend_data):
     current_dir = os.path.dirname(__file__)
