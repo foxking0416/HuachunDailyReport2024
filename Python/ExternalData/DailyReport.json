@@ -389,7 +389,7 @@
     "afternoon_weather":0,
 	"morning_human":0,
     "afternoon_human":0,
-    "suspend_work":0
+    "suspend_work":1
   },
   {
     "date":"2023-02-19",
@@ -397,7 +397,7 @@
     "afternoon_weather":0,
 	"morning_human":0,
     "afternoon_human":0,
-    "suspend_work":0
+    "suspend_work":1
   },
   {
     "date":"2023-02-20",

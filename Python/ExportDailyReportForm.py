@@ -349,15 +349,15 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
     f_human_no_count_days_each_month = 0
     f_human_no_count_days_accumulate = 0
 
-    n_total_work_days = 0 #E1
-    f_work_days_no_count_each_month = 0 #E0
-    f_work_days_no_count_accumulate = 0 #E0
-    f_work_days_used_each_month = 0 #E2
-    f_work_days_used_accumulate = 0 #E2
-    f_rest_work_days = 0 #E3
+    n_total_work_days = 0 #F1
+    f_work_days_no_count_each_month = 0 #F0
+    f_work_days_no_count_accumulate = 0 #F0
+    f_work_days_used_each_month = 0 #F2
+    f_work_days_used_accumulate = 0 #F2
+    f_rest_work_days = 0 #F3
 
-    f_calendar_days_used_each_month = 0 #F2
-    f_calendar_days_used_accumulate = 0 #F2
+    f_calendar_days_used_each_month = 0 #G2
+    f_calendar_days_used_accumulate = 0 #G2
 
     
 
@@ -500,12 +500,14 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                     Utility.insert_image( worksheet, Utility.image_path_weather_other_down, down_marker, Utility.half_size )
                     f_weather_other_days_each_month += 0.5
                     f_weather_other_days_accumulate += 0.5
-
-                if daily_data["morning_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
+                
+                # 不能搬到天氣前面，不然image會被蓋掉
+                if daily_data["suspend_work"] == ScheduleCount.SyspendWork.SUSPEND_WORK:#停工
                     Utility.insert_image( worksheet, Utility.image_path_suspend_work_up,   up_marker_human, Utility.quarter_size )
-                    f_suspend_work_days_each_month += 0.5
-                    f_suspend_work_days_accumulate += 0.5
-                elif daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
+                    f_suspend_work_days_each_month += 1
+                    f_suspend_work_days_accumulate += 1
+
+                if daily_data["morning_human"] == ScheduleCount.Human.POWER_OFF:#停電
                     Utility.insert_image( worksheet, Utility.image_path_power_off_up,      up_marker_human, Utility.quarter_size )
                     f_power_off_days_each_month += 0.5
                     f_power_off_days_accumulate += 0.5
@@ -514,11 +516,7 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                     f_human_other_days_each_month += 0.5
                     f_human_other_days_accumulate += 0.5
 
-                if daily_data["afternoon_human"] == ScheduleCount.Human.SUSPEND_WORK:#停工
-                    Utility.insert_image( worksheet, Utility.image_path_suspend_work_down, down_marker_human, Utility.quarter_size )
-                    f_suspend_work_days_each_month += 0.5
-                    f_suspend_work_days_accumulate += 0.5
-                elif daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
+                if daily_data["afternoon_human"] == ScheduleCount.Human.POWER_OFF:#停電
                     Utility.insert_image( worksheet, Utility.image_path_power_off_down,    down_marker_human, Utility.quarter_size )
                     f_power_off_days_each_month += 0.5
                     f_power_off_days_accumulate += 0.5
@@ -527,19 +525,27 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                     f_human_other_days_each_month += 0.5
                     f_human_other_days_accumulate += 0.5
 
+                dict_return_suspend_work = {}
                 dict_return_weather = {}
                 dict_return_human = {}
-                ScheduleCount.func_condition_no_count( dict_morning_weather_condition_setting,
-                                                    dict_afternoon_weather_condition_setting,
-                                                    dict_morning_human_condition_setting,
-                                                    dict_afternoon_human_condition_setting,
-                                                    daily_data["morning_weather"],
-                                                    daily_data["afternoon_weather"],
-                                                    daily_data["morning_human"],
-                                                    daily_data["afternoon_human"],
-                                                    dict_return_weather,
-                                                    dict_return_human )
-                #計算C1到C7的不計欄位
+                ScheduleCount.func_condition_no_count( b_is_work_day,
+                                                       dict_morning_weather_condition_setting,
+                                                       dict_afternoon_weather_condition_setting,
+                                                       dict_morning_human_condition_setting,
+                                                       dict_afternoon_human_condition_setting,
+                                                       daily_data["suspend_work"],
+                                                       daily_data["morning_weather"],
+                                                       daily_data["afternoon_weather"],
+                                                       daily_data["morning_human"],
+                                                       daily_data["afternoon_human"],
+                                                       dict_return_suspend_work,
+                                                       dict_return_weather,
+                                                       dict_return_human )
+                #計算C1
+                f_suspend_work_days_no_count_each_month += dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ]
+                f_suspend_work_days_no_count_accumulate += dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ]
+
+                #計算D1到D7的不計欄位
                 f_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.RAIN ]
                 f_rain_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.RAIN ]
                 f_heavy_rain_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ]
@@ -552,18 +558,16 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
                 f_muddy_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.MUDDY ]
                 f_weather_other_days_no_count_each_month += dict_return_weather[ ScheduleCount.Weather.OTHER ]
                 f_weather_other_days_no_count_accumulate += dict_return_weather[ ScheduleCount.Weather.OTHER ]
-                #計算C0
+                #計算D0
                 f_weather_no_count_days_each_month += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
                 f_weather_no_count_days_accumulate += dict_return_weather[ ScheduleCount.Weather.TOTAL ]
 
-                #計算D1到D3的不計欄位
-                f_suspend_work_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
-                f_suspend_work_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.SUSPEND_WORK ]
+                #計算E1到E2的不計欄位
                 f_power_off_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
                 f_power_off_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.POWER_OFF ]
                 f_human_other_days_no_count_each_month += dict_return_human[ ScheduleCount.Human.OTHER ]
                 f_human_other_days_no_count_accumulate += dict_return_human[ ScheduleCount.Human.OTHER ]
-                #計算D0
+                #計算E0
                 f_human_no_count_days_each_month += dict_return_human[ ScheduleCount.Human.TOTAL ]
                 f_human_no_count_days_accumulate += dict_return_human[ ScheduleCount.Human.TOTAL ]
 
@@ -614,99 +618,99 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             Utility.insert_image( worksheet, Utility.image_path_expect_finish_day, up_marker, Utility.whole_size )
 
         # region 定義要填入的欄位
-        str_cell_calendar_days_each_month = None #天數(每月) A 欄位"AM"
-        str_cell_calendar_days_accumulate = None #天數(累計) A 欄位"AM"
-        str_cell_calendar_days_accumulate_final = None #天數(總累計) A 欄位"AM"
-        str_cell_weekend_days_each_month = None #星期例假(每月) B1 欄位"AN"
-        str_cell_weekend_days_accumulate = None #星期例假(累計) B1 欄位"AN"
-        str_cell_weekend_days_accumulate_final = None #星期例假(總累計) B1 欄位"AN"
-        str_cell_holiday_days_each_month = None #國定例假(每月) B2 欄位"AO"
-        str_cell_holiday_days_accumulate = None #國定例假(累計) B2 欄位"AO"
-        str_cell_holiday_days_accumulate_final = None #國定例假(累計) B2 欄位"AO"
-        str_cell_no_count_days_each_month = None #不計工期(每月) B3
-        str_cell_no_count_days_accumulate = None #不計工期(累計) B3
-        str_cell_no_count_days_accumulate_final = None #不計工期(累計) B3
-        str_cell_sun_days_each_month = None #晴天(每月) C1
-        str_cell_sun_days_accumulate = None #晴天(累計) C1
-        str_cell_sun_days_accumulate_final = None #晴天(累計) C1
-        str_cell_rain_days_each_month = None #雨天(每月) C2
-        str_cell_rain_days_accumulate = None #雨天(累計) C2
-        str_cell_rain_days_accumulate_final = None #雨天(累計) C2
-        str_cell_rain_days_no_count_each_month = None #雨天且不計工期(每月) C2
-        str_cell_rain_days_no_count_accumulate = None #雨天且不計工期(累計) C2
-        str_cell_rain_days_no_count_accumulate_final = None #雨天且不計工期(累計) C2
-        str_cell_heavy_rain_days_each_month = None #豪雨(每月) C3
-        str_cell_heavy_rain_days_accumulate = None #豪雨(累計) C3
-        str_cell_heavy_rain_days_accumulate_final = None #豪雨(累計) C3
-        str_cell_heavy_rain_days_no_count_each_month = None #豪雨且不計工期(每月) C3
-        str_cell_heavy_rain_days_no_count_accumulate = None #豪雨且不計工期(累計) C3
-        str_cell_heavy_rain_days_no_count_accumulate_final = None #豪雨且不計工期(累計) C3
-        str_cell_typhoon_days_each_month = None #颱風(每月) C4
-        str_cell_typhoon_days_accumulate = None #颱風(累計) C4
-        str_cell_typhoon_days_accumulate_final = None #颱風(累計) C4
-        str_cell_typhoon_days_no_count_each_month = None #颱風且不計工期(每月) C4
-        str_cell_typhoon_days_no_count_accumulate = None #颱風且不計工期(累計) C4
-        str_cell_typhoon_days_no_count_accumulate_final = None #颱風且不計工期(累計) C4
-        str_cell_hot_days_each_month = None #酷熱(每月) C5
-        str_cell_hot_days_accumulate = None #酷熱(累計) C5
-        str_cell_hot_days_accumulate_final = None #酷熱(累計) C5
-        str_cell_hot_days_no_count_each_month = None #酷熱且不計工期(每月) C5
-        str_cell_hot_days_no_count_accumulate = None #酷熱且不計工期(累計) C5
-        str_cell_hot_days_no_count_accumulate_final = None #酷熱且不計工期(累計) C5
-        str_cell_muddy_days_each_month = None #雨後泥濘(每月) C6
-        str_cell_muddy_days_accumulate = None #雨後泥濘(累計) C6
-        str_cell_muddy_days_accumulate_final = None #雨後泥濘(累計) C6
-        str_cell_muddy_days_no_count_each_month = None #雨後泥濘且不計工期(每月) C6
-        str_cell_muddy_days_no_count_accumulate = None #雨後泥濘且不計工期(累計) C6
-        str_cell_muddy_days_no_count_accumulate_final = None #雨後泥濘且不計工期(累計) C6
-        str_cell_weather_other_days_each_month = None #天候其他因素(每月) C7
-        str_cell_weather_other_days_accumulate = None #天候其他因素(累計) C7
-        str_cell_weather_other_days_accumulate_final = None #天候其他因素(累計) C7
-        str_cell_weather_other_days_no_count_each_month = None #天候其他因素且不計工期(每月) C7
-        str_cell_weather_other_days_no_count_accumulate = None #天候其他因素且不計工期(累計) C7
-        str_cell_weather_other_days_no_count_accumulate_final = None #天候其他因素且不計工期(累計) C7
-        str_cell_weather_no_count_days_each_month = None #天候不計工期(每月) C0
-        str_cell_weather_no_count_days_accumulate = None #天候不計工期(累計) C0
-        str_cell_weather_no_count_days_accumulate_final = None #天候不計工期(累計) C0
+        str_cell_calendar_days_each_month = None                     #天數(每月) A 欄位"AM"
+        str_cell_calendar_days_accumulate = None                     #天數(累計) A 欄位"AM"
+        str_cell_calendar_days_accumulate_final = None               #天數(年總計) A 欄位"AM"
+        str_cell_weekend_days_each_month = None                      #星期例假(每月) B1 欄位"AN"
+        str_cell_weekend_days_accumulate = None                      #星期例假(累計) B1 欄位"AN"
+        str_cell_weekend_days_accumulate_final = None                #星期例假(年總計) B1 欄位"AN"
+        str_cell_holiday_days_each_month = None                      #國定例假(每月) B2 欄位"AO"
+        str_cell_holiday_days_accumulate = None                      #國定例假(累計) B2 欄位"AO"
+        str_cell_holiday_days_accumulate_final = None                #國定例假(年總計) B2 欄位"AO"
+        str_cell_no_count_days_each_month = None                     #不計工期(每月) B0 欄位"AP"
+        str_cell_no_count_days_accumulate = None                     #不計工期(累計) B0 欄位"AP"
+        str_cell_no_count_days_accumulate_final = None               #不計工期(年總計) B0 欄位"AP"
 
-        str_cell_suspend_work_days_each_month = None #停工(每月) D1
-        str_cell_suspend_work_days_accumulate = None #停工(累計) D1
-        str_cell_suspend_work_days_accumulate_final = None #停工(累計) D1
-        str_cell_suspend_work_days_no_count_each_month = None #停工且不計工期(每月) D1
-        str_cell_suspend_work_days_no_count_accumulate = None #停工且不計工期(累計) D1
-        str_cell_suspend_work_days_no_count_accumulate_final = None #停工且不計工期(累計) D1
-        str_cell_power_off_days_each_month = None #停電(每月) D2
-        str_cell_power_off_days_accumulate = None #停電(累計) D2
-        str_cell_power_off_days_accumulate_final = None #停電(累計) D2
-        str_cell_power_off_days_no_count_each_month = None #停電且不計工期(每月) D2
-        str_cell_power_off_days_no_count_accumulate = None #停電且不計工期(累計) D2
-        str_cell_power_off_days_no_count_accumulate_final = None #停電且不計工期(累計) D2
-        str_cell_human_other_days_each_month = None #人為其他因素(每月) D3
-        str_cell_human_other_days_accumulate = None #人為其他因素(累計) D3
-        str_cell_human_other_days_accumulate_final = None #人為其他因素(累計) D3
-        str_cell_human_other_days_no_count_each_month = None #人為其他因素且不計工期(每月) D3
-        str_cell_human_other_days_no_count_accumulate = None #人為其他因素且不計工期(累計) D3
-        str_cell_human_other_days_no_count_accumulate_final = None #人為其他因素且不計工期(累計) D3
-        str_cell_human_no_count_days_each_month = None #人為不計工期(每月) D0
-        str_cell_human_no_count_days_accumulate = None #人為不計工期(累計) D0
-        str_cell_human_no_count_days_accumulate_final = None #人為不計工期(累計) D0
+        str_cell_suspend_work_days_each_month = None                 #停工(每月) C1 欄位"AQ"
+        str_cell_suspend_work_days_accumulate = None                 #停工(累計) C1 欄位"AQ"
+        str_cell_suspend_work_days_accumulate_final = None           #停工(年總計) C1 欄位"AQ"
+        str_cell_suspend_work_days_no_count_each_month = None        #停工且不計工期(每月) C1 欄位"AR"
+        str_cell_suspend_work_days_no_count_accumulate = None        #停工且不計工期(累計) C1 欄位"AR"
+        str_cell_suspend_work_days_no_count_accumulate_final = None  #停工且不計工期(年總計) C1 欄位"AR"
 
-        str_cell_total_work_days_days = None #合約工期 E1
-        str_cell_work_days_no_count_each_month = None #不計工期(每月) E0
-        str_cell_work_days_no_count_accumulate = None #不計工期(累計) E0
-        str_cell_work_days_no_count_accumulate_final = None #不計工期(累計) E0
-        str_cell_work_days_used_each_month = None #使用工期(每月) E2
-        str_cell_work_days_used_accumulate = None #使用工期(累計) E2
-        str_cell_work_days_used_accumulate_final = None #使用工期(累計) E2
-        str_cell_rest_work_days = None #剩餘工期 E3
+        str_cell_sun_days_each_month = None                          #晴天(每月) D1 欄位"AS"
+        str_cell_sun_days_accumulate = None                          #晴天(累計) D1 欄位"AS"
+        str_cell_sun_days_accumulate_final = None                    #晴天(年總計) D1 欄位"AS"
+        str_cell_rain_days_each_month = None                         #雨天(每月) D2 欄位"AT"
+        str_cell_rain_days_accumulate = None                         #雨天(累計) D2 欄位"AT"
+        str_cell_rain_days_accumulate_final = None                   #雨天(年總計) D2 欄位"AT"
+        str_cell_rain_days_no_count_each_month = None                #雨天且不計工期(每月) D2 欄位"AU"
+        str_cell_rain_days_no_count_accumulate = None                #雨天且不計工期(累計) D2 欄位"AU"
+        str_cell_rain_days_no_count_accumulate_final = None          #雨天且不計工期(年總計) D2 欄位"AU"
+        str_cell_heavy_rain_days_each_month = None                   #豪雨(每月) D3 欄位"AV"
+        str_cell_heavy_rain_days_accumulate = None                   #豪雨(累計) D3 欄位"AV"
+        str_cell_heavy_rain_days_accumulate_final = None             #豪雨(年總計) D3 欄位"AV"
+        str_cell_heavy_rain_days_no_count_each_month = None          #豪雨且不計工期(每月) D3 欄位"AW"
+        str_cell_heavy_rain_days_no_count_accumulate = None          #豪雨且不計工期(累計) D3 欄位"AW"
+        str_cell_heavy_rain_days_no_count_accumulate_final = None    #豪雨且不計工期(年總計) D3 欄位"AW"
+        str_cell_typhoon_days_each_month = None                      #颱風(每月) D4 欄位"AX"
+        str_cell_typhoon_days_accumulate = None                      #颱風(累計) D4 欄位"AX"
+        str_cell_typhoon_days_accumulate_final = None                #颱風(年總計) D4 欄位"AX"
+        str_cell_typhoon_days_no_count_each_month = None             #颱風且不計工期(每月) D4 欄位"AY"
+        str_cell_typhoon_days_no_count_accumulate = None             #颱風且不計工期(累計) D4 欄位"AY"
+        str_cell_typhoon_days_no_count_accumulate_final = None       #颱風且不計工期(年總計) D4 欄位"AY"
+        str_cell_hot_days_each_month = None                          #酷熱(每月) D5 欄位"AZ"
+        str_cell_hot_days_accumulate = None                          #酷熱(累計) D5 欄位"AZ"
+        str_cell_hot_days_accumulate_final = None                    #酷熱(年總計) D5 欄位"AZ"
+        str_cell_hot_days_no_count_each_month = None                 #酷熱且不計工期(每月) D5 欄位"BA"
+        str_cell_hot_days_no_count_accumulate = None                 #酷熱且不計工期(累計) D5 欄位"BA"
+        str_cell_hot_days_no_count_accumulate_final = None           #酷熱且不計工期(年總計) D5 欄位"BA"
+        str_cell_muddy_days_each_month = None                        #雨後泥濘(每月) D6 欄位"BB"
+        str_cell_muddy_days_accumulate = None                        #雨後泥濘(累計) D6 欄位"BB"
+        str_cell_muddy_days_accumulate_final = None                  #雨後泥濘(年總計) D6 欄位"BB"
+        str_cell_muddy_days_no_count_each_month = None               #雨後泥濘且不計工期(每月) D6 欄位"BC"
+        str_cell_muddy_days_no_count_accumulate = None               #雨後泥濘且不計工期(累計) D6 欄位"BC"
+        str_cell_muddy_days_no_count_accumulate_final = None         #雨後泥濘且不計工期(年總計) D6 欄位"BC"
+        str_cell_weather_other_days_each_month = None                #天候其他因素(每月) D7 欄位"BD"
+        str_cell_weather_other_days_accumulate = None                #天候其他因素(累計) D7 欄位"BD"
+        str_cell_weather_other_days_accumulate_final = None          #天候其他因素(年總計) D7 欄位"BD"
+        str_cell_weather_other_days_no_count_each_month = None       #天候其他因素且不計工期(每月) D7 欄位"BE"
+        str_cell_weather_other_days_no_count_accumulate = None       #天候其他因素且不計工期(累計) D7 欄位"BE"
+        str_cell_weather_other_days_no_count_accumulate_final = None #天候其他因素且不計工期(年總計) D7 欄位"BE"
+        str_cell_weather_no_count_days_each_month = None             #天候不計工期(每月) D0 欄位"BF"
+        str_cell_weather_no_count_days_accumulate = None             #天候不計工期(累計) D0 欄位"BF"
+        str_cell_weather_no_count_days_accumulate_final = None       #天候不計工期(年總計) D0 欄位"BF"
+
+        str_cell_power_off_days_each_month = None                    #停電(每月) E1 欄位"BG"
+        str_cell_power_off_days_accumulate = None                    #停電(累計) E1 欄位"BG"
+        str_cell_power_off_days_accumulate_final = None              #停電(年總計) E1 欄位"BG"
+        str_cell_power_off_days_no_count_each_month = None           #停電且不計工期(每月) E1 欄位"BH"
+        str_cell_power_off_days_no_count_accumulate = None           #停電且不計工期(累計) E1 欄位"BH"
+        str_cell_power_off_days_no_count_accumulate_final = None     #停電且不計工期(年總計) E1 欄位"BH"
+        str_cell_human_other_days_each_month = None                  #人為其他因素(每月) E2 欄位"BI"
+        str_cell_human_other_days_accumulate = None                  #人為其他因素(累計) E2 欄位"BI"
+        str_cell_human_other_days_accumulate_final = None            #人為其他因素(年總計) E2 欄位"BI"
+        str_cell_human_other_days_no_count_each_month = None         #人為其他因素且不計工期(每月) E2 欄位"BJ"
+        str_cell_human_other_days_no_count_accumulate = None         #人為其他因素且不計工期(累計) E2 欄位"BJ"
+        str_cell_human_other_days_no_count_accumulate_final = None   #人為其他因素且不計工期(年總計) E2 欄位"BJ"
+        str_cell_human_no_count_days_each_month = None               #人為不計工期(每月) E0 欄位"BK"
+        str_cell_human_no_count_days_accumulate = None               #人為不計工期(累計) E0 欄位"BK" 
+        str_cell_human_no_count_days_accumulate_final = None         #人為不計工期(年總計) E0 欄位"BK"
+
+        str_cell_total_work_days_days = None                         #合約工期 F1 欄位"BL"
+        str_cell_work_days_no_count_each_month = None                #不計工期(每月) F0 欄位"BM"
+        str_cell_work_days_no_count_accumulate = None                #不計工期(累計) F0 欄位"BM"
+        str_cell_work_days_no_count_accumulate_final = None          #不計工期(年總計) F0 欄位"BM"
+        str_cell_work_days_used_each_month = None                    #使用工期(每月) F2 欄位"BN"
+        str_cell_work_days_used_accumulate = None                    #使用工期(累計) F2 欄位"BN"
+        str_cell_work_days_used_accumulate_final = None              #使用工期(年總計) F2 欄位"BN"
+        str_cell_rest_work_days = None                               #剩餘工期 F3 欄位"BO"
     
-        str_cell_total_calendar_days = None #總天數 F1
-        str_cell_calendar_days_used_each_month = None #使用天數(每月) F2
-        str_cell_calendar_days_used_accumulate = None #使用天數(累計) F2
-        str_cell_calendar_days_used_accumulate_final = None #使用天數(累計) F2
-        str_cell_rest_calendar_days = None #剩餘天數 F3 
-
-
+        str_cell_total_calendar_days = None                          #總天數 G1 欄位"BP"
+        str_cell_calendar_days_used_each_month = None                #使用天數(每月) G2 欄位"BQ"
+        str_cell_calendar_days_used_accumulate = None                #使用天數(累計) G2 欄位"BQ"
+        str_cell_calendar_days_used_accumulate_final = None          #使用天數(年總計) G2 欄位"BQ"
+        str_cell_rest_calendar_days = None                           #剩餘天數 G3 欄位"BR"
         # endregion
 
         n_each_month_row_count = 0
@@ -923,17 +927,17 @@ def func_create_weather_report_form( e_count_type, n_expect_total_workdays, obj_
             worksheet[ str_cell_human_no_count_days_each_month ]         = f_human_no_count_days_each_month
             worksheet[ str_cell_human_no_count_days_accumulate ]         = f_human_no_count_days_accumulate
 
-            worksheet[ str_cell_total_work_days_days ]                   = n_total_work_days #合約工期 E1
-            worksheet[ str_cell_work_days_no_count_each_month ]          = f_work_days_no_count_each_month #不計工期(每月) E0
-            worksheet[ str_cell_work_days_no_count_accumulate ]          = f_work_days_no_count_accumulate #不計工期(累計) E0
-            worksheet[ str_cell_work_days_used_each_month ]              = f_work_days_used_each_month #使用工期(每月) E2
-            worksheet[ str_cell_work_days_used_accumulate ]              = f_work_days_used_accumulate #使用工期(累計) E2
-            worksheet[ str_cell_rest_work_days ]                         = f_rest_work_days #剩餘工期 E3
+            worksheet[ str_cell_total_work_days_days ]                   = n_total_work_days #合約工期 F1
+            worksheet[ str_cell_work_days_no_count_each_month ]          = f_work_days_no_count_each_month #不計工期(每月) F0
+            worksheet[ str_cell_work_days_no_count_accumulate ]          = f_work_days_no_count_accumulate #不計工期(累計) F0
+            worksheet[ str_cell_work_days_used_each_month ]              = f_work_days_used_each_month #使用工期(每月) F2
+            worksheet[ str_cell_work_days_used_accumulate ]              = f_work_days_used_accumulate #使用工期(累計) F2
+            worksheet[ str_cell_rest_work_days ]                         = f_rest_work_days #剩餘工期 F3
         
             temp_real_finish_date = ScheduleCount.func_count_real_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, obj_date, arr_const_holiday, arr_const_workday, dict_weather_and_human_related_holiday, dict_extend_data )
-            worksheet[ str_cell_total_calendar_days ]                    = temp_real_finish_date['RealTotalCalendarDays'] #總天數 F1
-            worksheet[ str_cell_calendar_days_used_each_month ]          = f_calendar_days_used_each_month #使用天數(每月) F2
-            worksheet[ str_cell_calendar_days_used_accumulate ]          = f_calendar_days_used_accumulate #使用天數(累計) F2
+            worksheet[ str_cell_total_calendar_days ]                    = temp_real_finish_date['RealTotalCalendarDays'] #總天數 G1
+            worksheet[ str_cell_calendar_days_used_each_month ]          = f_calendar_days_used_each_month #使用天數(每月) G2
+            worksheet[ str_cell_calendar_days_used_accumulate ]          = f_calendar_days_used_accumulate #使用天數(累計) G2
             worksheet[ str_cell_rest_calendar_days ]                     = temp_real_finish_date['RealTotalCalendarDays'] - f_calendar_days_used_accumulate #剩餘天數 F3 
 
             f_sun_days_each_month = 0

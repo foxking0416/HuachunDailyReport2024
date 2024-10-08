@@ -4,6 +4,11 @@ import datetime
 from enum import Enum
 from enum import IntEnum
 
+class SyspendWork(IntEnum):
+    NONE = 0
+    SUSPEND_WORK = 1
+    TOTAL = 2
+
 class Weather(IntEnum):
     SUN = 0
     RAIN = 1
@@ -16,10 +21,9 @@ class Weather(IntEnum):
 
 class Human(IntEnum):
     NONE = 0
-    SUSPEND_WORK = 1
-    POWER_OFF = 2
-    OTHER = 3
-    TOTAL = 4
+    POWER_OFF = 1
+    OTHER = 2
+    TOTAL = 3
 
 class WorkDay(Enum):
     ONE_DAY_OFF = 0
@@ -104,11 +108,15 @@ def func_load_json_daily_report_data( dict_weather_and_human_related_holiday ):
     for item in daily_report_data:
         obj_date = datetime.datetime.strptime( item[ "date" ], "%Y-%m-%d")
 
+        n_suspend_work = item["suspend_work"]
         n_morning_weather = item["morning_weather"]
         n_afternoon_weather = item["afternoon_weather"]
         n_morning_human = item["morning_human"]
         n_afternoon_human = item["afternoon_human"]
         f_nocount = 0
+        if n_suspend_work == 1:
+            dict_weather_and_human_related_holiday[ obj_date ] = CountWorkingDay.NO_COUNT
+            continue
         if( n_morning_weather != Weather.SUN or n_morning_human != Human.NONE ):
             f_morning_weather_nocount = 0
             f_morning_human_nocount = 0
@@ -146,16 +154,21 @@ def func_load_json_daily_report_data( dict_weather_and_human_related_holiday ):
 
     return daily_report_data
 
-def func_condition_no_count( dict_morning_weather_condition_setting, 
+def func_condition_no_count( b_is_work_day,
+                             dict_morning_weather_condition_setting, 
                              dict_afternoon_weather_condition_setting, 
                              dict_morning_human_condition_setting, 
                              dict_afternoon_human_condition_setting, 
+                             n_suspend_work,
                              n_morning_weather, 
                              n_afternoon_weather, 
                              n_morning_human, 
                              n_afternoon_human,
+                             dict_return_suspend_work,
                              dict_return_weather,
                              dict_return_human ):
+
+    dict_return_suspend_work[ SyspendWork.SUSPEND_WORK ] = 0
 
     dict_return_weather[ Weather.RAIN ] = 0
     dict_return_weather[ Weather.HEAVY_RAIN ] = 0
@@ -165,54 +178,112 @@ def func_condition_no_count( dict_morning_weather_condition_setting,
     dict_return_weather[ Weather.OTHER ] = 0
     dict_return_weather[ Weather.TOTAL ] = 0
 
-    dict_return_human[ Human.SUSPEND_WORK ] = 0
     dict_return_human[ Human.POWER_OFF ] = 0
     dict_return_human[ Human.OTHER ] = 0
     dict_return_human[ Human.TOTAL ] = 0
 
-    if n_morning_weather != Weather.SUN:
-        if n_morning_weather in dict_morning_weather_condition_setting:
-            f_morning_nocount = dict_morning_weather_condition_setting[ n_morning_weather ]
+    if not b_is_work_day:
+        return
 
-            if f_morning_nocount == 1:
-                dict_return_weather[ n_morning_weather ] = 1
-                dict_return_weather[ Weather.TOTAL ] = 1
-            elif f_morning_nocount == 0.5:
-                dict_return_weather[ n_morning_weather ] += 0.5
-                dict_return_weather[ Weather.TOTAL ] += 0.5
+    if n_suspend_work != 0:
+        dict_return_suspend_work[ SyspendWork.SUSPEND_WORK ] = 1
+    else:
+        f_morning_weather_nocount = 0
+        f_afternoon_weather_nocount = 0
+        if n_morning_weather != Weather.SUN:
+            if n_morning_weather in dict_morning_weather_condition_setting:
+                f_morning_weather_nocount = dict_morning_weather_condition_setting[ n_morning_weather ]
 
-    if n_afternoon_weather != Weather.SUN:
-        if n_afternoon_weather in dict_afternoon_weather_condition_setting:
-            f_afternoon_nocount = dict_afternoon_weather_condition_setting[ n_afternoon_weather ]
+                if f_morning_weather_nocount == 1:
+                    dict_return_weather[ n_morning_weather ] = 1
+                    dict_return_weather[ Weather.TOTAL ] = 1
+                elif f_morning_weather_nocount == 0.5:
+                    dict_return_weather[ n_morning_weather ] += 0.5
+                    dict_return_weather[ Weather.TOTAL ] += 0.5
+        if f_morning_weather_nocount == 1:
+            pass
+        else:
+            if n_afternoon_weather != Weather.SUN:
+                if n_afternoon_weather in dict_afternoon_weather_condition_setting:
+                    f_afternoon_weather_nocount = dict_afternoon_weather_condition_setting[ n_afternoon_weather ]
 
-            if f_afternoon_nocount == 1:
-                dict_return_weather[ n_afternoon_weather ] = 1
-                dict_return_weather[ Weather.TOTAL ] = 1
-            elif f_afternoon_nocount == 0.5:
-                dict_return_weather[ n_afternoon_weather ] += 0.5
-                dict_return_weather[ Weather.TOTAL ] += 0.5
+                    if f_morning_weather_nocount == 0.5:
+                        if f_afternoon_weather_nocount == 1 or f_afternoon_weather_nocount == 0.5:
+                            dict_return_weather[ n_afternoon_weather ] += 0.5
+                            dict_return_weather[ Weather.TOTAL ] += 0.5
+                    else: # f_morning_weather_nocount == 0
+                        if f_afternoon_weather_nocount == 1:
+                            dict_return_weather[ n_afternoon_weather ] = 1
+                            dict_return_weather[ Weather.TOTAL ] = 1
+                        elif f_afternoon_weather_nocount == 0.5:
+                            dict_return_weather[ n_afternoon_weather ] += 0.5
+                            dict_return_weather[ Weather.TOTAL ] += 0.5
 
-    if n_morning_human != Human.NONE:
-        if n_morning_human in dict_morning_human_condition_setting:
-            f_morning_nocount = dict_morning_human_condition_setting[ n_morning_human ]
+            if f_afternoon_weather_nocount == 1:
+                pass
+            else:
+                if n_morning_human != Human.NONE:
+                    if n_morning_human in dict_morning_human_condition_setting:
+                        f_morning_human_nocount = dict_morning_human_condition_setting[ n_morning_human ]
 
-            if f_morning_nocount == 1:
-                dict_return_human[ n_morning_human ] = 1
-                dict_return_human[ Human.TOTAL ] = 1
-            elif f_morning_nocount == 0.5:
-                dict_return_human[ n_morning_human ] += 0.5
-                dict_return_human[ Human.TOTAL ] += 0.5
+                        if f_morning_weather_nocount == 0.5 and f_afternoon_weather_nocount == 0.5:
+                            pass
+                        elif f_morning_weather_nocount == 0.5 and f_afternoon_weather_nocount == 0:
+                            if f_morning_human_nocount == 1:
+                                dict_return_human[ n_morning_human ] += 0.5
+                                dict_return_human[ Human.TOTAL ] += 0.5
+                            elif f_morning_human_nocount == 0.5:
+                                pass
+                        elif f_morning_weather_nocount == 0 and f_afternoon_weather_nocount == 0.5:
+                            if f_morning_human_nocount == 1:
+                                dict_return_human[ n_morning_human ] += 0.5
+                                dict_return_human[ Human.TOTAL ] += 0.5
+                            elif f_morning_human_nocount == 0.5:
+                                dict_return_human[ n_morning_human ] += 0.5
+                                dict_return_human[ Human.TOTAL ] += 0.5
+                        elif f_morning_weather_nocount == 0 and f_afternoon_weather_nocount == 0:
+                            if f_morning_human_nocount == 1:
+                                dict_return_human[ n_morning_human ] = 1
+                                dict_return_human[ Human.TOTAL ] = 1
+                            elif f_morning_human_nocount == 0.5:
+                                dict_return_human[ n_morning_human ] += 0.5
+                                dict_return_human[ Human.TOTAL ] += 0.5
 
-    if n_afternoon_human != Human.NONE:
-        if n_afternoon_human in dict_afternoon_human_condition_setting:
-            f_afternoon_nocount = dict_afternoon_human_condition_setting[ n_afternoon_human ]
+                if n_afternoon_human != Human.NONE:
+                    if n_afternoon_human in dict_afternoon_human_condition_setting:
+                        f_afternoon_human_nocount = dict_afternoon_human_condition_setting[ n_afternoon_human ]
 
-            if f_afternoon_nocount == 1:
-                dict_return_human[ n_afternoon_human ] = 1
-                dict_return_human[ Human.TOTAL ] = 1
-            elif f_afternoon_nocount == 0.5:
-                dict_return_human[ n_afternoon_human ] += 0.5
-                dict_return_human[ Human.TOTAL ] += 0.5
+                        if f_morning_weather_nocount == 0.5 and f_afternoon_weather_nocount == 0.5:
+                            pass
+                        elif f_morning_weather_nocount == 0.5 and f_afternoon_weather_nocount == 0:
+                            if f_morning_human_nocount == 1:
+                                pass
+                            else:
+                                dict_return_human[ n_afternoon_human ] += 0.5
+                                dict_return_human[ Human.TOTAL ] += 0.5
+                        elif f_morning_weather_nocount == 0 and f_afternoon_weather_nocount == 0.5:
+                            if f_morning_human_nocount == 1 or f_morning_human_nocount == 0.5:
+                                pass
+                            else: #f_morning_human_nocount == 0
+                                if f_afternoon_human_nocount == 1:
+                                    dict_return_human[ n_afternoon_human ] += 0.5
+                                    dict_return_human[ Human.TOTAL ] += 0.5
+                        elif f_morning_weather_nocount == 0 and f_afternoon_weather_nocount == 0:
+                            if f_morning_human_nocount == 1:
+                                pass
+                            elif f_morning_human_nocount == 0.5:
+                                if f_afternoon_human_nocount == 1 or f_afternoon_human_nocount == 0.5:
+                                    dict_return_human[ n_afternoon_human ] += 0.5
+                                    dict_return_human[ Human.TOTAL ] += 0.5
+                            else: #f_morning_human_nocount == 0
+                                if f_afternoon_human_nocount == 1:
+                                    dict_return_human[ n_afternoon_human ] = 1
+                                    dict_return_human[ Human.TOTAL ] == 1
+                                elif f_afternoon_human_nocount == 0.5:
+                                    dict_return_human[ n_afternoon_human ] += 0.5
+                                    dict_return_human[ Human.TOTAL ] += 0.5
+
+    dict_return_suspend_work[ SyspendWork.SUSPEND_WORK ] = min( 1, dict_return_suspend_work[ SyspendWork.SUSPEND_WORK ] )
 
     dict_return_weather[ Weather.RAIN ]       = min( 1, dict_return_weather[ Weather.RAIN ] )
     dict_return_weather[ Weather.HEAVY_RAIN ] = min( 1, dict_return_weather[ Weather.HEAVY_RAIN ] )
@@ -222,7 +293,6 @@ def func_condition_no_count( dict_morning_weather_condition_setting,
     dict_return_weather[ Weather.OTHER ]      = min( 1, dict_return_weather[ Weather.OTHER ] )
     dict_return_weather[ Weather.TOTAL ]      = min( 1, dict_return_weather[ Weather.TOTAL ] )
 
-    dict_return_human[ Human.SUSPEND_WORK ] = min( 1, dict_return_human[ Human.SUSPEND_WORK ] )
     dict_return_human[ Human.POWER_OFF ]    = min( 1, dict_return_human[ Human.POWER_OFF ] )
     dict_return_human[ Human.OTHER ]        = min( 1, dict_return_human[ Human.OTHER ] )
     dict_return_human[ Human.TOTAL ]        = min( 1, dict_return_human[ Human.TOTAL ] )
