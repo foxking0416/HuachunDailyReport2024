@@ -199,6 +199,528 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(returnValue['RealRestWorkDays'], 40.5)#60+15-34.5
         self.assertEqual(returnValue['RealRestCalendarkDays'], 59)#0314~0508=17+30+12
 
+    def test_func_condition_no_count_1(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
 
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+        b_is_work_day = False
+        n_suspend_work = 1
+        n_morning_weather = int( ScheduleCount.Weather.HEAVY_RAIN )
+        n_afternoon_weather = int( ScheduleCount.Weather.HEAVY_RAIN )
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF )
+        n_afternoon_human = int( ScheduleCount.Human.POWER_OFF )
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_2(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+        b_is_work_day = True
+        n_suspend_work = 1
+        n_morning_weather = int( ScheduleCount.Weather.HEAVY_RAIN )
+        n_afternoon_weather = int( ScheduleCount.Weather.HEAVY_RAIN )
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF )
+        n_afternoon_human = int( ScheduleCount.Human.POWER_OFF )
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 1 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_3(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.HEAVY_RAIN ) # 1
+        n_afternoon_weather = int( ScheduleCount.Weather.HEAVY_RAIN ) # 1
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF ) # 1
+        n_afternoon_human = int( ScheduleCount.Human.POWER_OFF ) # 0.5
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 1 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_4(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.RAIN )# 0.5
+        n_afternoon_weather = int( ScheduleCount.Weather.HEAVY_RAIN )# 1
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF )# 1
+        n_afternoon_human = int( ScheduleCount.Human.OTHER )# 0.5
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0.5 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0.5 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_5(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.OTHER ) # 0
+        n_afternoon_weather = int( ScheduleCount.Weather.HEAVY_RAIN ) # 1
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF ) # 1
+        n_afternoon_human = int( ScheduleCount.Human.OTHER ) # 0.5
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 1 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_5(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.OTHER ) # 0
+        n_afternoon_weather = int( ScheduleCount.Weather.RAIN ) # 0.5
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF ) # 1
+        n_afternoon_human = int( ScheduleCount.Human.OTHER ) # 0.5
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0.5 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0.5 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_6(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 1
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.OTHER ) # 0
+        n_afternoon_weather = int( ScheduleCount.Weather.RAIN ) # 0.5
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF ) # 0.5
+        n_afternoon_human = int( ScheduleCount.Human.OTHER ) # 1
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0.5 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0.5 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_7(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 1
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.OTHER ) # 0
+        n_afternoon_weather = int( ScheduleCount.Weather.RAIN ) # 0.5
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF ) # 1
+        n_afternoon_human = int( ScheduleCount.Human.OTHER ) # 1
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0.5 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 0.5 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
+
+    def test_func_condition_no_count_8(self):
+        dict_morning_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 1,
+            int( ScheduleCount.Weather.HOT ): 0.5,
+            int( ScheduleCount.Weather.MUDDY ): 0,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+        dict_afternoon_weather_condition_setting = { 
+            int( ScheduleCount.Weather.RAIN ): 0.5,
+            int( ScheduleCount.Weather.HEAVY_RAIN ): 1,
+            int( ScheduleCount.Weather.TYPHOON ): 0.5,
+            int( ScheduleCount.Weather.HOT ): 1,
+            int( ScheduleCount.Weather.MUDDY ): 1,
+            int( ScheduleCount.Weather.OTHER ): 0
+        }
+
+        dict_morning_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 1,
+            int( ScheduleCount.Human.OTHER ): 0.5
+        }
+
+        dict_afternoon_human_condition_setting = { 
+            int( ScheduleCount.Human.POWER_OFF ): 0.5,
+            int( ScheduleCount.Human.OTHER ): 1
+        }
+        b_is_work_day = True
+        n_suspend_work = 0
+        n_morning_weather = int( ScheduleCount.Weather.OTHER ) # 0
+        n_afternoon_weather = int( ScheduleCount.Weather.OTHER ) # 0
+        n_morning_human = int( ScheduleCount.Human.POWER_OFF ) # 1
+        n_afternoon_human = int( ScheduleCount.Human.OTHER ) # 1
+
+        dict_return_suspend_work = {}
+        dict_return_weather = {}
+        dict_return_human = {}
+
+        ScheduleCount.func_condition_no_count( b_is_work_day, 
+                                               dict_morning_weather_condition_setting, dict_afternoon_weather_condition_setting,
+                                               dict_morning_human_condition_setting, dict_afternoon_human_condition_setting,
+                                               n_suspend_work,
+                                               n_morning_weather, n_afternoon_weather, 
+                                               n_morning_human, n_afternoon_human,
+                                               dict_return_suspend_work, dict_return_weather, dict_return_human )
+        
+        self.assertEqual( dict_return_suspend_work[ ScheduleCount.SyspendWork.SUSPEND_WORK ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HEAVY_RAIN ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.TYPHOON ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.HOT ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.MUDDY ], 0 )
+        self.assertEqual( dict_return_weather[ ScheduleCount.Weather.OTHER ], 0 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.POWER_OFF ], 1 )
+        self.assertEqual( dict_return_human[ ScheduleCount.Human.OTHER ], 0 )
+
+        pass
 if __name__ == '__main__':
     unittest.main()
