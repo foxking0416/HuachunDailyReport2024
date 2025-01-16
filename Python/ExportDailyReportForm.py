@@ -7,6 +7,11 @@ import datetime
 import openpyxl
 from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
 
+# pip install pywin32
+# pip install openpyxl
+# pip install lunarcalendar
+
+
 g_daily_report_type = Utility.DailyReportType.TYPE_A
 g_draw_triangle_for_weekend = True
 
