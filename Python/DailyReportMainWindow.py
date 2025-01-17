@@ -9,8 +9,12 @@ import time
 import math
 import copy
 from logging.handlers import TimedRotatingFileHandler
-from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
 import logging
+from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
+from QtCreateProjectPage1Dialog import Ui_Dialog as Ui_CreateProjectPage1Dialog
+from QtCreateProjectPage2Dialog import Ui_Dialog as Ui_CreateProjectPage2Dialog
+from QtMainDBHolidaySettingDialog import Ui_Dialog as Ui_StockTradingDialog
+from QtVariableConditionSettingDialog import Ui_Dialog as Ui_StockTradingDialog
 # from QtStockCapitalIncreaseEditDialog import Ui_Dialog as Ui_StockCapitalIncreaseDialog
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QButtonGroup, QMessageBox, QStyledItemDelegate, QFileDialog, QHeaderView, QVBoxLayout, QHBoxLayout, \
                               QLabel, QLineEdit, QDialogButtonBox, QTabBar, QWidget, QTableView, QComboBox, QPushButton, QSizePolicy, QSpacerItem, QCheckBox, QDoubleSpinBox, \
@@ -392,7 +396,12 @@ class MainWindow( QMainWindow ):
         
         delegate = CenterIconDelegate()
 
-        self.ui.qtMainHolidayDBSettingAction.triggered.connect( self.on_trigger_show_all )
+        self.ui.qtMainHolidayDBSettingAction.triggered.connect( self.on_trigger_main_holiday_db_setting )
+        self.ui.qtCreateNewProjectAction.triggered.connect( self.on_trigger_create_new_project )
+        self.ui.qtEditProjectAction.triggered.connect( self.on_trigger_edit_project )
+        self.ui.qtSelectProjectAction.triggered.connect( self.on_trigger_select_project )
+        self.ui.qtCreateNewDailyReportAction.triggered.connect( self.on_trigger_create_new_daily_report )
+        self.ui.qtEditDailyReportAction.triggered.connect( self.on_trigger_edit_daily_report )
 
         self.load_stylesheet( styles_css_path )
         # if b_unit_test:
@@ -411,7 +420,23 @@ class MainWindow( QMainWindow ):
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
-    def on_trigger_show_all( self ):
+    def on_trigger_main_holiday_db_setting( self ):
+        dialog = StockTradingEditDialog( str_stock_number, str_stock_name, b_etf, b_discount, f_discount_value, self )
+        pass
+
+    def on_trigger_create_new_project( self ):
+        pass
+
+    def on_trigger_edit_project( self ):
+        pass
+
+    def on_trigger_select_project( self ):
+        pass
+
+    def on_trigger_create_new_daily_report( self ):
+        pass
+
+    def on_trigger_edit_daily_report( self ):   
         pass
 
 
