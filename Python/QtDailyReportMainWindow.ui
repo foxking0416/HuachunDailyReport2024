@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>工程日報表</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>登入/登出</string>
+    </property>
+    <addaction name="qtSignInAction"/>
+    <addaction name="qtSignOutAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>基本資料維護</string>
+    </property>
+    <addaction name="qtMainHolidayDBSettingAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>工程資料維護</string>
+    </property>
+    <addaction name="qtCreateNewProjectAction"/>
+    <addaction name="qtEditProjectAction"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>日報表作業</string>
+    </property>
+    <addaction name="qtSelectProjectAction"/>
+    <addaction name="qtCreateNewDailyReportAction"/>
+    <addaction name="qtEditDailyReportAction"/>
+    <addaction name="qtCheckDailyReportAction"/>
+    <addaction name="separator"/>
+    <addaction name="qtExpectFinishFormAction"/>
+    <addaction name="qtWeatherFormAction"/>
+    <addaction name="actiond_3"/>
+    <addaction name="actiona_2"/>
+    <addaction name="actiona_3"/>
+    <addaction name="actiona_4"/>
+   </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>系統管理</string>
+    </property>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+   <addaction name="menu_4"/>
+   <addaction name="menu_5"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="qtSignInAction">
+   <property name="text">
+    <string>登入</string>
+   </property>
+  </action>
+  <action name="qtSignOutAction">
+   <property name="text">
+    <string>登出</string>
+   </property>
+  </action>
+  <action name="qtMainHolidayDBSettingAction">
+   <property name="text">
+    <string>主資料庫假日設定</string>
+   </property>
+  </action>
+  <action name="qtCreateNewProjectAction">
+   <property name="text">
+    <string>新增工程資料</string>
+   </property>
+  </action>
+  <action name="qtEditProjectAction">
+   <property name="text">
+    <string>修改現有工程資料</string>
+   </property>
+  </action>
+  <action name="qtSelectProjectAction">
+   <property name="text">
+    <string>選取工程</string>
+   </property>
+  </action>
+  <action name="qtCreateNewDailyReportAction">
+   <property name="text">
+    <string>新增日報表</string>
+   </property>
+  </action>
+  <action name="qtEditDailyReportAction">
+   <property name="text">
+    <string>修改現有日報表</string>
+   </property>
+  </action>
+  <action name="qtCheckDailyReportAction">
+   <property name="text">
+    <string>日報表檢查作業</string>
+   </property>
+  </action>
+  <action name="qtExpectFinishFormAction">
+   <property name="text">
+    <string>預計完工表</string>
+   </property>
+  </action>
+  <action name="qtWeatherFormAction">
+   <property name="text">
+    <string>晴雨表</string>
+   </property>
+  </action>
+  <action name="actiond_3">
+   <property name="text">
+    <string>日報明細表</string>
+   </property>
+  </action>
+  <action name="actiona_2">
+   <property name="text">
+    <string>不計工期圖表</string>
+   </property>
+  </action>
+  <action name="actiona_3">
+   <property name="text">
+    <string>不計工期明細表</string>
+   </property>
+  </action>
+  <action name="actiona_4">
+   <property name="text">
+    <string>不計工期統計表</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

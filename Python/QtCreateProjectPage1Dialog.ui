@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>534</height>
+    <width>267</width>
+    <height>226</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>TextLabel</string>
+        <string>工程編號</string>
        </property>
       </widget>
      </item>
@@ -33,7 +33,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>TextLabel</string>
+        <string>工程名稱</string>
        </property>
       </widget>
      </item>
@@ -47,7 +47,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>TextLabel</string>
+        <string>案號及契約號</string>
        </property>
       </widget>
      </item>
@@ -59,16 +59,16 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="qtNextStepPushButton">
        <property name="text">
-        <string>PushButton</string>
+        <string>下一步</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="qtCancelPushButton">
        <property name="text">
-        <string>PushButton</string>
+        <string>取消</string>
        </property>
       </widget>
      </item>

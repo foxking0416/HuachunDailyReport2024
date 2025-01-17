@@ -17,6 +17,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QDateEdit" name="qtDateEdit"/>
+     </item>
+     <item>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>理由</string>
@@ -24,7 +27,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="qtReasonLineEdit"/>
      </item>
     </layout>
    </item>
@@ -47,7 +50,7 @@
      <item>
       <widget class="QPushButton" name="qtAddPushButton">
        <property name="text">
-        <string>PushButton</string>
+        <string>新增</string>
        </property>
       </widget>
      </item>
