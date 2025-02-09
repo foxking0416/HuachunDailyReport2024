@@ -33,10 +33,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout.addWidget(self.label)
 
-        self.lineEdit = QLineEdit(Dialog)
-        self.lineEdit.setObjectName(u"lineEdit")
+        self.qtProjectNumberLineEdit = QLineEdit(Dialog)
+        self.qtProjectNumberLineEdit.setObjectName(u"qtProjectNumberLineEdit")
 
-        self.horizontalLayout.addWidget(self.lineEdit)
+        self.horizontalLayout.addWidget(self.qtProjectNumberLineEdit)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -48,10 +48,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_2.addWidget(self.label_2)
 
-        self.lineEdit_2 = QLineEdit(Dialog)
-        self.lineEdit_2.setObjectName(u"lineEdit_2")
+        self.qtProjectNameLineEdit = QLineEdit(Dialog)
+        self.qtProjectNameLineEdit.setObjectName(u"qtProjectNameLineEdit")
 
-        self.horizontalLayout_2.addWidget(self.lineEdit_2)
+        self.horizontalLayout_2.addWidget(self.qtProjectNameLineEdit)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -63,10 +63,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_3.addWidget(self.label_3)
 
-        self.lineEdit_3 = QLineEdit(Dialog)
-        self.lineEdit_3.setObjectName(u"lineEdit_3")
+        self.qtContractNumberLineEdit = QLineEdit(Dialog)
+        self.qtContractNumberLineEdit.setObjectName(u"qtContractNumberLineEdit")
 
-        self.horizontalLayout_3.addWidget(self.lineEdit_3)
+        self.horizontalLayout_3.addWidget(self.qtContractNumberLineEdit)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
@@ -93,7 +93,7 @@ class Ui_Dialog(object):
     # setupUi
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"\u65b0\u589e\u5de5\u7a0b\u8cc7\u6599", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"\u5de5\u7a0b\u7de8\u865f", None))
         self.label_2.setText(QCoreApplication.translate("Dialog", u"\u5de5\u7a0b\u540d\u7a31", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"\u6848\u865f\u53ca\u5951\u7d04\u865f", None))

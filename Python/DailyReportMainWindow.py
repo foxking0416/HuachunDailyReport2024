@@ -13,9 +13,10 @@ import logging
 from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
 from QtCreateProjectPage1Dialog import Ui_Dialog as Ui_CreateProjectPage1Dialog
 from QtCreateProjectPage2Dialog import Ui_Dialog as Ui_CreateProjectPage2Dialog
-from QtMainDBHolidaySettingDialog import Ui_Dialog as Ui_StockTradingDialog
-from QtVariableConditionSettingDialog import Ui_Dialog as Ui_StockTradingDialog
-# from QtStockCapitalIncreaseEditDialog import Ui_Dialog as Ui_StockCapitalIncreaseDialog
+from QtDailyReportPerDayDialog import Ui_Dialog as Ui_DailyReportPerDayDialog
+from QtSelectEditProjectDialog import Ui_Dialog as Ui_SelectEditProjectDialog
+from QtMainDBHolidaySettingDialog import Ui_Dialog as Ui_MainDBHolidaySettingDialog
+from QtVariableConditionSettingDialog import Ui_Dialog as Ui_VariableConditionSettingDialog
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QButtonGroup, QMessageBox, QStyledItemDelegate, QFileDialog, QHeaderView, QVBoxLayout, QHBoxLayout, \
                               QLabel, QLineEdit, QDialogButtonBox, QTabBar, QWidget, QTableView, QComboBox, QPushButton, QSizePolicy, QSpacerItem, QCheckBox, QDoubleSpinBox, \
                               QProgressBar, QTabWidget
@@ -43,6 +44,8 @@ from scipy.optimize import newton
 # pyside6-uic QtCreateProjectPage2Dialog.ui -o QtCreateProjectPage2Dialog.py
 # pyside6-uic QtMainDBHolidaySettingDialog.ui -o QtMainDBHolidaySettingDialog.py
 # pyside6-uic QtVariableConditionSettingDialog.ui -o QtVariableConditionSettingDialog.py
+# pyside6-uic QtSelectEditProjectDialog.ui -o QtSelectEditProjectDialog.py
+# pyside6-uic QtDailyReportPerDayDialog.ui -o QtDailyReportPerDayDialog.py
 
 # 靜態掃描
 # pylint --disable=all --enable=E1120,E1121 StockPriceMainWindow.py 只顯示參數數量錯誤
@@ -161,75 +164,17 @@ class TradingFeeType( Enum ):
     VARIABLE = 0
     CONSTANT = 1
 
-class EditTabTitleDialog( QDialog ):
-    """一個小對話框用於編輯 Tab 標題"""
-    def __init__( self, current_title, parent = None ):
-        super().__init__( parent )
-        self.setWindowTitle( "修改名稱" )
-        self.resize( 300, 100 )
-
-        self.layout = QVBoxLayout( self )
-
-        self.label = QLabel("輸入名稱:")
-        self.layout.addWidget( self.label )
-
-        self.line_edit = QLineEdit( self )
-        self.line_edit.setText( current_title )
-        self.line_edit.selectAll()
-        self.layout.addWidget( self.line_edit )
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.qtOkPushButton = QPushButton( self )
-        self.qtOkPushButton.setText( "確認" )
-        self.qtCancelPushButton = QPushButton( self )
-        self.qtCancelPushButton.setText( "取消" )
-
-        self.horizontalLayout_4.addWidget(self.qtOkPushButton)
-        self.horizontalLayout_4.addWidget(self.qtCancelPushButton)
-
-        self.qtOkPushButton.clicked.connect( self.accept )
-        self.qtCancelPushButton.clicked.connect( self.reject )
-
-        self.layout.addLayout( self.horizontalLayout_4 )
-
-    def get_new_title(self):
-        """返回用戶輸入的標題"""
-        return self.line_edit.text()
-
-class StockTradingEditDialog( QDialog ):
-    def __init__( self, str_stock_number, str_stock_name, b_etf, b_discount, f_discount_value, parent = None ):
+class CreateProjectPage1Dialog( QDialog ):
+    def __init__( self, parent = None ):
         super().__init__( parent )
 
-        self.ui = Ui_StockTradingDialog()
+        self.ui = Ui_CreateProjectPage1Dialog()
         self.ui.setupUi( self )
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
-
-        self.ui.qtStockNumberLabel.setText( str_stock_number )
-        self.ui.qtStockNameLabel.setText( str_stock_name )
-        obj_current_date = datetime.datetime.today()
-        self.ui.qtDateEdit.setDate( obj_current_date.date() )
-        self.ui.qtDateEdit.setCalendarPopup( True )
-        self.ui.qtDiscountCheckBox.setChecked( b_discount )
-        self.ui.qtDiscountRateDoubleSpinBox.setValue( f_discount_value * 10 )
-        self.ui.qtDiscountRateDoubleSpinBox.setEnabled( b_discount )
-
-        self.ui.qtDiscountCheckBox.stateChanged.connect( self.on_discount_check_box_state_changed )
-        self.ui.qtDiscountRateDoubleSpinBox.valueChanged.connect( self.compute_cost )
-        self.ui.qtBuyRadioButton.toggled.connect( self.compute_cost )
-        self.ui.qtSellRadioButton.toggled.connect( self.compute_cost )
-        self.ui.qtCommonTradeRadioButton.toggled.connect( self.on_trading_type_changed )
-        self.ui.qtOddTradeRadioButton.toggled.connect( self.on_trading_type_changed )
-        self.ui.qtPriceDoubleSpinBox.valueChanged.connect( self.compute_cost )
-        self.ui.qtCommonTradeCountSpinBox.valueChanged.connect( self.compute_cost )
-        self.ui.qtOddTradeCountSpinBox.valueChanged.connect( self.compute_cost )
-        self.ui.qtOkPushButton.clicked.connect( self.accept_data )
+        self.ui.qtNextStepPushButton.clicked.connect( self.next_step )
         self.ui.qtCancelPushButton.clicked.connect( self.cancel )
-        self.b_etf = b_etf
-        self.str_stock_name = str_stock_name
-        # self.load_stylesheet("style.css")
-        self.dict_trading_data = {}
 
     def load_stylesheet( self, file_path ):
         try:
@@ -241,68 +186,54 @@ class StockTradingEditDialog( QDialog ):
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
-    def on_discount_check_box_state_changed( self, state ):
-        if state == 2:
-            self.ui.qtDiscountRateDoubleSpinBox.setEnabled( True )
+    def next_step( self ):
+        if True:
+            self.accept()
+            dialog = CreateProjectPage2Dialog(  self )
+            if dialog.exec():
+                pass
         else:
-            self.ui.qtDiscountRateDoubleSpinBox.setEnabled( False )
+            self.reject()
+    
+    def cancel( self ):
+        self.reject()
 
-        self.compute_cost()
+class CreateProjectPage2Dialog( QDialog ):
+    def __init__( self, parent = None ):
+        super().__init__( parent )
 
-    def setup_trading_date( self, str_date ):
-        self.ui.qtDateEdit.setDate( datetime.datetime.strptime( str_date, "%Y-%m-%d" ).date() )
+        self.ui = Ui_CreateProjectPage2Dialog()
+        self.ui.setupUi( self )
+        
+        window_icon = QIcon( window_icon_file_path ) 
+        self.setWindowIcon( window_icon )
+        self.ui.qtOkPushButton.clicked.connect( self.accept_data )
+        self.ui.qtCancelPushButton.clicked.connect( self.cancel )
+        self.ui.qtConstantConditionSettingPushButton.clicked.connect( self.constant_condition_setting )
+        self.ui.qtVariableConditionSettingPushButton.clicked.connect( self.variable_condition_setting )
 
-    def setup_trading_type( self, e_trading_type ):
-        if e_trading_type == TradingType.BUY:
-            self.ui.qtBuyRadioButton.setChecked( True )
-        else:
-            self.ui.qtSellRadioButton.setChecked( True )
+    def load_stylesheet( self, file_path ):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
+                stylesheet = file.read()
+                self.setStyleSheet(stylesheet)
+        except FileNotFoundError:
+            print(f"CSS 檔案 {file_path} 找不到")
+        except Exception as e:
+            print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
-    def setup_trading_discount( self, f_discount_value ):
-        if f_discount_value != 1:
-            self.ui.qtDiscountCheckBox.setChecked( True )
-            self.ui.qtDiscountRateDoubleSpinBox.setValue( f_discount_value * 10 )
-            self.ui.qtDiscountRateDoubleSpinBox.setEnabled( True )
-        else:
-            self.ui.qtDiscountCheckBox.setChecked( False )
-            self.ui.qtDiscountRateDoubleSpinBox.setValue( 6 )
-            self.ui.qtDiscountRateDoubleSpinBox.setEnabled( False )
+    def constant_condition_setting( self ):
+        dialog = VariableConditionSettingDialog(  self )
+        if dialog.exec():
+            pass
 
-    def setup_trading_price( self, f_price ):
-        self.ui.qtPriceDoubleSpinBox.setValue( f_price )
-
-    def setup_trading_count( self, f_count ):
-        if f_count % 1000 == 0:
-            self.ui.qtCommonTradeRadioButton.setChecked( True )
-            self.ui.qtCommonTradeCountSpinBox.setValue( f_count / 1000 )
-            self.ui.qtOddTradeCountSpinBox.setValue( 0 )
-        else:
-            self.ui.qtOddTradeRadioButton.setChecked( True )
-            self.ui.qtCommonTradeCountSpinBox.setValue( 0 )
-            self.ui.qtOddTradeCountSpinBox.setValue( f_count )
-
-    def setup_daying_trading( self, b_daying_trading ):
-        if b_daying_trading:
-            self.ui.qtDayingTradingCheckBox.setChecked( True )
-        else:
-            self.ui.qtDayingTradingCheckBox.setChecked( False )
+    def variable_condition_setting( self ):
+        dialog = VariableConditionSettingDialog(  self )
+        if dialog.exec():
+            pass
 
     def accept_data( self ):
-
-        if float( self.ui.qtTotalCostLineEdit.text().replace( ',', '' ) ) != 0:
-            
-            self.dict_trading_data = Utility.generate_trading_data( self.ui.qtDateEdit.date().toString( "yyyy-MM-dd" ), #交易日期
-                                                                    self.get_trading_type(),                            #交易種類
-                                                                    self.ui.qtPriceDoubleSpinBox.value(),               #交易價格
-                                                                    self.get_trading_count(),                           #交易股數
-                                                                    TradingFeeType.VARIABLE,                            #手續費種類
-                                                                    self.get_trading_fee_discount(),                    #手續費折扣
-                                                                    0,                                                  #手續費最低金額
-                                                                    0,                                                  #手續費固定金額
-                                                                    0,                                                  #每股股票股利
-                                                                    0,                                                  #每股現金股利
-                                                                    0,                                                  #每股減資金額
-                                                                    self.ui.qtDayingTradingCheckBox.isChecked() )       #是否為當沖交易                                          
+        if True:
             self.accept()
         else:
             self.reject()
@@ -310,50 +241,124 @@ class StockTradingEditDialog( QDialog ):
     def cancel( self ):
         self.reject()
 
-    def on_trading_type_changed( self ):
-        if self.ui.qtCommonTradeRadioButton.isChecked():
-            self.ui.qtCommonTradeCountSpinBox.setEnabled( True )
-            self.ui.qtOddTradeCountSpinBox.setEnabled( False )
-        else:
-            self.ui.qtCommonTradeCountSpinBox.setEnabled( False )
-            self.ui.qtOddTradeCountSpinBox.setEnabled( True )
+class MainDBHolidaySettingDialog( QDialog ):
+    def __init__( self, parent = None ):
+        super().__init__( parent )
 
-        self.compute_cost()
-
-    def get_trading_type( self ):
-        if self.ui.qtBuyRadioButton.isChecked():
-            return TradingType.BUY
-        else:
-            return TradingType.SELL
-
-    def get_trading_count( self ):
-        if self.ui.qtCommonTradeRadioButton.isChecked():
-            return self.ui.qtCommonTradeCountSpinBox.value() * 1000
-        else:
-            return self.ui.qtOddTradeCountSpinBox.value()
+        self.ui = Ui_MainDBHolidaySettingDialog()
+        self.ui.setupUi( self )
         
-    def get_trading_fee_discount( self ):
-        if self.ui.qtDiscountCheckBox.isChecked():
-            return self.ui.qtDiscountRateDoubleSpinBox.value() / 10
+        window_icon = QIcon( window_icon_file_path ) 
+        self.setWindowIcon( window_icon )
+
+    def load_stylesheet( self, file_path ):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
+                stylesheet = file.read()
+                self.setStyleSheet(stylesheet)
+        except FileNotFoundError:
+            print(f"CSS 檔案 {file_path} 找不到")
+        except Exception as e:
+            print(f"讀取 CSS 檔案時發生錯誤: {e}")
+
+    def accept_data( self ):
+        if True:
+            self.accept()
         else:
-            return 1
+            self.reject()
+    
+    def cancel( self ):
+        self.reject()
 
-    def compute_cost( self ):
-        e_trading_type = self.get_trading_type()
-        f_trading_price = self.ui.qtPriceDoubleSpinBox.value()
-        n_trading_count = self.get_trading_count()
-        f_trading_fee_discount = self.get_trading_fee_discount() 
-        b_bond = True if '債' in self.str_stock_name else False
-        dict_result = Utility.compute_cost( e_trading_type, f_trading_price, n_trading_count, f_trading_fee_discount, self.b_etf, False, b_bond )
+class VariableConditionSettingDialog( QDialog ):
+    def __init__( self, parent = None ):
+        super().__init__( parent )
 
-        if e_trading_type == TradingType.BUY:
-            self.ui.qtTradingValueLineEdit.setText( format( dict_result[ TradingCost.TRADING_VALUE ], ',' ) )
-            self.ui.qtTotalCostLineEdit.setText( format( dict_result[ TradingCost.TRADING_TOTAL_COST ], ',' ) )
-        elif e_trading_type == TradingType.SELL:
-            self.ui.qtTradingValueLineEdit.setText( format( -dict_result[ TradingCost.TRADING_VALUE ], ',' ) )
-            self.ui.qtTotalCostLineEdit.setText( format( -dict_result[ TradingCost.TRADING_TOTAL_COST ], ',' ) )
-        self.ui.qtFeeLineEdit.setText( format( dict_result[ TradingCost.TRADING_FEE ], ',' ) )
-        self.ui.qtTaxLineEdit.setText( format( dict_result[ TradingCost.TRADING_TAX ], ',' ) )
+        self.ui = Ui_VariableConditionSettingDialog()
+        self.ui.setupUi( self )
+        
+        window_icon = QIcon( window_icon_file_path ) 
+        self.setWindowIcon( window_icon )
+        self.ui.qtOkPushButton.clicked.connect( self.accept_data )
+        self.ui.qtCancelPushButton.clicked.connect( self.cancel )
+
+    def load_stylesheet( self, file_path ):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
+                stylesheet = file.read()
+                self.setStyleSheet(stylesheet)
+        except FileNotFoundError:
+            print(f"CSS 檔案 {file_path} 找不到")
+        except Exception as e:
+            print(f"讀取 CSS 檔案時發生錯誤: {e}")
+
+    def accept_data( self ):
+        if True:
+            self.accept()
+        else:
+            self.reject()
+    
+    def cancel( self ):
+        self.reject()
+
+class SelectEditProjectDialog( QDialog ):
+    def __init__( self, parent = None ):
+        super().__init__( parent )
+
+        self.ui = Ui_SelectEditProjectDialog()
+        self.ui.setupUi( self )
+        
+        window_icon = QIcon( window_icon_file_path ) 
+        self.setWindowIcon( window_icon )
+
+    def load_stylesheet( self, file_path ):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
+                stylesheet = file.read()
+                self.setStyleSheet(stylesheet)
+        except FileNotFoundError:
+            print(f"CSS 檔案 {file_path} 找不到")
+        except Exception as e:
+            print(f"讀取 CSS 檔案時發生錯誤: {e}")
+
+    def accept_data( self ):
+        if True:
+            self.accept()
+        else:
+            self.reject()
+    
+    def cancel( self ):
+        self.reject()
+
+class DailyReportPerDayDialog( QDialog ):
+    def __init__( self, parent = None ):
+        super().__init__( parent )
+
+        self.ui = Ui_DailyReportPerDayDialog()
+        self.ui.setupUi( self )
+        
+        window_icon = QIcon( window_icon_file_path ) 
+        self.setWindowIcon( window_icon )
+
+    def load_stylesheet( self, file_path ):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
+                stylesheet = file.read()
+                self.setStyleSheet(stylesheet)
+        except FileNotFoundError:
+            print(f"CSS 檔案 {file_path} 找不到")
+        except Exception as e:
+            print(f"讀取 CSS 檔案時發生錯誤: {e}")
+
+    def accept_data( self ):
+        if True:
+            self.accept()
+        else:
+            self.reject()
+    
+    def cancel( self ):
+        self.reject()
+
 
 class SaveCheckDialog( QDialog ):
     def __init__( self, str_title = '', parent = None ):
@@ -421,14 +426,19 @@ class MainWindow( QMainWindow ):
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
     def on_trigger_main_holiday_db_setting( self ):
-        dialog = StockTradingEditDialog( str_stock_number, str_stock_name, b_etf, b_discount, f_discount_value, self )
-        pass
+        dialog = MainDBHolidaySettingDialog(  self )
+        if dialog.exec():
+            pass
 
     def on_trigger_create_new_project( self ):
-        pass
+        dialog = CreateProjectPage1Dialog(  self )
+        if dialog.exec():
+            pass
 
     def on_trigger_edit_project( self ):
-        pass
+        dialog = SelectEditProjectDialog(  self )
+        if dialog.exec():
+            pass
 
     def on_trigger_select_project( self ):
         pass

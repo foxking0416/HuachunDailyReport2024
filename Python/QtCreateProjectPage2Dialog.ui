@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>367</height>
+    <width>572</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>新增工程資料</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -28,7 +28,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="qtProjectNumberLabel">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -74,7 +74,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_5"/>
+          <widget class="QLineEdit" name="qtSupervisorLineEdit"/>
          </item>
         </layout>
        </item>
@@ -92,7 +92,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+          <widget class="QSpinBox" name="qtContractValueSpinBox"/>
          </item>
         </layout>
        </item>
@@ -106,7 +106,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QDateEdit" name="dateEdit"/>
+          <widget class="QDateEdit" name="qtDateEdit"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="qtDecideWeekdayLabel">
+           <property name="text">
+            <string>日</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -134,7 +141,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_7"/>
+          <widget class="QLineEdit" name="qtContractorLineEdit"/>
          </item>
         </layout>
        </item>
@@ -160,6 +167,9 @@
             <widget class="QRadioButton" name="qtWorkingDayRadioButton">
              <property name="text">
               <string>工作天</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -190,6 +200,9 @@
             <widget class="QRadioButton" name="qtOneDayOffRadioButton">
              <property name="text">
               <string>周休一日</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -235,7 +248,7 @@
           <widget class="QDateEdit" name="qtStartDateEdit"/>
          </item>
          <item>
-          <widget class="QLabel" name="label_14">
+          <widget class="QLabel" name="qtStartWeekdayLabel">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -266,7 +279,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+          <widget class="QDoubleSpinBox" name="qtContractWorkingDaysDoubleSpinBox">
            <property name="decimals">
             <number>1</number>
            </property>
@@ -300,10 +313,10 @@
           </widget>
          </item>
          <item>
-          <widget class="QDateEdit" name="dateEdit_3"/>
+          <widget class="QDateEdit" name="qtContractFinishDateEdit"/>
          </item>
          <item>
-          <widget class="QLabel" name="label_15">
+          <widget class="QLabel" name="qtFinishWeekdayLabel">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -334,7 +347,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+          <widget class="QDoubleSpinBox" name="qtTotalDaysDoubleSpinBox">
            <property name="decimals">
             <number>1</number>
            </property>

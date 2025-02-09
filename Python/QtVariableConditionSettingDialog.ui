@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
-    <height>436</height>
+    <width>950</width>
+    <height>575</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,657 +15,891 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>下雨</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
+    <widget class="QGroupBox" name="qtWeatherConditionGroupBox">
+     <property name="title">
+      <string>天候因素</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>7</number>
+      </property>
+      <property name="leftMargin">
+       <number>7</number>
+      </property>
+      <property name="topMargin">
+       <number>7</number>
+      </property>
+      <item>
+       <widget class="QGroupBox" name="qtRainGroupBox">
+        <property name="title">
+         <string/>
         </property>
-        <property name="topMargin">
-         <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningRainGroupBox">
+           <property name="title">
+            <string>上午下雨</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QRadioButton" name="qtMorningRainOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningRainHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningRainNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonRainGroupBox">
+           <property name="title">
+            <string>下午下雨</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonRainOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonRainHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonRainNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtHeavyRainGroupBox">
+        <property name="title">
+         <string/>
         </property>
-        <property name="rightMargin">
-         <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningHeavyRainGroupBox">
+           <property name="title">
+            <string>上午豪雨</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QRadioButton" name="qtMorningHeavyRainOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningHeavyRainHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningHeavyRainNoDayOffRadioButton_2">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonHeavyRainGroupBox">
+           <property name="title">
+            <string>下午豪雨</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHeavyRainOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHeavyRainHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHeavyRainNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtTyphoonGroupBox">
+        <property name="title">
+         <string/>
         </property>
-        <property name="bottomMargin">
-         <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningTyphoonGroupBox">
+           <property name="title">
+            <string>上午颱風</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QRadioButton" name="qtMorningTyphoonOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningTyphoonHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningTyphoonNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonTyphoonGroupBox">
+           <property name="title">
+            <string>下午颱風</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonTyphoonOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonTyphoonHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonTyphoonNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtHotGroupBox">
+        <property name="title">
+         <string/>
         </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_7">
-          <property name="title">
-           <string>上午下雨</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QRadioButton" name="radioButton">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_3">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_2">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_6">
-          <property name="title">
-           <string>下午下雨</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QRadioButton" name="radioButton_6">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_4">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_5">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_4">
-       <property name="title">
-        <string>豪雨</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="leftMargin">
-         <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_13">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningHotGroupBox">
+           <property name="title">
+            <string>上午酷熱</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_20">
+            <item>
+             <widget class="QRadioButton" name="qtMorningHotOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningHotHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningHotNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonHotGroupBox">
+           <property name="title">
+            <string>下午酷熱</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_21">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHotOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHotHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHotNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtMuddyGroupBox">
+        <property name="title">
+         <string/>
         </property>
-        <property name="topMargin">
-         <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_11">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningMuddyGroupBox">
+           <property name="title">
+            <string>上午泥濘</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_16">
+            <item>
+             <widget class="QRadioButton" name="qtMorningMuddyOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningMuddyHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningMuddyNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonMuddyGroupBox">
+           <property name="title">
+            <string>下午泥濘</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_18">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonMuddyOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonMuddyHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonMuddyNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtWeatherOtherGroupBox">
+        <property name="title">
+         <string/>
         </property>
-        <property name="rightMargin">
-         <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_26">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningWeatherOtherGroupBox">
+           <property name="title">
+            <string>上午其他</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_27">
+            <item>
+             <widget class="QRadioButton" name="qtMorningWeatherOtherOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningWeatherOtherHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningWeatherOtherNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonWeatherOtherGroupBox">
+           <property name="title">
+            <string>下午其他</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_28">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonWeatherOtherOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonWeatherOtherHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonWeatherOtherNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="bottomMargin">
-         <number>0</number>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
         </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_9">
-          <property name="title">
-           <string>上午豪雨</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <item>
-            <widget class="QRadioButton" name="radioButton_7">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_9">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_8">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_8">
-          <property name="title">
-           <string>下午豪雨</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
-           <item>
-            <widget class="QRadioButton" name="radioButton_10">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_11">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_12">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="title">
-        <string>颱風</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_8">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_10">
-          <property name="title">
-           <string>上午颱風</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
-           <item>
-            <widget class="QRadioButton" name="radioButton_13">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_15">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_14">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_11">
-          <property name="title">
-           <string>下午颱風</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_10">
-           <item>
-            <widget class="QRadioButton" name="radioButton_16">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_17">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_18">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_2">
-       <property name="title">
-        <string>酷熱</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_13">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_23">
-          <property name="title">
-           <string>上午酷熱</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_20">
-           <item>
-            <widget class="QRadioButton" name="radioButton_32">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_33">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_34">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_24">
-          <property name="title">
-           <string>下午酷熱</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_21">
-           <item>
-            <widget class="QRadioButton" name="radioButton_35">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_36">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_37">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <widget class="QGroupBox" name="qtHumanConditionGroupBox">
+     <property name="title">
+      <string>人為因素</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>7</number>
+      </property>
+      <property name="topMargin">
+       <number>7</number>
+      </property>
+      <item>
+       <widget class="QGroupBox" name="qtSuspendGroupBox">
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_15">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningSuspendGroupBox">
+           <property name="title">
+            <string>上午停工</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_19">
+            <item>
+             <widget class="QRadioButton" name="qtMorningSuspendOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningSuspendHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningSuspendNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonSuspendGroupBox">
+           <property name="title">
+            <string>下午停工</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_23">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonSuspendOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonSuspendHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonSuspendNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtPowerOffGroupBox">
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningPowerOffGroupBox">
+           <property name="title">
+            <string>上午停電</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_17">
+            <item>
+             <widget class="QRadioButton" name="qtMorningPowerOffOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningPowerOffHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningPowerOffNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonPowerOffGroupBox">
+           <property name="title">
+            <string>下午停電</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_22">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonPowerOffOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonPowerOffHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonPowerOffNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="qtHumanOtherGroupBox">
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_14">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="qtMorningHumanOtherGroupBox">
+           <property name="title">
+            <string>上午其他</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_24">
+            <item>
+             <widget class="QRadioButton" name="qtMorningHumanOtherOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningHumanOtherHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtMorningHumanOtherNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="qtAfternoonHumanOtherGroupBox">
+           <property name="title">
+            <string>下午其他</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_25">
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHumanOtherOneDayOffRadioButton">
+              <property name="text">
+               <string>不計工期1天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHumanOtherHalfDayOffRadioButton">
+              <property name="text">
+               <string>不計工期0.5天</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="qtAfternoonHumanOtherNoDayOffRadioButton">
+              <property name="text">
+               <string>照計工期</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QGroupBox" name="groupBox_12">
-       <property name="title">
-        <string>泥濘</string>
+      <widget class="QPushButton" name="qtOkPushButton">
+       <property name="text">
+        <string>確認</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_11">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_15">
-          <property name="title">
-           <string>上午泥濘</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_16">
-           <item>
-            <widget class="QRadioButton" name="radioButton_19">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_20">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_22">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_19">
-          <property name="title">
-           <string>下午泥濘</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_18">
-           <item>
-            <widget class="QRadioButton" name="radioButton_23">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_24">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_27">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_14">
-       <property name="title">
-        <string>停電</string>
+      <widget class="QPushButton" name="qtCancelPushButton">
+       <property name="text">
+        <string>取消</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_12">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_16">
-          <property name="title">
-           <string>上午停電</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_17">
-           <item>
-            <widget class="QRadioButton" name="radioButton_21">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_26">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_25">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_20">
-          <property name="title">
-           <string>下午停電</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_22">
-           <item>
-            <widget class="QRadioButton" name="radioButton_28">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_41">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_42">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_13">
-       <property name="title">
-        <string>停工</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_15">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_17">
-          <property name="title">
-           <string>上午停工</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_19">
-           <item>
-            <widget class="QRadioButton" name="radioButton_29">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_30">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_31">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_21">
-          <property name="title">
-           <string>下午停工</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_23">
-           <item>
-            <widget class="QRadioButton" name="radioButton_38">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_39">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_40">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_5">
-       <property name="title">
-        <string>其他</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_14">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_18">
-          <property name="title">
-           <string>上午其他</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_24">
-           <item>
-            <widget class="QRadioButton" name="radioButton_43">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_44">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_45">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_22">
-          <property name="title">
-           <string>下午其他</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_25">
-           <item>
-            <widget class="QRadioButton" name="radioButton_46">
-             <property name="text">
-              <string>不計工期1天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_47">
-             <property name="text">
-              <string>不計工期0.5天</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radioButton_48">
-             <property name="text">
-              <string>照計工期</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
       </widget>
      </item>
     </layout>
