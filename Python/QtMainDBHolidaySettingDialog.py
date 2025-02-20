@@ -51,6 +51,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.qtHolidayRadioButton = QRadioButton(Dialog)
         self.qtHolidayRadioButton.setObjectName(u"qtHolidayRadioButton")
+        self.qtHolidayRadioButton.setChecked(True)
 
         self.horizontalLayout_2.addWidget(self.qtHolidayRadioButton)
 
@@ -69,10 +70,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.tableView = QTableView(Dialog)
-        self.tableView.setObjectName(u"tableView")
+        self.qtTableView = QTableView(Dialog)
+        self.qtTableView.setObjectName(u"qtTableView")
 
-        self.horizontalLayout_3.addWidget(self.tableView)
+        self.horizontalLayout_3.addWidget(self.qtTableView)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
@@ -109,7 +110,7 @@ class Ui_Dialog(object):
     # setupUi
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"\u4e3b\u8cc7\u6599\u5eab\u5047\u65e5\u8a2d\u5b9a", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"\u7406\u7531", None))
         self.qtHolidayRadioButton.setText(QCoreApplication.translate("Dialog", u"\u653e\u5047", None))
         self.qtWorkdayRadioButton.setText(QCoreApplication.translate("Dialog", u"\u88dc\u73ed", None))
