@@ -8,8 +8,10 @@ import datetime
 import time
 import math
 import copy
+import re
 from logging.handlers import TimedRotatingFileHandler
 import logging
+import ScheduleCount
 from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
 from QtCreateProjectPage1Dialog import Ui_Dialog as Ui_CreateProjectPage1Dialog
 from QtCreateProjectPage2Dialog import Ui_Dialog as Ui_CreateProjectPage2Dialog
@@ -25,7 +27,7 @@ from PySide6.QtCore import Qt, QModelIndex, QRect, QSignalBlocker, QSize, QThrea
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, auto
 from decimal import Decimal
 from scipy.optimize import newton
 
@@ -136,6 +138,49 @@ class HolidayData( Enum ):
     REASON = 0
     HOLIDAY = 1
 
+class ContractCondition( Enum ):
+    WORKING_DAY_ONE_DAYOFF = 0
+    WORKING_DAY_TWO_DAYOFF = 1
+    CALANDER_DAY = 2
+    FIXED_DEADLINE = 3
+
+class WeatherCondition( Enum ):
+    MORNING_RAIN = 0
+    AFTERNOON_RAIN = auto()
+    MORNING_HEAVYRAIN = auto()
+    AFTERNOON_HEAVYRAIN = auto()
+    MORNING_TYPHOON = auto()
+    AFTERNOON_TYPHOON = auto()
+    MORNING_HOT = auto()
+    AFTERNOON_HOT = auto()
+    MORNING_MUDDY = auto()
+    AFTERNOON_MUDDY = auto()
+    MORNING_OTHER = auto()
+    AFTERNOON_OTHER = auto()
+
+class HumanCondition( Enum ):
+    MORNING_SUSPENSION = 0
+    AFTERNOON_SUSPENSION = auto()
+    MORNING_POWER_OFF = auto()
+    AFTERNOON_POWER_OFF = auto()
+    MORNING_OTHER = auto()
+    AFTERNOON_OTHER = auto()
+
+class ProjectData( Enum ):
+    PROJECT_NUMBER = 0
+    PROJECT_NAME = auto()
+    PROJECT_LOCATION = auto()
+    CONTRACT_NUMBER = auto() #合約號碼
+    OWNER = auto() #業主
+    SUPERSIOR = auto() #監造
+    DESIGNER = auto() #設計
+    CONTRACTOR = auto() #承包商
+    BID_DATE = auto() #決標日期
+    START_DATE = auto() #開工日期
+    CONDITION = auto() #工期條件
+    CONTRACT_DURATION = auto() #契約工期
+    CONTRACT_FINISH_DATE = auto() #合約完工日期
+
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
         # 获取单元格数据
@@ -157,8 +202,46 @@ class CenterIconDelegate( QStyledItemDelegate ):
             # 如果没有图标，使用默认绘制方法
             super().paint( painter, option, index )
 
+class Utility():
+    def create_project_data( str_project_number, 
+                             str_project_name, 
+                             str_contract_number,
+                             str_project_location,
+                             str_owner,
+                             str_supersior,
+                             str_designer,
+                             str_contractor,
+                             str_bid_date,
+                             str_start_date,
+                             e_condition,
+                             n_contract_duration,
+                             str_contract_finish_date ):
+        dict_project_data = {}
+        dict_project_data[ ProjectData.PROJECT_NUMBER ] = str_project_number
+        dict_project_data[ ProjectData.PROJECT_NAME ] = str_project_name
+        dict_project_data[ ProjectData.PROJECT_LOCATION ] = str_project_location
+        dict_project_data[ ProjectData.CONTRACT_NUMBER ] = str_contract_number
+        dict_project_data[ ProjectData.OWNER ] = str_owner
+        dict_project_data[ ProjectData.SUPERSIOR ] = str_supersior
+        dict_project_data[ ProjectData.DESIGNER ] = str_designer
+        dict_project_data[ ProjectData.CONTRACTOR ] = str_contractor
+        dict_project_data[ ProjectData.BID_DATE ] = str_bid_date
+        dict_project_data[ ProjectData.START_DATE ] = str_start_date
+        dict_project_data[ ProjectData.CONDITION ] = e_condition
+        dict_project_data[ ProjectData.CONTRACT_DURATION ] = n_contract_duration
+        dict_project_data[ ProjectData.CONTRACT_FINISH_DATE ] = str_contract_finish_date
+        return dict_project_data
+
+    def is_valid_english_number_string( s ):
+        pattern = r'^[a-zA-Z0-9_-]+$'  # 允許的字元: 英文(a-zA-Z)、數字(0-9)、下劃線(_)、減號(-)
+        return bool( re.fullmatch( pattern, s ) )
+    
+    def is_valid_english_chinese_number_string( s ):
+        pattern = r'^[a-zA-Z0-9_\-\u4e00-\u9fff]+$'  # 允許: 英文、數字、中文、_、-
+        return bool( re.fullmatch( pattern, s ) )
+
 class CreateProjectPage1Dialog( QDialog ):
-    def __init__( self, parent = None ):
+    def __init__( self, dict_project_data, parent = None ):
         super().__init__( parent )
 
         self.ui = Ui_CreateProjectPage1Dialog()
@@ -166,6 +249,15 @@ class CreateProjectPage1Dialog( QDialog ):
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
+
+        self.ui.qtProjectNumberWarningLabel.setVisible( False )
+        self.ui.qtProjectNameWarningLabel.setVisible( False )
+        self.ui.qtContractNumberWarningLabel.setVisible( False )
+
+        self.ui.qtProjectNumberLineEdit.textChanged.connect( self.on_project_number_text_changed ) 
+        self.ui.qtProjectNameLineEdit.textChanged.connect( self.on_project_name_text_changed ) 
+        self.ui.qtContractNumberLineEdit.textChanged.connect( self.on_contract_number_text_changed ) 
+
         self.ui.qtNextStepPushButton.clicked.connect( self.next_step )
         self.ui.qtCancelPushButton.clicked.connect( self.cancel )
 
@@ -179,10 +271,42 @@ class CreateProjectPage1Dialog( QDialog ):
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
+    def on_project_number_text_changed( self ):
+        str_project_number = self.ui.qtProjectNumberLineEdit.text()
+        b_valid_project_number = Utility.is_valid_english_number_string( str_project_number )
+        if b_valid_project_number:
+            self.ui.qtProjectNumberWarningLabel.setVisible( False )
+        else:
+            self.ui.qtProjectNumberWarningLabel.setVisible( True )
+
+    def on_project_name_text_changed( self ):
+        str_project_name = self.ui.qtProjectNameLineEdit.text()
+        b_valid_project_name = Utility.is_valid_english_chinese_number_string( str_project_name )
+        if b_valid_project_name:
+            self.ui.qtProjectNameWarningLabel.setVisible( False )
+        else:
+            self.ui.qtProjectNameWarningLabel.setVisible( True )
+
+    def on_contract_number_text_changed( self ):
+        pass
+
+    def is_valid_input( self ):
+        str_project_number = self.ui.qtProjectNumberLineEdit.text()
+        b_valid_project_number = Utility.is_valid_english_number_string( str_project_number )
+        str_project_name = self.ui.qtProjectNameLineEdit.text()
+        b_valid_project_name = Utility.is_valid_english_chinese_number_string( str_project_number )
+        str_contract_number = self.ui.qtContractNumberLineEdit.text()
+
+        return True
+
     def next_step( self ):
+        str_project_number = self.ui.qtProjectNumberLineEdit.text()
+        str_project_name = self.ui.qtProjectNameLineEdit.text()
+        str_contract_number = self.ui.qtContractNumberLineEdit.text()
         if True:
+
             self.accept()
-            dialog = CreateProjectPage2Dialog(  self )
+            dialog = CreateProjectPage2Dialog( str_project_number, str_project_name, str_contract_number, self )
             if dialog.exec():
                 pass
         else:
@@ -200,6 +324,27 @@ class CreateProjectPage2Dialog( QDialog ):
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
+
+        self.ui.qtProjectNumberWarningLabel.setVisible( False )
+        self.ui.qtProjectNameWarningLabel.setVisible( False )
+        self.ui.qtContractNumberWarningLabel.setVisible( False )
+
+        obj_current_date = datetime.datetime.today()
+        self.ui.qtBidDateEdit.setDate( obj_current_date.date() )
+        self.ui.qtStartDateEdit.setDate( obj_current_date.date() )
+        self.ui.qtContractFinishDateEdit.setDate( obj_current_date.date() )
+        self.update_weekday_text()
+
+        self.ui.qtBidDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtBidDateEdit, self.ui.qtBidWeekdayLabel ) )
+
+        self.ui.qtStartDateEdit.dateChanged.connect( self.compute_contract_finish_date )
+        self.ui.qtContractFinishDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtContractFinishDateEdit, self.ui.qtFinishWeekdayLabel ) )
+
+        self.ui.qtWorkingDayRadioButton.toggled.connect( self.compute_contract_finish_date )
+        self.ui.qtCalendarDayRadioButton.toggled.connect( self.compute_contract_finish_date )
+        self.ui.qtFixedDeadlineRadioButton.toggled.connect( self.compute_contract_finish_date )
+
+
         self.ui.qtOkPushButton.clicked.connect( self.accept_data )
         self.ui.qtCancelPushButton.clicked.connect( self.cancel )
         self.ui.qtConstantConditionSettingPushButton.clicked.connect( self.constant_condition_setting )
@@ -215,6 +360,35 @@ class CreateProjectPage2Dialog( QDialog ):
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
+    def get_weekday_text( self, n_weekday ):
+        if n_weekday == 0:
+            return "(日)"
+        elif n_weekday == 1:
+            return "(一)"
+        elif n_weekday == 2:    
+            return "(二)"
+        elif n_weekday == 3:
+            return "(三)"
+        elif n_weekday == 4:
+            return "(四)"
+        elif n_weekday == 5:
+            return "(五)"
+        elif n_weekday == 6:
+            return "(六)"
+        else:
+            return ""
+        
+    def on_date_changed( self, qt_date_edit, qt_weekday_label ):
+        obj_date = qt_date_edit.date()
+        n_weekday = obj_date.dayOfWeek()
+        str_weekday = self.get_weekday_text( n_weekday )
+        qt_weekday_label.setText( str_weekday )
+
+    def update_weekday_text( self ):
+        self.on_date_changed( self.ui.qtBidDateEdit, self.ui.qtBidWeekdayLabel )
+        self.on_date_changed( self.ui.qtStartDateEdit, self.ui.qtStartWeekdayLabel )
+        self.on_date_changed( self.ui.qtContractFinishDateEdit, self.ui.qtFinishWeekdayLabel )
+
     def constant_condition_setting( self ):
         dialog = VariableConditionSettingDialog(  self )
         if dialog.exec():
@@ -224,8 +398,46 @@ class CreateProjectPage2Dialog( QDialog ):
         dialog = VariableConditionSettingDialog(  self )
         if dialog.exec():
             pass
+    
+    def update_ui( self ):
+        if self.ui.qtWorkingDayRadioButton.isChecked():
+            self.ui.qtWorkingDayGroupBox.setEnabled( True )
+            self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( True )
+            self.ui.qtContractFinishDateEdit.setEnabled( False )
+        elif self.ui.qtCalendarDayRadioButton.isChecked():
+            self.ui.qtWorkingDayGroupBox.setEnabled( False )
+            self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( True )
+            self.ui.qtContractFinishDateEdit.setEnabled( False )
+        elif self.ui.qtFixedDeadlineRadioButton.isChecked():
+            self.ui.qtWorkingDayGroupBox.setEnabled( False )
+            self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( False )
+            self.ui.qtContractFinishDateEdit.setEnabled( True )
+
+    def compute_contract_finish_date( self ):
+        self.update_ui()
+        pass
 
     def accept_data( self ):
+        str_project_number = self.ui.qtProjectNumberLineEdit.text()
+        str_project_name = self.ui.qtProjectNameLineEdit.text()
+        str_contract_number = self.ui.qtContractNumberLineEdit.text()
+        str_project_location = self.ui.qtProjectLocationLineEdit.text()
+
+        dict_project_data = {}
+        dict_project_data[ ProjectData.PROJECT_NUMBER ] = Utility.create_project_data( str_project_number, 
+                                                                                       str_project_name, 
+                                                                                       str_contract_number,
+                                                                                        str_project_location,
+                                                                                        str_owner,
+                                                                                        str_supersior,
+                                                                                        str_designer,
+                                                                                        str_contractor,
+                                                                                        str_bid_date,
+                                                                                        str_start_date,
+                                                                                        e_condition,
+                                                                                        n_contract_duration,
+                                                                                        str_contract_finish_date )
+
         if True:
             self.accept()
         else:
@@ -246,6 +458,7 @@ class MainDBHolidaySettingDialog( QDialog ):
 
         obj_current_date = datetime.datetime.today()
         self.ui.qtDateEdit.setDate( obj_current_date.date() )
+        self.ui.qtDateEdit.setCalendarPopup( True )
 
         delegate = CenterIconDelegate()
 
@@ -400,6 +613,7 @@ class VariableConditionSettingDialog( QDialog ):
 
     def accept_data( self ):
         if True:
+            dict_variable_condition_data = {}
             self.accept()
         else:
             self.reject()
@@ -509,6 +723,7 @@ class MainWindow( QMainWindow ):
         self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
 
         self.global_holiday_data = {}
+        self.dict_project_data = {}
 
         self.load_stylesheet( styles_css_path )
         if b_unit_test:
@@ -577,7 +792,7 @@ class MainWindow( QMainWindow ):
             self.auto_save_data()
 
     def on_trigger_create_new_project( self ):
-        dialog = CreateProjectPage1Dialog(  self )
+        dialog = CreateProjectPage2Dialog(  self )
         if dialog.exec():
             pass
 
