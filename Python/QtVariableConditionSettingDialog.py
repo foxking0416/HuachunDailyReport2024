@@ -23,7 +23,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(1006, 575)
+        Dialog.resize(950, 575)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.qtWeatherConditionGroupBox = QGroupBox(Dialog)
@@ -108,10 +108,10 @@ class Ui_Dialog(object):
 
         self.verticalLayout_6.addWidget(self.qtMorningHeavyRainHalfDayOffRadioButton)
 
-        self.qtMorningHeavyRainNoDayOffRadioButton_2 = QRadioButton(self.qtMorningHeavyRainGroupBox)
-        self.qtMorningHeavyRainNoDayOffRadioButton_2.setObjectName(u"qtMorningHeavyRainNoDayOffRadioButton_2")
+        self.qtMorningHeavyRainNoDayOffRadioButton = QRadioButton(self.qtMorningHeavyRainGroupBox)
+        self.qtMorningHeavyRainNoDayOffRadioButton.setObjectName(u"qtMorningHeavyRainNoDayOffRadioButton")
 
-        self.verticalLayout_6.addWidget(self.qtMorningHeavyRainNoDayOffRadioButton_2)
+        self.verticalLayout_6.addWidget(self.qtMorningHeavyRainNoDayOffRadioButton)
 
 
         self.verticalLayout_5.addWidget(self.qtMorningHeavyRainGroupBox)
@@ -584,7 +584,7 @@ class Ui_Dialog(object):
         self.qtMorningHeavyRainGroupBox.setTitle(QCoreApplication.translate("Dialog", u"\u4e0a\u5348\u8c6a\u96e8", None))
         self.qtMorningHeavyRainOneDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u4e0d\u8a08\u5de5\u671f1\u5929", None))
         self.qtMorningHeavyRainHalfDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u4e0d\u8a08\u5de5\u671f0.5\u5929", None))
-        self.qtMorningHeavyRainNoDayOffRadioButton_2.setText(QCoreApplication.translate("Dialog", u"\u7167\u8a08\u5de5\u671f", None))
+        self.qtMorningHeavyRainNoDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u7167\u8a08\u5de5\u671f", None))
         self.qtAfternoonHeavyRainGroupBox.setTitle(QCoreApplication.translate("Dialog", u"\u4e0b\u5348\u8c6a\u96e8", None))
         self.qtAfternoonHeavyRainOneDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u4e0d\u8a08\u5de5\u671f1\u5929", None))
         self.qtAfternoonHeavyRainHalfDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u4e0d\u8a08\u5de5\u671f0.5\u5929", None))

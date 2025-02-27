@@ -1,8 +1,44 @@
 import json
 import os
 import datetime
-from enum import Enum
-from enum import IntEnum
+from enum import Enum, IntEnum, auto
+
+class HolidayData( Enum ):
+    REASON = 0
+    HOLIDAY = 1
+
+class ContractCondition( Enum ):
+    WORKING_DAY_ONE_DAYOFF = 0
+    WORKING_DAY_TWO_DAYOFF = 1
+    CALANDER_DAY = 2
+    FIXED_DEADLINE = 3
+
+class WeatherCondition( Enum ):
+    MORNING_RAIN = 0
+    AFTERNOON_RAIN = auto()
+    MORNING_HEAVYRAIN = auto()
+    AFTERNOON_HEAVYRAIN = auto()
+    MORNING_TYPHOON = auto()
+    AFTERNOON_TYPHOON = auto()
+    MORNING_HOT = auto()
+    AFTERNOON_HOT = auto()
+    MORNING_MUDDY = auto()
+    AFTERNOON_MUDDY = auto()
+    MORNING_OTHER = auto()
+    AFTERNOON_OTHER = auto()
+
+class HumanCondition( Enum ):
+    MORNING_SUSPENSION = 0
+    AFTERNOON_SUSPENSION = auto()
+    MORNING_POWER_OFF = auto()
+    AFTERNOON_POWER_OFF = auto()
+    MORNING_HUMAN_OTHER = auto()
+    AFTERNOON_HUMAN_OTHER = auto()
+
+class VariableConditionNoCount( Enum ):
+    COUNT_ONE_DAY_OFF = 0
+    COUNT_HALF_DAY_OFF = 1
+    COUNT_NO_DAY_OFF = 2
 
 class SyspendWork(IntEnum):
     NONE = 0

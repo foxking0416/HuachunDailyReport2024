@@ -164,7 +164,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="qtMorningHeavyRainNoDayOffRadioButton_2">
+             <widget class="QRadioButton" name="qtMorningHeavyRainNoDayOffRadioButton">
               <property name="text">
                <string>照計工期</string>
               </property>
