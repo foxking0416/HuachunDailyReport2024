@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'QtCreateProjectPage2Dialog.ui'
+## Form generated from reading UI file 'QtCreateProjectDialog.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.0
 ##

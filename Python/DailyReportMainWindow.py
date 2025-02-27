@@ -13,11 +13,10 @@ from logging.handlers import TimedRotatingFileHandler
 import logging
 import ScheduleCount
 from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
-from QtCreateProjectPage1Dialog import Ui_Dialog as Ui_CreateProjectPage1Dialog
-from QtCreateProjectPage2Dialog import Ui_Dialog as Ui_CreateProjectPage2Dialog
+from QtCreateProjectDialog import Ui_Dialog as Ui_CreateProjectDialog
 from QtDailyReportPerDayDialog import Ui_Dialog as Ui_DailyReportPerDayDialog
 from QtSelectEditProjectDialog import Ui_Dialog as Ui_SelectEditProjectDialog
-from QtMainDBHolidaySettingDialog import Ui_Dialog as Ui_MainDBHolidaySettingDialog
+from QtHolidaySettingDialog import Ui_Dialog as Ui_HolidaySettingDialog
 from QtVariableConditionSettingDialog import Ui_Dialog as Ui_VariableConditionSettingDialog
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QButtonGroup, QMessageBox, QStyledItemDelegate, QFileDialog, QHeaderView, QVBoxLayout, QHBoxLayout, \
                               QLabel, QLineEdit, QDialogButtonBox, QTabBar, QWidget, QTableView, QComboBox, QPushButton, QSizePolicy, QSpacerItem, QCheckBox, QDoubleSpinBox, \
@@ -42,9 +41,8 @@ from scipy.optimize import newton
 # 要把.ui檔變成.py
 # cd D:\_2.code\HuachunDailyReport2024\Python
 # pyside6-uic QtDailyReportMainWindow.ui -o QtDailyReportMainWindow.py
-# pyside6-uic QtCreateProjectPage1Dialog.ui -o QtCreateProjectPage1Dialog.py
-# pyside6-uic QtCreateProjectPage2Dialog.ui -o QtCreateProjectPage2Dialog.py
-# pyside6-uic QtMainDBHolidaySettingDialog.ui -o QtMainDBHolidaySettingDialog.py
+# pyside6-uic QtCreateProjectDialog.ui -o QtCreateProjectDialog.py
+# pyside6-uic QtHolidaySettingDialog.ui -o QtHolidaySettingDialog.py
 # pyside6-uic QtVariableConditionSettingDialog.ui -o QtVariableConditionSettingDialog.py
 # pyside6-uic QtSelectEditProjectDialog.ui -o QtSelectEditProjectDialog.py
 # pyside6-uic QtDailyReportPerDayDialog.ui -o QtDailyReportPerDayDialog.py
@@ -209,86 +207,11 @@ class Utility():
         pattern = r'^[a-zA-Z0-9_\-\u4e00-\u9fff]+$'  # 允許: 英文、數字、中文、_、-
         return bool( re.fullmatch( pattern, s ) )
 
-class CreateProjectPage1Dialog( QDialog ):
-    def __init__( self, dict_project_data, parent = None ):
-        super().__init__( parent )
-
-        self.ui = Ui_CreateProjectPage1Dialog()
-        self.ui.setupUi( self )
-        
-        window_icon = QIcon( window_icon_file_path ) 
-        self.setWindowIcon( window_icon )
-
-        self.ui.qtProjectNumberWarningLabel.setVisible( False )
-        self.ui.qtProjectNameWarningLabel.setVisible( False )
-        self.ui.qtContractNumberWarningLabel.setVisible( False )
-
-        self.ui.qtProjectNumberLineEdit.textChanged.connect( self.on_project_number_text_changed ) 
-        self.ui.qtProjectNameLineEdit.textChanged.connect( self.on_project_name_text_changed ) 
-        self.ui.qtContractNumberLineEdit.textChanged.connect( self.on_contract_number_text_changed ) 
-
-        self.ui.qtNextStepPushButton.clicked.connect( self.next_step )
-        self.ui.qtCancelPushButton.clicked.connect( self.cancel )
-
-    def load_stylesheet( self, file_path ):
-        try:
-            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
-                stylesheet = file.read()
-                self.setStyleSheet(stylesheet)
-        except FileNotFoundError:
-            print(f"CSS 檔案 {file_path} 找不到")
-        except Exception as e:
-            print(f"讀取 CSS 檔案時發生錯誤: {e}")
-
-    def on_project_number_text_changed( self ):
-        str_project_number = self.ui.qtProjectNumberLineEdit.text()
-        b_valid_project_number = Utility.is_valid_english_number_string( str_project_number )
-        if b_valid_project_number:
-            self.ui.qtProjectNumberWarningLabel.setVisible( False )
-        else:
-            self.ui.qtProjectNumberWarningLabel.setVisible( True )
-
-    def on_project_name_text_changed( self ):
-        str_project_name = self.ui.qtProjectNameLineEdit.text()
-        b_valid_project_name = Utility.is_valid_english_chinese_number_string( str_project_name )
-        if b_valid_project_name:
-            self.ui.qtProjectNameWarningLabel.setVisible( False )
-        else:
-            self.ui.qtProjectNameWarningLabel.setVisible( True )
-
-    def on_contract_number_text_changed( self ):
-        pass
-
-    def is_valid_input( self ):
-        str_project_number = self.ui.qtProjectNumberLineEdit.text()
-        b_valid_project_number = Utility.is_valid_english_number_string( str_project_number )
-        str_project_name = self.ui.qtProjectNameLineEdit.text()
-        b_valid_project_name = Utility.is_valid_english_chinese_number_string( str_project_number )
-        str_contract_number = self.ui.qtContractNumberLineEdit.text()
-
-        return True
-
-    def next_step( self ):
-        str_project_number = self.ui.qtProjectNumberLineEdit.text()
-        str_project_name = self.ui.qtProjectNameLineEdit.text()
-        str_contract_number = self.ui.qtContractNumberLineEdit.text()
-        if True:
-
-            self.accept()
-            dialog = CreateProjectPage2Dialog( str_project_number, str_project_name, str_contract_number, self )
-            if dialog.exec():
-                pass
-        else:
-            self.reject()
-    
-    def cancel( self ):
-        self.reject()
-
-class CreateProjectPage2Dialog( QDialog ):
+class CreateProjectDialog( QDialog ):
     def __init__( self, parent = None ):
         super().__init__( parent )
 
-        self.ui = Ui_CreateProjectPage2Dialog()
+        self.ui = Ui_CreateProjectDialog()
         self.ui.setupUi( self )
         
         window_icon = QIcon( window_icon_file_path ) 
@@ -436,11 +359,11 @@ class CreateProjectPage2Dialog( QDialog ):
     def cancel( self ):
         self.reject()
 
-class MainDBHolidaySettingDialog( QDialog ):
+class HolidaySettingDialog( QDialog ):
     def __init__( self, dict_global_holiday_data, parent = None ):
         super().__init__( parent )
 
-        self.ui = Ui_MainDBHolidaySettingDialog()
+        self.ui = Ui_HolidaySettingDialog()
         self.ui.setupUi( self )
         
         window_icon = QIcon( window_icon_file_path ) 
@@ -962,12 +885,12 @@ class MainWindow( QMainWindow ):
         self.manual_load_data( self.global_holiday_file_path )
 
     def on_trigger_main_holiday_db_setting( self ):
-        dialog = MainDBHolidaySettingDialog( self.global_holiday_data, self )
+        dialog = HolidaySettingDialog( self.global_holiday_data, self )
         if dialog.exec():
             self.auto_save_data()
 
     def on_trigger_create_new_project( self ):
-        dialog = CreateProjectPage2Dialog(  self )
+        dialog = CreateProjectDialog(  self )
         if dialog.exec():
             pass
 

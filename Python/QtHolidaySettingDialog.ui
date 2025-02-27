@@ -15,6 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QPushButton" name="qtImportFromMainDBPushButton">
+     <property name="text">
+      <string>從主資料庫載入</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QDateEdit" name="qtDateEdit"/>
@@ -69,14 +76,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QPushButton" name="qtExportPushButton">
+      <widget class="QPushButton" name="qtExportFilePushButton">
        <property name="text">
         <string>匯出</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="qtImportPushButton">
+      <widget class="QPushButton" name="qtImportFilePushButton">
        <property name="text">
         <string>匯入</string>
        </property>
