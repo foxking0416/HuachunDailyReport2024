@@ -131,8 +131,6 @@ up_icon = QIcon( up_icon_file_path )
 styles_css_path = os.path.join( g_exe_root_dir, 'resources\\styles.css' ) 
 #endregion
 
-
-
 class ProjectData( Enum ):
     PROJECT_NUMBER = 0
     PROJECT_NAME = auto()
@@ -263,6 +261,8 @@ class CreateProjectDialog( QDialog ):
                                                     ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                     ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
 
+        self.project_holiday_data = {}
+
     def load_stylesheet( self, file_path ):
         try:
             with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
@@ -303,7 +303,7 @@ class CreateProjectDialog( QDialog ):
         self.on_date_changed( self.ui.qtContractFinishDateEdit, self.ui.qtFinishWeekdayLabel )
 
     def constant_condition_setting( self ):
-        dialog = VariableConditionSettingDialog( self )
+        dialog = HolidaySettingDialog( self, False, self.project_holiday_data )
         if dialog.exec():
             pass
 
@@ -360,7 +360,7 @@ class CreateProjectDialog( QDialog ):
         self.reject()
 
 class HolidaySettingDialog( QDialog ):
-    def __init__( self, dict_global_holiday_data, parent = None ):
+    def __init__( self, parent, b_main_db, dict_global_holiday_data ):
         super().__init__( parent )
 
         self.ui = Ui_HolidaySettingDialog()
@@ -368,6 +368,13 @@ class HolidaySettingDialog( QDialog ):
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
+
+        if b_main_db:
+            self.ui.qtImportFromMainDBPushButton.setVisible( False )
+            self.setWindowTitle("主資料庫假日設定")
+        else:
+            self.ui.qtImportFromMainDBPushButton.setVisible( True )
+            self.setWindowTitle("專案假日設定")
 
         obj_current_date = datetime.datetime.today()
         self.ui.qtDateEdit.setDate( obj_current_date.date() )
@@ -820,7 +827,7 @@ class MainWindow( QMainWindow ):
 
         self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
 
-        self.global_holiday_data = {}
+        self.dict_global_holiday_data = {}
         self.dict_project_data = {}
 
         self.load_stylesheet( styles_css_path )
@@ -885,7 +892,7 @@ class MainWindow( QMainWindow ):
         self.manual_load_data( self.global_holiday_file_path )
 
     def on_trigger_main_holiday_db_setting( self ):
-        dialog = HolidaySettingDialog( self.global_holiday_data, self )
+        dialog = HolidaySettingDialog( self, True, self.dict_global_holiday_data )
         if dialog.exec():
             self.auto_save_data()
 
@@ -914,7 +921,7 @@ class MainWindow( QMainWindow ):
 
     def manual_save_data( self, file_path ): 
         dict_save_holiday_data = {}
-        for key,value in self.global_holiday_data.items():
+        for key,value in self.dict_global_holiday_data.items():
             dict_save_holiday_data[ key ] = { "reason" : str( value[ ScheduleCount.HolidayData.REASON ] ), "holiday" : bool( value[ ScheduleCount.HolidayData.HOLIDAY ] ) }
 
         with open( file_path, 'w', encoding='utf-8' ) as f:
@@ -928,7 +935,7 @@ class MainWindow( QMainWindow ):
                 if str_version == "v1.0.0":
                     dict_load_holiday_data = json.load( f )
                     for key,value in dict_load_holiday_data.items():
-                        self.global_holiday_data[ key ] = { ScheduleCount.HolidayData.REASON : value[ "reason" ], ScheduleCount.HolidayData.HOLIDAY : value[ "holiday" ] }
+                        self.dict_global_holiday_data[ key ] = { ScheduleCount.HolidayData.REASON : value[ "reason" ], ScheduleCount.HolidayData.HOLIDAY : value[ "holiday" ] }
         except FileNotFoundError:
             print(f"檔案 {file_path} 找不到")
 
