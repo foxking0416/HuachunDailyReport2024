@@ -972,6 +972,7 @@ class MainWindow( QMainWindow ):
 
     def load_initialize_data( self ):
         self.manual_load_global_holiday_data( self.global_holiday_file_path )
+        self.manual_load_project_data( self.global_project_data_file_path )
 
     def on_trigger_main_holiday_db_setting( self ):
         dialog = HolidaySettingDialog( self, True, self.dict_global_holiday_data, {} )
@@ -1002,13 +1003,12 @@ class MainWindow( QMainWindow ):
         self.manual_save_project_data( self.global_project_data_file_path )
 
     def manual_save_project_data( self, file_path ): 
-        # self.dict_all_project_data
         export_json_data = {}
         for key, value in self.dict_all_project_data.items():
             dict_per_project_data = {}
             dict_per_project_data[ "project_name" ] = value[ ProjectData.STR_PROJECT_NAME ]
-            dict_per_project_data[ "project_location" ] = value[ ProjectData.STR_PROJECT_LOCATION ]
             dict_per_project_data[ "contract_number" ] = value[ ProjectData.STR_CONTRACT_NUMBER ]
+            dict_per_project_data[ "project_location" ] = value[ ProjectData.STR_PROJECT_LOCATION ]
             dict_per_project_data[ "owner" ] = value[ ProjectData.STR_OWNER ]
             dict_per_project_data[ "supervisor" ] = value[ ProjectData.STR_SUPERSIOR ]
             dict_per_project_data[ "designer" ] = value[ ProjectData.STR_DESIGNER ]
@@ -1056,13 +1056,70 @@ class MainWindow( QMainWindow ):
             f.write( "v1.0.0" '\n' )
             json.dump( export_json_data, f, ensure_ascii=False, indent=4 )
 
+    def manual_load_project_data( self, file_path ):
+        try:
+            with open( file_path, 'r', encoding='utf-8' ) as f:
+                str_version = f.readline().strip()
+                if str_version == "v1.0.0":
+                    dict_load_project_data = json.load( f )
+                    for key_project_number, value in dict_load_project_data.items():
+                        import_json_holiday_data = value[ "holiday_data" ]
+                        dict_holiday_data = {}
+                        for key_holiday, value_holiday in import_json_holiday_data.items():
+                            dict_holiday_data[ key_holiday ] = { ScheduleCount.HolidayData.REASON : value_holiday[ "reason" ], 
+                                                                 ScheduleCount.HolidayData.HOLIDAY : value_holiday[ "holiday" ] }
+                        import_json_weather_condition_data = value[ "weather_condition_data" ]
+                        dict_weather_condition_data = {}
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_RAIN ]            = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "morning_rain" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_RAIN ]          = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_rain" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN ]       = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "morning_heavyrain" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_HEAVYRAIN ]     = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_heavyrain" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_TYPHOON ]         = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "morning_typhoon" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_TYPHOON ]       = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_typhoon" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_HOT ]             = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "morning_hot" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_HOT ]           = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_hot" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_MUDDY ]           = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "morning_muddy" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_MUDDY ]         = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_muddy" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER ]   = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "morning_weather_other" ] )
+                        dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER ] = ScheduleCount.VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_weather_other" ] )
+                        
+                        import_json_human_condition_data = value[ "human_condition_data" ]
+                        dict_human_condition_data = {}
+                        dict_human_condition_data[ ScheduleCount.HumanCondition.MORNING_SUSPENSION ]    = ScheduleCount.VariableConditionNoCount( import_json_human_condition_data[ "morning_suspension" ] )
+                        dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION ]  = ScheduleCount.VariableConditionNoCount( import_json_human_condition_data[ "afternoon_suspension" ] )
+                        dict_human_condition_data[ ScheduleCount.HumanCondition.MORNING_POWER_OFF ]     = ScheduleCount.VariableConditionNoCount( import_json_human_condition_data[ "morning_poweroff" ] )
+                        dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_POWER_OFF ]   = ScheduleCount.VariableConditionNoCount( import_json_human_condition_data[ "afternoon_poweroff" ] )
+                        dict_human_condition_data[ ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER ]   = ScheduleCount.VariableConditionNoCount( import_json_human_condition_data[ "morning_human_other" ] )
+                        dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER ] = ScheduleCount.VariableConditionNoCount( import_json_human_condition_data[ "afternoon_human_other" ] )
+
+                        self.dict_all_project_data[ key_project_number ] = Utility.create_project_data( key_project_number,
+                                                                                                        value[ "project_name" ],
+                                                                                                        value[ "contract_number" ],
+                                                                                                        value[ "project_location" ],
+                                                                                                        value[ "owner" ],
+                                                                                                        value[ "supervisor" ],
+                                                                                                        value[ "designer" ],
+                                                                                                        value[ "contractor" ],
+                                                                                                        value[ "bid_date" ],
+                                                                                                        value[ "start_date" ],
+                                                                                                        ScheduleCount.ContractCondition( value[ "contract_condition" ] ),
+                                                                                                        value[ "contract_duration" ],
+                                                                                                        value[ "contract_finish_date" ],
+                                                                                                        dict_holiday_data,
+                                                                                                        dict_weather_condition_data,
+                                                                                                        dict_human_condition_data )
+                        pass
+        except FileNotFoundError:
+            print(f"檔案 {file_path} 找不到")
+
     def auto_save_global_holiday_data( self ): 
         self.manual_save_global_holiday_data( self.global_holiday_file_path )
 
     def manual_save_global_holiday_data( self, file_path ): 
         dict_save_holiday_data = {}
         for key,value in self.dict_global_holiday_data.items():
-            dict_save_holiday_data[ key ] = { "reason" : str( value[ ScheduleCount.HolidayData.REASON ] ), "holiday" : bool( value[ ScheduleCount.HolidayData.HOLIDAY ] ) }
+            dict_save_holiday_data[ key ] = { "reason" : str( value[ ScheduleCount.HolidayData.REASON ] ), 
+                                              "holiday" : bool( value[ ScheduleCount.HolidayData.HOLIDAY ] ) }
 
         with open( file_path, 'w', encoding='utf-8' ) as f:
             f.write( "v1.0.0" '\n' )
@@ -1075,7 +1132,8 @@ class MainWindow( QMainWindow ):
                 if str_version == "v1.0.0":
                     dict_load_holiday_data = json.load( f )
                     for key,value in dict_load_holiday_data.items():
-                        self.dict_global_holiday_data[ key ] = { ScheduleCount.HolidayData.REASON : value[ "reason" ], ScheduleCount.HolidayData.HOLIDAY : value[ "holiday" ] }
+                        self.dict_global_holiday_data[ key ] = { ScheduleCount.HolidayData.REASON : value[ "reason" ], 
+                                                                 ScheduleCount.HolidayData.HOLIDAY : value[ "holiday" ] }
         except FileNotFoundError:
             print(f"檔案 {file_path} 找不到")
 
