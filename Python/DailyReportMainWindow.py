@@ -234,21 +234,6 @@ class CreateProjectDialog( QDialog ):
         self.ui.qtContractFinishDateEdit.setDate( self.obj_current_date.date() )
         self.update_weekday_text()
 
-        if b_edit_mode:
-            self.ui.qtProjectNumberLineEdit.setEnabled( False )
-            self.ui.qtProjectNumberLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_NUMBER ] )
-            self.ui.qtProjectNameLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_NAME ] )
-            self.ui.qtContractNumberLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACT_NUMBER ] )
-            self.ui.qtProjectLocationLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_LOCATION ] )
-            self.ui.qtOwnerLineEdit.setText( dict_single_project_data[ ProjectData.STR_OWNER ] )
-            self.ui.qtSupervisorLineEdit.setText( dict_single_project_data[ ProjectData.STR_SUPERSIOR ] )
-            self.ui.qtDesignerLineEdit.setText( dict_single_project_data[ ProjectData.STR_DESIGNER ] )
-            self.ui.qtContractorLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACTOR ] )
-            self.ui.qtBidDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_BID_DATE ], "%Y-%m-%d" ).date() )
-            self.ui.qtStartDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" ).date() )
-        else:
-            self.ui.qtProjectNumberLineEdit.setEnabled( True ) 
-
         self.ui.qtBidDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtBidDateEdit, self.ui.qtBidWeekdayLabel ) )
 
         self.ui.qtStartDateEdit.dateChanged.connect( self.compute_contract_finish_date )
@@ -271,27 +256,46 @@ class CreateProjectDialog( QDialog ):
 
         self.dict_global_holiday_data = copy.deepcopy( dict_global_holiday_data )
 
-        self.dict_variable_weather_condition_data = { ScheduleCount.WeatherCondition.MORNING_RAIN :            ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_RAIN :          ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_HEAVYRAIN :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_TYPHOON :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_TYPHOON :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_HOT :             ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_HOT :           ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_MUDDY :           ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_MUDDY :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+        if b_edit_mode:
+            self.ui.qtProjectNumberLineEdit.setEnabled( False )
+            self.ui.qtProjectNumberLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_NUMBER ] )
+            self.ui.qtProjectNameLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_NAME ] )
+            self.ui.qtContractNumberLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACT_NUMBER ] )
+            self.ui.qtProjectLocationLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_LOCATION ] )
+            self.ui.qtOwnerLineEdit.setText( dict_single_project_data[ ProjectData.STR_OWNER ] )
+            self.ui.qtSupervisorLineEdit.setText( dict_single_project_data[ ProjectData.STR_SUPERSIOR ] )
+            self.ui.qtDesignerLineEdit.setText( dict_single_project_data[ ProjectData.STR_DESIGNER ] )
+            self.ui.qtContractorLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACTOR ] )
+            self.ui.qtBidDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_BID_DATE ], "%Y-%m-%d" ).date() )
+            self.ui.qtStartDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" ).date() )
+            self.dict_variable_weather_condition_data = dict_single_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
+            self.dict_variable_human_condition_data = dict_single_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
+            self.dict_project_holiday_data = dict_single_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
+        else:
+            self.ui.qtProjectNumberLineEdit.setEnabled( True ) 
 
-        self.dict_variable_human_condition_data = { ScheduleCount.HumanCondition.MORNING_SUSPENSION :    ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                    ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION :  ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                    ScheduleCount.HumanCondition.MORNING_POWER_OFF :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                    ScheduleCount.HumanCondition.AFTERNOON_POWER_OFF :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                    ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                    ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+            self.dict_variable_weather_condition_data = { ScheduleCount.WeatherCondition.MORNING_RAIN :            ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.AFTERNOON_RAIN :          ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.AFTERNOON_HEAVYRAIN :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.MORNING_TYPHOON :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.AFTERNOON_TYPHOON :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.MORNING_HOT :             ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.AFTERNOON_HOT :           ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.MORNING_MUDDY :           ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.AFTERNOON_MUDDY :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                          ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+
+            self.dict_variable_human_condition_data = { ScheduleCount.HumanCondition.MORNING_SUSPENSION :    ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                        ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION :  ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                        ScheduleCount.HumanCondition.MORNING_POWER_OFF :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                        ScheduleCount.HumanCondition.AFTERNOON_POWER_OFF :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                        ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                        ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+            self.dict_project_holiday_data = {}
+        
         self.dict_single_project_data = {}
-        self.dict_project_holiday_data = {}
 
         self.compute_contract_finish_date()
 
@@ -820,97 +824,6 @@ class VariableConditionSettingDialog( QDialog ):
     def cancel( self ):
         self.reject()
 
-class SelectEditProjectDialog( QDialog ):
-    def __init__( self, parent, dict_all_project_data ):
-        super().__init__( parent )
-
-        self.ui = Ui_SelectEditProjectDialog()
-        self.ui.setupUi( self )
-        
-        window_icon = QIcon( window_icon_file_path ) 
-        self.setWindowIcon( window_icon )
-        delegate = CenterIconDelegate()
-
-        self.list_table_horizontal_header = [ '工程編號', '工程名稱', '編輯', '刪除' ]
-        self.project_data_model = QStandardItemModel( 0, 0 ) 
-        self.project_data_model.setHorizontalHeaderLabels( self.list_table_horizontal_header )
-        self.ui.qtTableView.setModel( self.project_data_model )
-        self.ui.qtTableView.setItemDelegate( delegate )
-        self.ui.qtTableView.verticalHeader().hide()
-        self.ui.qtTableView.clicked.connect( lambda index: self.on_table_item_clicked( index, self.project_data_model ) )
-
-        self.ui.qtExitPushButton.clicked.connect( self.cancel )
-
-        self.str_project_number = ""
-        self.dict_all_project_data = dict_all_project_data
-        self.refresh_table()
-
-    def load_stylesheet( self, file_path ):
-        try:
-            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
-                stylesheet = file.read()
-                self.setStyleSheet(stylesheet)
-        except FileNotFoundError:
-            print(f"CSS 檔案 {file_path} 找不到")
-        except Exception as e:
-            print(f"讀取 CSS 檔案時發生錯誤: {e}")
-
-    def on_table_item_clicked( self, index, stock_list_model ):
-        project_number_item = self.project_data_model.item( index.row(), 0 )
-        str_project_number = project_number_item.text()
-
-        if index.column() == 2:# edit
-            self.str_project_number = str_project_number
-            self.accept()
-        elif index.column() == 3:# delete
-            result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆專案資料嗎?" )
-            if result:
-                del self.dict_all_project_data[ str_project_number ]
-                self.project_data_model.removeRow( index.row() )
-
-    def refresh_table( self ):
-        for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
-            project_number_item = QStandardItem( key_project_number )
-            project_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            project_number_item.setFlags( project_number_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 0, project_number_item ) 
-
-            str_project_name = value_dict_project_data[ ProjectData.STR_PROJECT_NAME ]
-            project_name_item = QStandardItem( str_project_name )
-            project_name_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            project_name_item.setFlags( project_name_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 1, project_name_item ) 
-
-            edit_icon_item = QStandardItem("")
-            edit_icon_item.setIcon( edit_icon )
-            edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 2, edit_icon_item ) 
-
-            delete_icon_item = QStandardItem("")
-            delete_icon_item.setIcon( delete_icon )
-            delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 3, delete_icon_item ) 
-
-    def show_warning_message_box_with_ok_cancel_button( self, str_title, str_message ): 
-        message_box = QMessageBox( self )
-        message_box.setIcon( QMessageBox.Warning )  # 設置為警告圖示
-        message_box.setWindowTitle( str_title )
-        message_box.setText( str_message )
-
-        # 添加自訂按鈕
-        button_ok = message_box.addButton("確定", QMessageBox.AcceptRole)
-        button_cancel = message_box.addButton("取消", QMessageBox.RejectRole)
-
-        message_box.exec()
-
-        if message_box.clickedButton() == button_ok:
-            return True
-        elif message_box.clickedButton() == button_cancel:
-            return False
-        
-    def cancel( self ):
-        self.reject()
-
 class DailyReportPerDayDialog( QDialog ):
     def __init__( self, parent = None ):
         super().__init__( parent )
@@ -974,13 +887,18 @@ class MainWindow( QMainWindow ):
             self.progress_bar.setVisible( False )
         
         delegate = CenterIconDelegate()
+        self.project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點','工期條件','開工日期', '編輯', '刪除' ]
+        self.project_data_model = QStandardItemModel( 0, 0 ) 
+        self.project_data_model.setHorizontalHeaderLabels( self.project_list_table_horizontal_header )
+        self.ui.qtProjectListTableView.setModel( self.project_data_model )
+        self.ui.qtProjectListTableView.setItemDelegate( delegate )
+        self.ui.qtProjectListTableView.verticalHeader().hide()
+        self.ui.qtProjectListTableView.clicked.connect( lambda index: self.on_project_list_table_item_clicked( index, self.project_data_model ) )
+        self.ui.qtAddDailyReportPushButton.clicked.connect( self.on_add_daily_report_data_push_button_clicked )
+
 
         self.ui.qtMainHolidayDBSettingAction.triggered.connect( self.on_trigger_main_holiday_db_setting )
         self.ui.qtCreateNewProjectAction.triggered.connect( self.on_trigger_create_new_project )
-        self.ui.qtEditProjectAction.triggered.connect( self.on_trigger_edit_project )
-        self.ui.qtSelectProjectAction.triggered.connect( self.on_trigger_select_project )
-        self.ui.qtCreateNewDailyReportAction.triggered.connect( self.on_trigger_create_new_daily_report )
-        self.ui.qtEditDailyReportAction.triggered.connect( self.on_trigger_edit_daily_report )
 
         self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
         self.global_project_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_project_file )
@@ -1049,6 +967,7 @@ class MainWindow( QMainWindow ):
     def load_initialize_data( self ):
         self.manual_load_global_holiday_data( self.global_holiday_file_path )
         self.manual_load_project_data( self.global_project_data_file_path )
+        self.refresh_project_list_table()
 
     def on_trigger_main_holiday_db_setting( self ):
         dialog = HolidaySettingDialog( self, True, self.dict_global_holiday_data, {} )
@@ -1061,23 +980,46 @@ class MainWindow( QMainWindow ):
             self.dict_all_project_data.update( dialog.dict_single_project_data )
             self.auto_save_project_data()
 
-    def on_trigger_edit_project( self ):
-        select_dialog = SelectEditProjectDialog( self, self.dict_all_project_data )
-        if select_dialog.exec():
-            str_project_number = select_dialog.str_project_number
+    def refresh_project_list_table( self ):
+        for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
+            project_number_item = QStandardItem( key_project_number )
+            project_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            project_number_item.setFlags( project_number_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 0, project_number_item ) 
+
+            str_project_name = value_dict_project_data[ ProjectData.STR_PROJECT_NAME ]
+            project_name_item = QStandardItem( str_project_name )
+            project_name_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            project_name_item.setFlags( project_name_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 1, project_name_item ) 
+
+            edit_icon_item = QStandardItem("")
+            edit_icon_item.setIcon( edit_icon )
+            edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, len( self.project_list_table_horizontal_header ) - 2, edit_icon_item ) 
+
+            delete_icon_item = QStandardItem("")
+            delete_icon_item.setIcon( delete_icon )
+            delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, len( self.project_list_table_horizontal_header ) - 1, delete_icon_item ) 
+
+    def on_project_list_table_item_clicked( self, index, stock_list_model ):
+        project_number_item = self.project_data_model.item( index.row(), 0 )
+        str_project_number = project_number_item.text()
+
+        if index.column() == len( self.project_list_table_horizontal_header ) - 2:# edit
             dict_single_project_data = self.dict_all_project_data[ str_project_number ]
             edit_dialog = CreateProjectDialog( self, self.dict_global_holiday_data, True, dict_single_project_data )
             if edit_dialog.exec():
                 self.dict_all_project_data.update( edit_dialog.dict_single_project_data )
-                # self.auto_save_project_data()
+                self.auto_save_project_data()
+        elif index.column() == len( self.project_list_table_horizontal_header ) - 1:# delete
+            result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆專案資料嗎?" )
+            if result:
+                del self.dict_all_project_data[ str_project_number ]
+                self.project_data_model.removeRow( index.row() )
 
-    def on_trigger_select_project( self ):
-        pass
-
-    def on_trigger_create_new_daily_report( self ):
-        pass
-
-    def on_trigger_edit_daily_report( self ):   
+    def on_add_daily_report_data_push_button_clicked( self ):
         pass
 
     def auto_save_project_data( self ): 
@@ -1217,6 +1159,23 @@ class MainWindow( QMainWindow ):
                                                                  ScheduleCount.HolidayData.HOLIDAY : value[ "holiday" ] }
         except FileNotFoundError:
             print(f"檔案 {file_path} 找不到")
+
+    def show_warning_message_box_with_ok_cancel_button( self, str_title, str_message ): 
+        message_box = QMessageBox( self )
+        message_box.setIcon( QMessageBox.Warning )  # 設置為警告圖示
+        message_box.setWindowTitle( str_title )
+        message_box.setText( str_message )
+
+        # 添加自訂按鈕
+        button_ok = message_box.addButton("確定", QMessageBox.AcceptRole)
+        button_cancel = message_box.addButton("取消", QMessageBox.RejectRole)
+
+        message_box.exec()
+
+        if message_box.clickedButton() == button_ok:
+            return True
+        elif message_box.clickedButton() == button_cancel:
+            return False
 
 def run_app():
     app = QApplication( sys.argv )
