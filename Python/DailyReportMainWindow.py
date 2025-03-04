@@ -142,9 +142,12 @@ class ProjectData( Enum ):
     CONTRACTOR = auto() #承包商
     BID_DATE = auto() #決標日期
     START_DATE = auto() #開工日期
-    CONDITION = auto() #工期條件
+    CONTRACT_CONDITION = auto() #工期條件
     CONTRACT_DURATION = auto() #契約工期
     CONTRACT_FINISH_DATE = auto() #合約完工日期
+    HOLIDAY_DATA = auto() #專案假日資料
+    WEATHER_CONDITION_DATA = auto() #變動天候條件資料
+    HUMAN_CONDITION_DATA = auto() #變動人為條件資料
 
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
@@ -178,24 +181,30 @@ class Utility():
                              str_contractor,
                              str_bid_date,
                              str_start_date,
-                             e_condition,
-                             n_contract_duration,
-                             str_contract_finish_date ):
-        dict_project_data = {}
-        dict_project_data[ ProjectData.PROJECT_NUMBER ] = str_project_number
-        dict_project_data[ ProjectData.PROJECT_NAME ] = str_project_name
-        dict_project_data[ ProjectData.PROJECT_LOCATION ] = str_project_location
-        dict_project_data[ ProjectData.CONTRACT_NUMBER ] = str_contract_number
-        dict_project_data[ ProjectData.OWNER ] = str_owner
-        dict_project_data[ ProjectData.SUPERSIOR ] = str_supersior
-        dict_project_data[ ProjectData.DESIGNER ] = str_designer
-        dict_project_data[ ProjectData.CONTRACTOR ] = str_contractor
-        dict_project_data[ ProjectData.BID_DATE ] = str_bid_date
-        dict_project_data[ ProjectData.START_DATE ] = str_start_date
-        dict_project_data[ ProjectData.CONDITION ] = e_condition
-        dict_project_data[ ProjectData.CONTRACT_DURATION ] = n_contract_duration
-        dict_project_data[ ProjectData.CONTRACT_FINISH_DATE ] = str_contract_finish_date
-        return dict_project_data
+                             e_contract_condition,
+                             f_contract_duration,
+                             str_contract_finish_date,
+                             dict_project_holiday_data,
+                             dict_variable_weather_condition_data, 
+                             dict_variable_human_condition_data ):
+        dict_per_project_data = {}
+        dict_per_project_data[ ProjectData.PROJECT_NUMBER ] = str_project_number
+        dict_per_project_data[ ProjectData.PROJECT_NAME ] = str_project_name
+        dict_per_project_data[ ProjectData.PROJECT_LOCATION ] = str_project_location
+        dict_per_project_data[ ProjectData.CONTRACT_NUMBER ] = str_contract_number
+        dict_per_project_data[ ProjectData.OWNER ] = str_owner
+        dict_per_project_data[ ProjectData.SUPERSIOR ] = str_supersior
+        dict_per_project_data[ ProjectData.DESIGNER ] = str_designer
+        dict_per_project_data[ ProjectData.CONTRACTOR ] = str_contractor
+        dict_per_project_data[ ProjectData.BID_DATE ] = str_bid_date
+        dict_per_project_data[ ProjectData.START_DATE ] = str_start_date
+        dict_per_project_data[ ProjectData.CONTRACT_CONDITION ] = e_contract_condition
+        dict_per_project_data[ ProjectData.CONTRACT_DURATION ] = f_contract_duration
+        dict_per_project_data[ ProjectData.CONTRACT_FINISH_DATE ] = str_contract_finish_date
+        dict_per_project_data[ ProjectData.HOLIDAY_DATA ] = dict_project_holiday_data
+        dict_per_project_data[ ProjectData.WEATHER_CONDITION_DATA ] = dict_variable_weather_condition_data
+        dict_per_project_data[ ProjectData.HUMAN_CONDITION_DATA ] = dict_variable_human_condition_data
+        return dict_per_project_data
 
     def is_valid_english_number_string( s ):
         pattern = r'^[a-zA-Z0-9_-]+$'  # 允許的字元: 英文(a-zA-Z)、數字(0-9)、下劃線(_)、減號(-)
@@ -206,7 +215,7 @@ class Utility():
         return bool( re.fullmatch( pattern, s ) )
 
 class CreateProjectDialog( QDialog ):
-    def __init__( self, parent = None ):
+    def __init__( self, parent, dict_global_holiday_data ):
         super().__init__( parent )
 
         self.ui = Ui_CreateProjectDialog()
@@ -219,10 +228,10 @@ class CreateProjectDialog( QDialog ):
         self.ui.qtProjectNameWarningLabel.setVisible( False )
         self.ui.qtContractNumberWarningLabel.setVisible( False )
 
-        obj_current_date = datetime.datetime.today()
-        self.ui.qtBidDateEdit.setDate( obj_current_date.date() )
-        self.ui.qtStartDateEdit.setDate( obj_current_date.date() )
-        self.ui.qtContractFinishDateEdit.setDate( obj_current_date.date() )
+        self.obj_current_date = datetime.datetime.today()
+        self.ui.qtBidDateEdit.setDate( self.obj_current_date.date() )
+        self.ui.qtStartDateEdit.setDate( self.obj_current_date.date() )
+        self.ui.qtContractFinishDateEdit.setDate( self.obj_current_date.date() )
         self.update_weekday_text()
 
         self.ui.qtBidDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtBidDateEdit, self.ui.qtBidWeekdayLabel ) )
@@ -234,13 +243,20 @@ class CreateProjectDialog( QDialog ):
         self.ui.qtCalendarDayRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtFixedDeadlineRadioButton.toggled.connect( self.compute_contract_finish_date )
 
+        self.ui.qtNoDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
+        self.ui.qtOneDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
+        self.ui.qtTwoDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
 
-        self.ui.qtOkPushButton.clicked.connect( self.accept_data )
-        self.ui.qtCancelPushButton.clicked.connect( self.cancel )
+        self.ui.qtContractWorkingDaysDoubleSpinBox.valueChanged.connect( self.compute_contract_finish_date )
+
         self.ui.qtConstantConditionSettingPushButton.clicked.connect( self.constant_condition_setting )
         self.ui.qtVariableConditionSettingPushButton.clicked.connect( self.variable_condition_setting )
 
-        self.compute_contract_finish_date()
+        self.ui.qtOkPushButton.clicked.connect( self.accept_data )
+        self.ui.qtCancelPushButton.clicked.connect( self.cancel )
+
+        self.dict_global_holiday_data = copy.deepcopy( dict_global_holiday_data )
+
         self.dict_variable_weather_condition_data = { ScheduleCount.WeatherCondition.MORNING_RAIN :        ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                       ScheduleCount.WeatherCondition.AFTERNOON_RAIN :      ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                       ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
@@ -260,8 +276,10 @@ class CreateProjectDialog( QDialog ):
                                                     ScheduleCount.HumanCondition.AFTERNOON_POWER_OFF :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                     ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                     ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+        self.dict_single_project_data = {}
+        self.dict_project_holiday_data = {}
 
-        self.project_holiday_data = {}
+        self.compute_contract_finish_date()
 
     def load_stylesheet( self, file_path ):
         try:
@@ -303,9 +321,9 @@ class CreateProjectDialog( QDialog ):
         self.on_date_changed( self.ui.qtContractFinishDateEdit, self.ui.qtFinishWeekdayLabel )
 
     def constant_condition_setting( self ):
-        dialog = HolidaySettingDialog( self, False, self.project_holiday_data )
+        dialog = HolidaySettingDialog( self, False, self.dict_global_holiday_data, self.dict_project_holiday_data )
         if dialog.exec():
-            pass
+            self.compute_contract_finish_date()
 
     def variable_condition_setting( self ):
         dialog = VariableConditionSettingDialog( self, self.dict_variable_weather_condition_data, self.dict_variable_human_condition_data )
@@ -317,50 +335,105 @@ class CreateProjectDialog( QDialog ):
             self.ui.qtWorkingDayGroupBox.setEnabled( True )
             self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( True )
             self.ui.qtContractFinishDateEdit.setEnabled( False )
+            self.ui.qtTotalDaysDoubleSpinBox.setEnabled( False )
         elif self.ui.qtCalendarDayRadioButton.isChecked():
             self.ui.qtWorkingDayGroupBox.setEnabled( False )
             self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( True )
             self.ui.qtContractFinishDateEdit.setEnabled( False )
+            self.ui.qtTotalDaysDoubleSpinBox.setEnabled( False )
         elif self.ui.qtFixedDeadlineRadioButton.isChecked():
             self.ui.qtWorkingDayGroupBox.setEnabled( False )
             self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( False )
             self.ui.qtContractFinishDateEdit.setEnabled( True )
+            self.ui.qtTotalDaysDoubleSpinBox.setEnabled( False )
 
     def compute_contract_finish_date( self ):
         self.update_ui()
-        pass
+
+        list_const_holiday = []
+        list_const_workday = []
+        dict_weather_related_holiday = {}
+        dict_extend_data = {}
+        dict_holiday_reason = {}
+
+        e_contract_condition = self.get_contract_condition()
+            
+        f_expect_total_workdays = self.ui.qtContractWorkingDaysDoubleSpinBox.value()
+        obj_start_date = datetime.datetime.strptime( self.ui.qtStartDateEdit.date().toString( "yyyy-MM-dd" ), "%Y-%m-%d" )
+
+        for key_str_date, value in self.dict_project_holiday_data.items():
+            if value[ ScheduleCount.HolidayData.HOLIDAY ]:
+                list_const_holiday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
+            else:
+                list_const_workday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
+
+        returnValue = ScheduleCount.func_count_real_finish_date( e_contract_condition, 
+                                                                 f_expect_total_workdays, 
+                                                                 obj_start_date, 
+                                                                 self.obj_current_date, 
+                                                                 list_const_holiday, 
+                                                                 list_const_workday, 
+                                                                 dict_weather_related_holiday, 
+                                                                 dict_extend_data )
+
+        self.ui.qtContractFinishDateEdit.setDate( returnValue['ExpectFinishDate'] )
+
+    def get_contract_condition( self ):
+        if self.ui.qtWorkingDayRadioButton.isChecked():
+            if self.ui.qtNoDayOffRadioButton.isChecked():
+                e_contract_condition = ScheduleCount.ContractCondition.WORKING_DAY_NO_DAYOFF
+            elif self.ui.qtOneDayOffRadioButton.isChecked():
+                e_contract_condition = ScheduleCount.ContractCondition.WORKING_DAY_ONE_DAYOFF
+            else:
+                e_contract_condition = ScheduleCount.ContractCondition.WORKING_DAY_TWO_DAYOFF
+        elif self.ui.qtCalendarDayRadioButton.isChecked():
+            e_contract_condition = ScheduleCount.ContractCondition.CALENDAR_DAY
+        else:
+            e_contract_condition = ScheduleCount.ContractCondition.FIXED_DEADLINE
+
+        return e_contract_condition
 
     def accept_data( self ):
         str_project_number = self.ui.qtProjectNumberLineEdit.text()
         str_project_name = self.ui.qtProjectNameLineEdit.text()
         str_contract_number = self.ui.qtContractNumberLineEdit.text()
         str_project_location = self.ui.qtProjectLocationLineEdit.text()
+        str_owner = self.ui.qtOwnerLineEdit.text()
+        str_supersior = self.ui.qtSupervisorLineEdit.text()
+        str_designer = self.ui.qtDesignerLineEdit.text()
+        str_contractor = self.ui.qtContractorLineEdit.text()
+        str_bid_date = self.ui.qtBidDateEdit.date().toString( "yyyy-MM-dd" )
+        str_start_date = self.ui.qtStartDateEdit.date().toString( "yyyy-MM-dd" )
 
-        dict_project_data = {}
-        dict_project_data[ ProjectData.PROJECT_NUMBER ] = Utility.create_project_data( str_project_number, 
-                                                                                       str_project_name, 
-                                                                                       str_contract_number,
-                                                                                        str_project_location,
-                                                                                        str_owner,
-                                                                                        str_supersior,
-                                                                                        str_designer,
-                                                                                        str_contractor,
-                                                                                        str_bid_date,
-                                                                                        str_start_date,
-                                                                                        e_condition,
-                                                                                        n_contract_duration,
-                                                                                        str_contract_finish_date )
+        e_contract_condition = self.get_contract_condition()
+        f_contract_duration = self.ui.qtContractWorkingDaysDoubleSpinBox.value()
+        str_contract_finish_date = self.ui.qtContractFinishDateEdit.date().toString( "yyyy-MM-dd" )
 
-        if True:
-            self.accept()
-        else:
-            self.reject()
+        
+        self.dict_single_project_data[ str_project_number ] = Utility.create_project_data( str_project_number, 
+                                                                                           str_project_name, 
+                                                                                           str_contract_number,
+                                                                                           str_project_location,
+                                                                                           str_owner,
+                                                                                           str_supersior,
+                                                                                           str_designer,
+                                                                                           str_contractor,
+                                                                                           str_bid_date,
+                                                                                           str_start_date,
+                                                                                           e_contract_condition,
+                                                                                           f_contract_duration,
+                                                                                           str_contract_finish_date,
+                                                                                           self.dict_project_holiday_data,
+                                                                                           self.dict_variable_weather_condition_data, 
+                                                                                           self.dict_variable_human_condition_data )
+
+        self.accept()
     
     def cancel( self ):
         self.reject()
 
 class HolidaySettingDialog( QDialog ):
-    def __init__( self, parent, b_main_db, dict_global_holiday_data ):
+    def __init__( self, parent, b_main_db, dict_global_holiday_data, dict_project_holiday_data ):
         super().__init__( parent )
 
         self.ui = Ui_HolidaySettingDialog()
@@ -368,13 +441,6 @@ class HolidaySettingDialog( QDialog ):
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
-
-        if b_main_db:
-            self.ui.qtImportFromMainDBPushButton.setVisible( False )
-            self.setWindowTitle("主資料庫假日設定")
-        else:
-            self.ui.qtImportFromMainDBPushButton.setVisible( True )
-            self.setWindowTitle("專案假日設定")
 
         obj_current_date = datetime.datetime.today()
         self.ui.qtDateEdit.setDate( obj_current_date.date() )
@@ -391,9 +457,22 @@ class HolidaySettingDialog( QDialog ):
         self.ui.qtTableView.verticalHeader().hide()
         self.ui.qtTableView.clicked.connect( lambda index: self.on_table_item_clicked( index, self.holiday_data_model ) )
 
+        self.ui.qtImportFromMainDBPushButton.clicked.connect( self.import_from_main_db_override )
         self.ui.qtAddPushButton.clicked.connect( self.add_data )
         self.ui.qtExitPushButton.clicked.connect( self.accept )
+
         self.dict_global_holiday_data = dict_global_holiday_data
+        self.dict_project_holiday_data = dict_project_holiday_data
+
+        if b_main_db:
+            self.ui.qtImportFromMainDBPushButton.setVisible( False )
+            self.setWindowTitle("主資料庫假日設定")
+            self.used_holiday_data = self.dict_global_holiday_data
+        else:
+            self.ui.qtImportFromMainDBPushButton.setVisible( True )
+            self.setWindowTitle("專案假日設定")
+            self.used_holiday_data = self.dict_project_holiday_data
+
         self.refresh_table()
 
     def load_stylesheet( self, file_path ):
@@ -406,18 +485,22 @@ class HolidaySettingDialog( QDialog ):
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
+    def import_from_main_db_override( self ):
+        self.used_holiday_data.update( self.dict_global_holiday_data )
+        self.refresh_table()
+
     def add_data( self ):
         str_date = self.ui.qtDateEdit.date().toString( "yyyy-MM-dd" )
         str_reason = self.ui.qtReasonLineEdit.text()
         b_holiday = self.ui.qtHolidayRadioButton.isChecked()
 
-        if str_date in self.dict_global_holiday_data:
+        if str_date in self.used_holiday_data:
             # TODO: show error message
             return
         else:
-            self.dict_global_holiday_data[ str_date ] = {}
-            self.dict_global_holiday_data[ str_date ][ ScheduleCount.HolidayData.REASON ] = str_reason
-            self.dict_global_holiday_data[ str_date ][ ScheduleCount.HolidayData.HOLIDAY ] = b_holiday
+            self.used_holiday_data[ str_date ] = {}
+            self.used_holiday_data[ str_date ][ ScheduleCount.HolidayData.REASON ] = str_reason
+            self.used_holiday_data[ str_date ][ ScheduleCount.HolidayData.HOLIDAY ] = b_holiday
 
         self.refresh_table()
 
@@ -428,11 +511,11 @@ class HolidaySettingDialog( QDialog ):
                 # delete icon
                 date_item = self.holiday_data_model.item( index.row(), 0 )
                 str_date = date_item.text()
-                del self.dict_global_holiday_data[ str_date ]
+                del self.used_holiday_data[ str_date ]
                 self.holiday_data_model.removeRow( index.row() )
 
     def refresh_table( self ):
-        for index_row,( key_date, value_dict_holiday_data ) in enumerate( self.dict_global_holiday_data.items() ):
+        for index_row,( key_date, value_dict_holiday_data ) in enumerate( self.used_holiday_data.items() ):
             date_item = QStandardItem( key_date )
             date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
             date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
@@ -501,10 +584,7 @@ class HolidaySettingDialog( QDialog ):
             return False
         
     def accept_data( self ):
-        if True:
-            self.accept()
-        else:
-            self.reject()
+        self.accept()
     
     def cancel( self ):
         self.reject()
@@ -803,7 +883,8 @@ class Worker( QObject ):
 class MainWindow( QMainWindow ):
     def __init__( self, b_unit_test = False, 
                   str_UI_setting_file = 'UISetting.config',
-                  str_global_holiday_file = 'GlobalHoliday.txt'  ):
+                  str_global_holiday_file = 'GlobalHoliday.txt',
+                  str_global_project_file = 'ProjectData.txt'  ):
         super( MainWindow, self ).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi( self )  # 設置 UI
@@ -826,9 +907,10 @@ class MainWindow( QMainWindow ):
         self.ui.qtEditDailyReportAction.triggered.connect( self.on_trigger_edit_daily_report )
 
         self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
+        self.global_project_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_project_file )
 
         self.dict_global_holiday_data = {}
-        self.dict_project_data = {}
+        self.dict_all_project_data = {}
 
         self.load_stylesheet( styles_css_path )
         if b_unit_test:
@@ -889,17 +971,18 @@ class MainWindow( QMainWindow ):
         self.load_initialize_data()
 
     def load_initialize_data( self ):
-        self.manual_load_data( self.global_holiday_file_path )
+        self.manual_load_global_holiday_data( self.global_holiday_file_path )
 
     def on_trigger_main_holiday_db_setting( self ):
-        dialog = HolidaySettingDialog( self, True, self.dict_global_holiday_data )
+        dialog = HolidaySettingDialog( self, True, self.dict_global_holiday_data, {} )
         if dialog.exec():
-            self.auto_save_data()
+            self.auto_save_global_holiday_data()
 
     def on_trigger_create_new_project( self ):
-        dialog = CreateProjectDialog(  self )
+        dialog = CreateProjectDialog( self, self.dict_global_holiday_data )
         if dialog.exec():
-            pass
+            self.dict_all_project_data.update( dialog.dict_single_project_data )
+            self.auto_save_project_data()
 
     def on_trigger_edit_project( self ):
         dialog = SelectEditProjectDialog(  self )
@@ -915,11 +998,16 @@ class MainWindow( QMainWindow ):
     def on_trigger_edit_daily_report( self ):   
         pass
 
-    def auto_save_data( self ): 
-        self.manual_save_data( self.global_holiday_file_path )
+    def auto_save_project_data( self ): 
+        self.manual_save_project_data( self.global_holiday_file_path )
+
+    def manual_save_project_data( self, file_path ): 
         pass
 
-    def manual_save_data( self, file_path ): 
+    def auto_save_global_holiday_data( self ): 
+        self.manual_save_global_holiday_data( self.global_holiday_file_path )
+
+    def manual_save_global_holiday_data( self, file_path ): 
         dict_save_holiday_data = {}
         for key,value in self.dict_global_holiday_data.items():
             dict_save_holiday_data[ key ] = { "reason" : str( value[ ScheduleCount.HolidayData.REASON ] ), "holiday" : bool( value[ ScheduleCount.HolidayData.HOLIDAY ] ) }
@@ -928,7 +1016,7 @@ class MainWindow( QMainWindow ):
             f.write( "v1.0.0" '\n' )
             json.dump( dict_save_holiday_data, f, ensure_ascii=False, indent=4 )
 
-    def manual_load_data( self, file_path ):
+    def manual_load_global_holiday_data( self, file_path ):
         try:
             with open( file_path, 'r', encoding='utf-8' ) as f:
                 str_version = f.readline().strip()

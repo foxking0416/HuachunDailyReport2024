@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>572</width>
+    <width>570</width>
     <height>476</height>
    </rect>
   </property>
@@ -32,7 +32,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit"/>
+              <widget class="QLineEdit" name="qtProjectNumberLineEdit"/>
              </item>
             </layout>
            </item>
@@ -83,7 +83,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_2"/>
+                <widget class="QLineEdit" name="qtProjectNameLineEdit"/>
                </item>
               </layout>
              </item>
@@ -136,7 +136,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_3"/>
+                <widget class="QLineEdit" name="qtContractNumberLineEdit"/>
                </item>
               </layout>
              </item>
@@ -183,7 +183,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="qtLocationLineEdit"/>
+          <widget class="QLineEdit" name="qtProjectLocationLineEdit"/>
          </item>
         </layout>
        </item>
@@ -377,6 +377,13 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_16">
            <item>
+            <widget class="QRadioButton" name="qtNoDayOffRadioButton">
+             <property name="text">
+              <string>無周休</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QRadioButton" name="qtOneDayOffRadioButton">
              <property name="text">
               <string>周休一日</string>
@@ -467,8 +474,14 @@
            <property name="decimals">
             <number>1</number>
            </property>
+           <property name="minimum">
+            <double>1.000000000000000</double>
+           </property>
            <property name="maximum">
             <double>10000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -539,8 +552,14 @@
            <property name="decimals">
             <number>1</number>
            </property>
+           <property name="minimum">
+            <double>1.000000000000000</double>
+           </property>
            <property name="maximum">
             <double>10000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
            </property>
           </widget>
          </item>

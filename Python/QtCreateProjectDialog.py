@@ -24,7 +24,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(572, 476)
+        Dialog.resize(570, 476)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
@@ -42,10 +42,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_5.addWidget(self.label_5)
 
-        self.lineEdit = QLineEdit(Dialog)
-        self.lineEdit.setObjectName(u"lineEdit")
+        self.qtProjectNumberLineEdit = QLineEdit(Dialog)
+        self.qtProjectNumberLineEdit.setObjectName(u"qtProjectNumberLineEdit")
 
-        self.horizontalLayout_5.addWidget(self.lineEdit)
+        self.horizontalLayout_5.addWidget(self.qtProjectNumberLineEdit)
 
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_5)
@@ -83,10 +83,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_18.addWidget(self.label_14)
 
-        self.lineEdit_2 = QLineEdit(Dialog)
-        self.lineEdit_2.setObjectName(u"lineEdit_2")
+        self.qtProjectNameLineEdit = QLineEdit(Dialog)
+        self.qtProjectNameLineEdit.setObjectName(u"qtProjectNameLineEdit")
 
-        self.horizontalLayout_18.addWidget(self.lineEdit_2)
+        self.horizontalLayout_18.addWidget(self.qtProjectNameLineEdit)
 
 
         self.horizontalLayout_23.addLayout(self.horizontalLayout_18)
@@ -127,10 +127,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_19.addWidget(self.label)
 
-        self.lineEdit_3 = QLineEdit(Dialog)
-        self.lineEdit_3.setObjectName(u"lineEdit_3")
+        self.qtContractNumberLineEdit = QLineEdit(Dialog)
+        self.qtContractNumberLineEdit.setObjectName(u"qtContractNumberLineEdit")
 
-        self.horizontalLayout_19.addWidget(self.lineEdit_3)
+        self.horizontalLayout_19.addWidget(self.qtContractNumberLineEdit)
 
 
         self.horizontalLayout_26.addLayout(self.horizontalLayout_19)
@@ -165,10 +165,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_6.addWidget(self.label_4)
 
-        self.qtLocationLineEdit = QLineEdit(Dialog)
-        self.qtLocationLineEdit.setObjectName(u"qtLocationLineEdit")
+        self.qtProjectLocationLineEdit = QLineEdit(Dialog)
+        self.qtProjectLocationLineEdit.setObjectName(u"qtProjectLocationLineEdit")
 
-        self.horizontalLayout_6.addWidget(self.qtLocationLineEdit)
+        self.horizontalLayout_6.addWidget(self.qtProjectLocationLineEdit)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_6)
@@ -325,6 +325,11 @@ class Ui_Dialog(object):
         self.qtWorkingDayGroupBox.setObjectName(u"qtWorkingDayGroupBox")
         self.horizontalLayout_16 = QHBoxLayout(self.qtWorkingDayGroupBox)
         self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.qtNoDayOffRadioButton = QRadioButton(self.qtWorkingDayGroupBox)
+        self.qtNoDayOffRadioButton.setObjectName(u"qtNoDayOffRadioButton")
+
+        self.horizontalLayout_16.addWidget(self.qtNoDayOffRadioButton)
+
         self.qtOneDayOffRadioButton = QRadioButton(self.qtWorkingDayGroupBox)
         self.qtOneDayOffRadioButton.setObjectName(u"qtOneDayOffRadioButton")
         self.qtOneDayOffRadioButton.setChecked(True)
@@ -389,7 +394,9 @@ class Ui_Dialog(object):
         self.qtContractWorkingDaysDoubleSpinBox = QDoubleSpinBox(Dialog)
         self.qtContractWorkingDaysDoubleSpinBox.setObjectName(u"qtContractWorkingDaysDoubleSpinBox")
         self.qtContractWorkingDaysDoubleSpinBox.setDecimals(1)
+        self.qtContractWorkingDaysDoubleSpinBox.setMinimum(1.000000000000000)
         self.qtContractWorkingDaysDoubleSpinBox.setMaximum(10000.000000000000000)
+        self.qtContractWorkingDaysDoubleSpinBox.setValue(1.000000000000000)
 
         self.horizontalLayout_13.addWidget(self.qtContractWorkingDaysDoubleSpinBox)
 
@@ -435,7 +442,9 @@ class Ui_Dialog(object):
         self.qtTotalDaysDoubleSpinBox = QDoubleSpinBox(Dialog)
         self.qtTotalDaysDoubleSpinBox.setObjectName(u"qtTotalDaysDoubleSpinBox")
         self.qtTotalDaysDoubleSpinBox.setDecimals(1)
+        self.qtTotalDaysDoubleSpinBox.setMinimum(1.000000000000000)
         self.qtTotalDaysDoubleSpinBox.setMaximum(10000.000000000000000)
+        self.qtTotalDaysDoubleSpinBox.setValue(1.000000000000000)
 
         self.horizontalLayout_15.addWidget(self.qtTotalDaysDoubleSpinBox)
 
@@ -499,6 +508,7 @@ class Ui_Dialog(object):
         self.qtCalendarDayRadioButton.setText(QCoreApplication.translate("Dialog", u"\u65e5\u66c6\u5929", None))
         self.qtFixedDeadlineRadioButton.setText(QCoreApplication.translate("Dialog", u"\u9650\u671f\u5b8c\u5de5", None))
         self.qtWorkingDayGroupBox.setTitle(QCoreApplication.translate("Dialog", u"\u5468\u4f11\u5de5\u671f", None))
+        self.qtNoDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u7121\u5468\u4f11", None))
         self.qtOneDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u5468\u4f11\u4e00\u65e5", None))
         self.qtTwoDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u5468\u4f11\u4e8c\u65e5", None))
         self.qtConstantConditionSettingPushButton.setText(QCoreApplication.translate("Dialog", u"\u56fa\u5b9a\u56e0\u7d20\u8a2d\u5b9a(\u570b\u5b9a\u5047\u65e5)", None))
