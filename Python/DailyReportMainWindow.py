@@ -215,7 +215,7 @@ class Utility():
         return bool( re.fullmatch( pattern, s ) )
 
 class CreateProjectDialog( QDialog ):
-    def __init__( self, parent, dict_global_holiday_data ):
+    def __init__( self, parent, dict_global_holiday_data, b_edit_mode, dict_single_project_data ):
         super().__init__( parent )
 
         self.ui = Ui_CreateProjectDialog()
@@ -234,6 +234,21 @@ class CreateProjectDialog( QDialog ):
         self.ui.qtContractFinishDateEdit.setDate( self.obj_current_date.date() )
         self.update_weekday_text()
 
+        if b_edit_mode:
+            self.ui.qtProjectNumberLineEdit.setEnabled( False )
+            self.ui.qtProjectNumberLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_NUMBER ] )
+            self.ui.qtProjectNameLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_NAME ] )
+            self.ui.qtContractNumberLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACT_NUMBER ] )
+            self.ui.qtProjectLocationLineEdit.setText( dict_single_project_data[ ProjectData.STR_PROJECT_LOCATION ] )
+            self.ui.qtOwnerLineEdit.setText( dict_single_project_data[ ProjectData.STR_OWNER ] )
+            self.ui.qtSupervisorLineEdit.setText( dict_single_project_data[ ProjectData.STR_SUPERSIOR ] )
+            self.ui.qtDesignerLineEdit.setText( dict_single_project_data[ ProjectData.STR_DESIGNER ] )
+            self.ui.qtContractorLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACTOR ] )
+            self.ui.qtBidDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_BID_DATE ], "%Y-%m-%d" ).date() )
+            self.ui.qtStartDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" ).date() )
+        else:
+            self.ui.qtProjectNumberLineEdit.setEnabled( True ) 
+
         self.ui.qtBidDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtBidDateEdit, self.ui.qtBidWeekdayLabel ) )
 
         self.ui.qtStartDateEdit.dateChanged.connect( self.compute_contract_finish_date )
@@ -242,7 +257,6 @@ class CreateProjectDialog( QDialog ):
         self.ui.qtWorkingDayRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtCalendarDayRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtFixedDeadlineRadioButton.toggled.connect( self.compute_contract_finish_date )
-
         self.ui.qtNoDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtOneDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtTwoDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
@@ -827,6 +841,7 @@ class SelectEditProjectDialog( QDialog ):
 
         self.ui.qtExitPushButton.clicked.connect( self.cancel )
 
+        self.str_project_number = ""
         self.dict_all_project_data = dict_all_project_data
         self.refresh_table()
 
@@ -841,14 +856,15 @@ class SelectEditProjectDialog( QDialog ):
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
     def on_table_item_clicked( self, index, stock_list_model ):
-        if index.column() == 2:
-            pass
-        elif index.column() == 3:
+        project_number_item = self.project_data_model.item( index.row(), 0 )
+        str_project_number = project_number_item.text()
+
+        if index.column() == 2:# edit
+            self.str_project_number = str_project_number
+            self.accept()
+        elif index.column() == 3:# delete
             result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆專案資料嗎?" )
             if result:
-                # delete icon
-                project_number_item = self.project_data_model.item( index.row(), 0 )
-                str_project_number = project_number_item.text()
                 del self.dict_all_project_data[ str_project_number ]
                 self.project_data_model.removeRow( index.row() )
 
@@ -1040,15 +1056,20 @@ class MainWindow( QMainWindow ):
             self.auto_save_global_holiday_data()
 
     def on_trigger_create_new_project( self ):
-        dialog = CreateProjectDialog( self, self.dict_global_holiday_data )
+        dialog = CreateProjectDialog( self, self.dict_global_holiday_data, False, {} )
         if dialog.exec():
             self.dict_all_project_data.update( dialog.dict_single_project_data )
             self.auto_save_project_data()
 
     def on_trigger_edit_project( self ):
-        dialog = SelectEditProjectDialog( self, self.dict_all_project_data )
-        if dialog.exec():
-            pass
+        select_dialog = SelectEditProjectDialog( self, self.dict_all_project_data )
+        if select_dialog.exec():
+            str_project_number = select_dialog.str_project_number
+            dict_single_project_data = self.dict_all_project_data[ str_project_number ]
+            edit_dialog = CreateProjectDialog( self, self.dict_global_holiday_data, True, dict_single_project_data )
+            if edit_dialog.exec():
+                self.dict_all_project_data.update( edit_dialog.dict_single_project_data )
+                # self.auto_save_project_data()
 
     def on_trigger_select_project( self ):
         pass
