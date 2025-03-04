@@ -25,8 +25,8 @@ class WeatherCondition( Enum ):
     AFTERNOON_HOT = auto()
     MORNING_MUDDY = auto()
     AFTERNOON_MUDDY = auto()
-    MORNING_OTHER = auto()
-    AFTERNOON_OTHER = auto()
+    MORNING_WEATHER_OTHER = auto()
+    AFTERNOON_WEATHER_OTHER = auto()
 
 class HumanCondition( Enum ):
     MORNING_SUSPENSION = 0

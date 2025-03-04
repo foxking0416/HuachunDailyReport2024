@@ -132,22 +132,22 @@ styles_css_path = os.path.join( g_exe_root_dir, 'resources\\styles.css' )
 #endregion
 
 class ProjectData( Enum ):
-    PROJECT_NUMBER = 0
-    PROJECT_NAME = auto()
-    PROJECT_LOCATION = auto()
-    CONTRACT_NUMBER = auto() #合約號碼
-    OWNER = auto() #業主
-    SUPERSIOR = auto() #監造
-    DESIGNER = auto() #設計
-    CONTRACTOR = auto() #承包商
-    BID_DATE = auto() #決標日期
-    START_DATE = auto() #開工日期
-    CONTRACT_CONDITION = auto() #工期條件
-    CONTRACT_DURATION = auto() #契約工期
-    CONTRACT_FINISH_DATE = auto() #合約完工日期
-    HOLIDAY_DATA = auto() #專案假日資料
-    WEATHER_CONDITION_DATA = auto() #變動天候條件資料
-    HUMAN_CONDITION_DATA = auto() #變動人為條件資料
+    STR_PROJECT_NUMBER = 0
+    STR_PROJECT_NAME = auto()
+    STR_PROJECT_LOCATION = auto()
+    STR_CONTRACT_NUMBER = auto() #合約號碼
+    STR_OWNER = auto() #業主
+    STR_SUPERSIOR = auto() #監造
+    STR_DESIGNER = auto() #設計
+    STR_CONTRACTOR = auto() #承包商
+    STR_BID_DATE = auto() #決標日期
+    STR_START_DATE = auto() #開工日期
+    E_CONTRACT_CONDITION = auto() #工期條件
+    F_CONTRACT_DURATION = auto() #契約工期
+    STR_CONTRACT_FINISH_DATE = auto() #合約完工日期
+    DICT_HOLIDAY_DATA = auto() #專案假日資料
+    DICT_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
+    DICT_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
 
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
@@ -188,22 +188,22 @@ class Utility():
                              dict_variable_weather_condition_data, 
                              dict_variable_human_condition_data ):
         dict_per_project_data = {}
-        dict_per_project_data[ ProjectData.PROJECT_NUMBER ] = str_project_number
-        dict_per_project_data[ ProjectData.PROJECT_NAME ] = str_project_name
-        dict_per_project_data[ ProjectData.PROJECT_LOCATION ] = str_project_location
-        dict_per_project_data[ ProjectData.CONTRACT_NUMBER ] = str_contract_number
-        dict_per_project_data[ ProjectData.OWNER ] = str_owner
-        dict_per_project_data[ ProjectData.SUPERSIOR ] = str_supersior
-        dict_per_project_data[ ProjectData.DESIGNER ] = str_designer
-        dict_per_project_data[ ProjectData.CONTRACTOR ] = str_contractor
-        dict_per_project_data[ ProjectData.BID_DATE ] = str_bid_date
-        dict_per_project_data[ ProjectData.START_DATE ] = str_start_date
-        dict_per_project_data[ ProjectData.CONTRACT_CONDITION ] = e_contract_condition
-        dict_per_project_data[ ProjectData.CONTRACT_DURATION ] = f_contract_duration
-        dict_per_project_data[ ProjectData.CONTRACT_FINISH_DATE ] = str_contract_finish_date
-        dict_per_project_data[ ProjectData.HOLIDAY_DATA ] = dict_project_holiday_data
-        dict_per_project_data[ ProjectData.WEATHER_CONDITION_DATA ] = dict_variable_weather_condition_data
-        dict_per_project_data[ ProjectData.HUMAN_CONDITION_DATA ] = dict_variable_human_condition_data
+        dict_per_project_data[ ProjectData.STR_PROJECT_NUMBER ] = str_project_number
+        dict_per_project_data[ ProjectData.STR_PROJECT_NAME ] = str_project_name
+        dict_per_project_data[ ProjectData.STR_PROJECT_LOCATION ] = str_project_location
+        dict_per_project_data[ ProjectData.STR_CONTRACT_NUMBER ] = str_contract_number
+        dict_per_project_data[ ProjectData.STR_OWNER ] = str_owner
+        dict_per_project_data[ ProjectData.STR_SUPERSIOR ] = str_supersior
+        dict_per_project_data[ ProjectData.STR_DESIGNER ] = str_designer
+        dict_per_project_data[ ProjectData.STR_CONTRACTOR ] = str_contractor
+        dict_per_project_data[ ProjectData.STR_BID_DATE ] = str_bid_date
+        dict_per_project_data[ ProjectData.STR_START_DATE ] = str_start_date
+        dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ] = e_contract_condition
+        dict_per_project_data[ ProjectData.F_CONTRACT_DURATION ] = f_contract_duration
+        dict_per_project_data[ ProjectData.STR_CONTRACT_FINISH_DATE ] = str_contract_finish_date
+        dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ] = dict_project_holiday_data
+        dict_per_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ] = dict_variable_weather_condition_data
+        dict_per_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ] = dict_variable_human_condition_data
         return dict_per_project_data
 
     def is_valid_english_number_string( s ):
@@ -257,18 +257,18 @@ class CreateProjectDialog( QDialog ):
 
         self.dict_global_holiday_data = copy.deepcopy( dict_global_holiday_data )
 
-        self.dict_variable_weather_condition_data = { ScheduleCount.WeatherCondition.MORNING_RAIN :        ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_RAIN :      ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_HEAVYRAIN : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_TYPHOON :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_TYPHOON :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_HOT :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_HOT :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_MUDDY :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_MUDDY :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.MORNING_OTHER :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                      ScheduleCount.WeatherCondition.AFTERNOON_OTHER :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+        self.dict_variable_weather_condition_data = { ScheduleCount.WeatherCondition.MORNING_RAIN :            ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.AFTERNOON_RAIN :          ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.AFTERNOON_HEAVYRAIN :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.MORNING_TYPHOON :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.AFTERNOON_TYPHOON :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.MORNING_HOT :             ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.AFTERNOON_HOT :           ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.MORNING_MUDDY :           ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.AFTERNOON_MUDDY :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                      ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
 
         self.dict_variable_human_condition_data = { ScheduleCount.HumanCondition.MORNING_SUSPENSION :    ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                     ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION :  ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
@@ -626,8 +626,8 @@ class VariableConditionSettingDialog( QDialog ):
         self.update_radio_button( self.ui.qtAfternoonHotOneDayOffRadioButton,          self.ui.qtAfternoonHotHalfDayOffRadioButton,          self.ui.qtAfternoonHotNoDayOffRadioButton,          self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.AFTERNOON_HOT )
         self.update_radio_button( self.ui.qtMorningMuddyOneDayOffRadioButton,          self.ui.qtMorningMuddyHalfDayOffRadioButton,          self.ui.qtMorningMuddyNoDayOffRadioButton,          self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.MORNING_MUDDY )
         self.update_radio_button( self.ui.qtAfternoonMuddyOneDayOffRadioButton,        self.ui.qtAfternoonMuddyHalfDayOffRadioButton,        self.ui.qtAfternoonMuddyNoDayOffRadioButton,        self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.AFTERNOON_MUDDY )
-        self.update_radio_button( self.ui.qtMorningWeatherOtherOneDayOffRadioButton,   self.ui.qtMorningWeatherOtherHalfDayOffRadioButton,   self.ui.qtMorningWeatherOtherNoDayOffRadioButton,   self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.MORNING_OTHER )
-        self.update_radio_button( self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton, self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton, self.ui.qtAfternoonWeatherOtherNoDayOffRadioButton, self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.AFTERNOON_OTHER )
+        self.update_radio_button( self.ui.qtMorningWeatherOtherOneDayOffRadioButton,   self.ui.qtMorningWeatherOtherHalfDayOffRadioButton,   self.ui.qtMorningWeatherOtherNoDayOffRadioButton,   self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER )
+        self.update_radio_button( self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton, self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton, self.ui.qtAfternoonWeatherOtherNoDayOffRadioButton, self.dict_variable_weather_condition_data, ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER )
 
         self.update_radio_button( self.ui.qtMorningSuspendOneDayOffRadioButton,      self.ui.qtMorningSuspendHalfDayOffRadioButton,      self.ui.qtMorningSuspendNoDayOffRadioButton,           self.dict_variable_human_condition_data, ScheduleCount.HumanCondition.MORNING_SUSPENSION )
         self.update_radio_button( self.ui.qtAfternoonSuspendOneDayOffRadioButton,    self.ui.qtAfternoonSuspendHalfDayOffRadioButton,    self.ui.qtAfternoonSuspendNoDayOffRadioButton,         self.dict_variable_human_condition_data, ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION )
@@ -747,22 +747,22 @@ class VariableConditionSettingDialog( QDialog ):
         self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_HOT ] = e_afternoon_hot
         self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_MUDDY ] = e_morning_muddy
         self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_MUDDY ] = e_afternoon_muddy
-        self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_OTHER ] = e_morning_weather_other
-        self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_OTHER ] = e_afternoon_weather_other 
+        self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER ] = e_morning_weather_other
+        self.dict_variable_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER ] = e_afternoon_weather_other 
 
         if self.ui.qtMorningSuspendOneDayOffRadioButton.isChecked():
-            e_morning_suspend = ScheduleCount.VariableConditionNoCount.COUNT_ONE_DAY_OFF
+            e_morning_suspension = ScheduleCount.VariableConditionNoCount.COUNT_ONE_DAY_OFF
         elif self.ui.qtMorningSuspendHalfDayOffRadioButton.isChecked():
-            e_morning_suspend = ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF
+            e_morning_suspension = ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF
         else:
-            e_morning_suspend = ScheduleCount.VariableConditionNoCount.COUNT_NO_DAY_OFF
+            e_morning_suspension = ScheduleCount.VariableConditionNoCount.COUNT_NO_DAY_OFF
 
         if self.ui.qtAfternoonSuspendOneDayOffRadioButton.isChecked():
-            e_afternoon_suspend = ScheduleCount.VariableConditionNoCount.COUNT_ONE_DAY_OFF
+            e_afternoon_suspension = ScheduleCount.VariableConditionNoCount.COUNT_ONE_DAY_OFF
         elif self.ui.qtAfternoonSuspendHalfDayOffRadioButton.isChecked():
-            e_afternoon_suspend = ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF
+            e_afternoon_suspension = ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF
         else:
-            e_afternoon_suspend = ScheduleCount.VariableConditionNoCount.COUNT_NO_DAY_OFF
+            e_afternoon_suspension = ScheduleCount.VariableConditionNoCount.COUNT_NO_DAY_OFF
 
 
         if self.ui.qtMorningPowerOffOneDayOffRadioButton.isChecked():
@@ -794,8 +794,8 @@ class VariableConditionSettingDialog( QDialog ):
         else:
             e_afternoon_human_other = ScheduleCount.VariableConditionNoCount.COUNT_NO_DAY_OFF
 
-        self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.MORNING_SUSPENSION ] = e_morning_suspend
-        self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION ] = e_afternoon_suspend
+        self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.MORNING_SUSPENSION ] = e_morning_suspension
+        self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION ] = e_afternoon_suspension
         self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.MORNING_POWER_OFF ] = e_morning_power_off
         self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_POWER_OFF ] = e_afternoon_power_off
         self.dict_variable_human_condition_data[ ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER ] = e_morning_human_other
@@ -999,10 +999,62 @@ class MainWindow( QMainWindow ):
         pass
 
     def auto_save_project_data( self ): 
-        self.manual_save_project_data( self.global_holiday_file_path )
+        self.manual_save_project_data( self.global_project_data_file_path )
 
     def manual_save_project_data( self, file_path ): 
-        pass
+        # self.dict_all_project_data
+        export_json_data = {}
+        for key, value in self.dict_all_project_data.items():
+            dict_per_project_data = {}
+            dict_per_project_data[ "project_name" ] = value[ ProjectData.STR_PROJECT_NAME ]
+            dict_per_project_data[ "project_location" ] = value[ ProjectData.STR_PROJECT_LOCATION ]
+            dict_per_project_data[ "contract_number" ] = value[ ProjectData.STR_CONTRACT_NUMBER ]
+            dict_per_project_data[ "owner" ] = value[ ProjectData.STR_OWNER ]
+            dict_per_project_data[ "supervisor" ] = value[ ProjectData.STR_SUPERSIOR ]
+            dict_per_project_data[ "designer" ] = value[ ProjectData.STR_DESIGNER ]
+            dict_per_project_data[ "contractor" ] = value[ ProjectData.STR_CONTRACTOR ]
+            dict_per_project_data[ "bid_date" ] = value[ ProjectData.STR_BID_DATE ]
+            dict_per_project_data[ "start_date" ] = value[ ProjectData.STR_START_DATE ]
+            dict_per_project_data[ "contract_condition" ] = int( value[ ProjectData.E_CONTRACT_CONDITION ].value )
+            dict_per_project_data[ "contract_duration" ] = value[ ProjectData.F_CONTRACT_DURATION ]
+            dict_per_project_data[ "contract_finish_date" ] = value[ ProjectData.STR_CONTRACT_FINISH_DATE ]
+            dict_holiday_data = value[ ProjectData.DICT_HOLIDAY_DATA ]
+            json_holiday_data = {}
+            for key_holiday, value_holiday in dict_holiday_data.items():
+                json_holiday_data[ key_holiday ] = { "reason" : value_holiday[ ScheduleCount.HolidayData.REASON ], 
+                                                     "holiday" : bool( value_holiday[ ScheduleCount.HolidayData.HOLIDAY ] ) }
+            dict_per_project_data[ "holiday_data" ] = json_holiday_data
+            dict_weather_condition_data = value[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
+            export_json_weather_condition_data = {}
+            export_json_weather_condition_data[ "morning_rain" ]            = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_RAIN].value )
+            export_json_weather_condition_data[ "afternoon_rain" ]          = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_RAIN].value )
+            export_json_weather_condition_data[ "morning_heavyrain" ]       = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN].value )
+            export_json_weather_condition_data[ "afternoon_heavyrain" ]     = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_HEAVYRAIN].value )
+            export_json_weather_condition_data[ "morning_typhoon" ]         = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_TYPHOON].value )
+            export_json_weather_condition_data[ "afternoon_typhoon" ]       = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_TYPHOON].value )
+            export_json_weather_condition_data[ "morning_hot" ]             = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_HOT].value )
+            export_json_weather_condition_data[ "afternoon_hot" ]           = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_HOT].value )
+            export_json_weather_condition_data[ "morning_muddy" ]           = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_MUDDY].value )
+            export_json_weather_condition_data[ "afternoon_muddy" ]         = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_MUDDY].value )
+            export_json_weather_condition_data[ "morning_weather_other" ]   = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER].value )
+            export_json_weather_condition_data[ "afternoon_weather_other" ] = int( dict_weather_condition_data[ ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER].value )
+            dict_per_project_data[ "weather_condition_data" ] = export_json_weather_condition_data
+
+            dict_human_condition_data = value[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
+            export_json_human_condition_data = {}
+            export_json_human_condition_data[ "morning_suspension" ]        = int( dict_human_condition_data[ ScheduleCount.HumanCondition.MORNING_SUSPENSION].value )
+            export_json_human_condition_data[ "afternoon_suspension" ]      = int( dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION].value )
+            export_json_human_condition_data[ "morning_poweroff" ]        = int( dict_human_condition_data[ ScheduleCount.HumanCondition.MORNING_POWER_OFF].value )
+            export_json_human_condition_data[ "afternoon_poweroff" ]      = int( dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_POWER_OFF].value )
+            export_json_human_condition_data[ "morning_human_other" ]       = int( dict_human_condition_data[ ScheduleCount.HumanCondition.MORNING_HUMAN_OTHER].value )
+            export_json_human_condition_data[ "afternoon_human_other" ]     = int( dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER].value )
+            dict_per_project_data[ "human_condition_data" ] = export_json_human_condition_data
+            
+            export_json_data[ key ] = dict_per_project_data
+
+        with open( file_path, 'w', encoding='utf-8' ) as f:
+            f.write( "v1.0.0" '\n' )
+            json.dump( export_json_data, f, ensure_ascii=False, indent=4 )
 
     def auto_save_global_holiday_data( self ): 
         self.manual_save_global_holiday_data( self.global_holiday_file_path )

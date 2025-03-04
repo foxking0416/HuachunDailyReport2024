@@ -32,7 +32,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="qtProjectNumberLineEdit"/>
+              <widget class="QLineEdit" name="qtProjectNumberLineEdit">
+               <property name="text">
+                <string>123</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -83,7 +87,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="qtProjectNameLineEdit"/>
+                <widget class="QLineEdit" name="qtProjectNameLineEdit">
+                 <property name="text">
+                  <string>1</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -136,7 +144,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="qtContractNumberLineEdit"/>
+                <widget class="QLineEdit" name="qtContractNumberLineEdit">
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -183,7 +195,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="qtProjectLocationLineEdit"/>
+          <widget class="QLineEdit" name="qtProjectLocationLineEdit">
+           <property name="text">
+            <string>3</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -266,7 +282,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="qtOwnerLineEdit"/>
+          <widget class="QLineEdit" name="qtOwnerLineEdit">
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -280,7 +300,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="qtSupervisorLineEdit"/>
+          <widget class="QLineEdit" name="qtSupervisorLineEdit">
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -294,7 +318,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="qtDesignerLineEdit"/>
+          <widget class="QLineEdit" name="qtDesignerLineEdit">
+           <property name="text">
+            <string>6</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -308,7 +336,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="qtContractorLineEdit"/>
+          <widget class="QLineEdit" name="qtContractorLineEdit">
+           <property name="text">
+            <string>7</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
