@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
+    <width>402</width>
     <height>300</height>
    </rect>
   </property>
@@ -22,6 +22,9 @@
         <widget class="QRadioButton" name="qtSearchNumberRadioButton">
          <property name="text">
           <string>搜尋工程編號</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -41,24 +44,6 @@
    </item>
    <item>
     <widget class="QTableView" name="qtTableView"/>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="qtEditPushButton">
-       <property name="text">
-        <string>編輯</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="qtDeletePushButton">
-       <property name="text">
-        <string>刪除</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QPushButton" name="qtExitPushButton">

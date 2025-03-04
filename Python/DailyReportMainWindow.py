@@ -807,7 +807,7 @@ class VariableConditionSettingDialog( QDialog ):
         self.reject()
 
 class SelectEditProjectDialog( QDialog ):
-    def __init__( self, parent = None ):
+    def __init__( self, parent, dict_all_project_data ):
         super().__init__( parent )
 
         self.ui = Ui_SelectEditProjectDialog()
@@ -815,6 +815,20 @@ class SelectEditProjectDialog( QDialog ):
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
+        delegate = CenterIconDelegate()
+
+        self.list_table_horizontal_header = [ '工程編號', '工程名稱', '編輯', '刪除' ]
+        self.project_data_model = QStandardItemModel( 0, 0 ) 
+        self.project_data_model.setHorizontalHeaderLabels( self.list_table_horizontal_header )
+        self.ui.qtTableView.setModel( self.project_data_model )
+        self.ui.qtTableView.setItemDelegate( delegate )
+        self.ui.qtTableView.verticalHeader().hide()
+        self.ui.qtTableView.clicked.connect( lambda index: self.on_table_item_clicked( index, self.project_data_model ) )
+
+        self.ui.qtExitPushButton.clicked.connect( self.cancel )
+
+        self.dict_all_project_data = dict_all_project_data
+        self.refresh_table()
 
     def load_stylesheet( self, file_path ):
         try:
@@ -826,12 +840,58 @@ class SelectEditProjectDialog( QDialog ):
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
-    def accept_data( self ):
-        if True:
-            self.accept()
-        else:
-            self.reject()
-    
+    def on_table_item_clicked( self, index, stock_list_model ):
+        if index.column() == 2:
+            pass
+        elif index.column() == 3:
+            result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆專案資料嗎?" )
+            if result:
+                # delete icon
+                project_number_item = self.project_data_model.item( index.row(), 0 )
+                str_project_number = project_number_item.text()
+                del self.dict_all_project_data[ str_project_number ]
+                self.project_data_model.removeRow( index.row() )
+
+    def refresh_table( self ):
+        for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
+            project_number_item = QStandardItem( key_project_number )
+            project_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            project_number_item.setFlags( project_number_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 0, project_number_item ) 
+
+            str_project_name = value_dict_project_data[ ProjectData.STR_PROJECT_NAME ]
+            project_name_item = QStandardItem( str_project_name )
+            project_name_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            project_name_item.setFlags( project_name_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 1, project_name_item ) 
+
+            edit_icon_item = QStandardItem("")
+            edit_icon_item.setIcon( edit_icon )
+            edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 2, edit_icon_item ) 
+
+            delete_icon_item = QStandardItem("")
+            delete_icon_item.setIcon( delete_icon )
+            delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 3, delete_icon_item ) 
+
+    def show_warning_message_box_with_ok_cancel_button( self, str_title, str_message ): 
+        message_box = QMessageBox( self )
+        message_box.setIcon( QMessageBox.Warning )  # 設置為警告圖示
+        message_box.setWindowTitle( str_title )
+        message_box.setText( str_message )
+
+        # 添加自訂按鈕
+        button_ok = message_box.addButton("確定", QMessageBox.AcceptRole)
+        button_cancel = message_box.addButton("取消", QMessageBox.RejectRole)
+
+        message_box.exec()
+
+        if message_box.clickedButton() == button_ok:
+            return True
+        elif message_box.clickedButton() == button_cancel:
+            return False
+        
     def cancel( self ):
         self.reject()
 
@@ -986,7 +1046,7 @@ class MainWindow( QMainWindow ):
             self.auto_save_project_data()
 
     def on_trigger_edit_project( self ):
-        dialog = SelectEditProjectDialog(  self )
+        dialog = SelectEditProjectDialog( self, self.dict_all_project_data )
         if dialog.exec():
             pass
 

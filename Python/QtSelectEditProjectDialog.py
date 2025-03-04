@@ -23,7 +23,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(335, 300)
+        Dialog.resize(402, 300)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
@@ -32,6 +32,7 @@ class Ui_Dialog(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.qtSearchNumberRadioButton = QRadioButton(Dialog)
         self.qtSearchNumberRadioButton.setObjectName(u"qtSearchNumberRadioButton")
+        self.qtSearchNumberRadioButton.setChecked(True)
 
         self.verticalLayout_2.addWidget(self.qtSearchNumberRadioButton)
 
@@ -56,21 +57,6 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.qtTableView)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.qtEditPushButton = QPushButton(Dialog)
-        self.qtEditPushButton.setObjectName(u"qtEditPushButton")
-
-        self.horizontalLayout_2.addWidget(self.qtEditPushButton)
-
-        self.qtDeletePushButton = QPushButton(Dialog)
-        self.qtDeletePushButton.setObjectName(u"qtDeletePushButton")
-
-        self.horizontalLayout_2.addWidget(self.qtDeletePushButton)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
         self.qtExitPushButton = QPushButton(Dialog)
         self.qtExitPushButton.setObjectName(u"qtExitPushButton")
 
@@ -86,8 +72,6 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"\u7de8\u8f2f\u65e2\u6709\u5de5\u7a0b", None))
         self.qtSearchNumberRadioButton.setText(QCoreApplication.translate("Dialog", u"\u641c\u5c0b\u5de5\u7a0b\u7de8\u865f", None))
         self.qtSearchNameRadioButton.setText(QCoreApplication.translate("Dialog", u"\u641c\u5c0b\u5de5\u7a0b\u540d\u7a31", None))
-        self.qtEditPushButton.setText(QCoreApplication.translate("Dialog", u"\u7de8\u8f2f", None))
-        self.qtDeletePushButton.setText(QCoreApplication.translate("Dialog", u"\u522a\u9664", None))
         self.qtExitPushButton.setText(QCoreApplication.translate("Dialog", u"\u96e2\u958b", None))
     # retranslateUi
 
