@@ -135,8 +135,9 @@ styles_css_path = os.path.join( g_exe_root_dir, 'resources\\styles.css' )
 class ProjectData( Enum ):
     STR_PROJECT_NUMBER = 0
     STR_PROJECT_NAME = auto()
-    STR_PROJECT_LOCATION = auto()
     STR_CONTRACT_NUMBER = auto() #合約號碼
+    STR_PROJECT_LOCATION = auto()
+    I_CONTRACT_VALUE = auto() #合約金額
     STR_OWNER = auto() #業主
     STR_SUPERSIOR = auto() #監造
     STR_DESIGNER = auto() #設計
@@ -183,6 +184,7 @@ class Utility():
                              str_project_name, 
                              str_contract_number,
                              str_project_location,
+                             i_contract_value,
                              str_owner,
                              str_supersior,
                              str_designer,
@@ -198,8 +200,9 @@ class Utility():
         dict_per_project_data = {}
         dict_per_project_data[ ProjectData.STR_PROJECT_NUMBER ] = str_project_number
         dict_per_project_data[ ProjectData.STR_PROJECT_NAME ] = str_project_name
-        dict_per_project_data[ ProjectData.STR_PROJECT_LOCATION ] = str_project_location
         dict_per_project_data[ ProjectData.STR_CONTRACT_NUMBER ] = str_contract_number
+        dict_per_project_data[ ProjectData.STR_PROJECT_LOCATION ] = str_project_location
+        dict_per_project_data[ ProjectData.I_CONTRACT_VALUE ] = i_contract_value
         dict_per_project_data[ ProjectData.STR_OWNER ] = str_owner
         dict_per_project_data[ ProjectData.STR_SUPERSIOR ] = str_supersior
         dict_per_project_data[ ProjectData.STR_DESIGNER ] = str_designer
@@ -283,30 +286,21 @@ class CreateProjectDialog( QDialog ):
         self.ui.qtProjectNumberWarningLabel.setVisible( False )
         self.ui.qtProjectNameWarningLabel.setVisible( False )
         self.ui.qtContractNumberWarningLabel.setVisible( False )
-
         self.obj_current_date = datetime.datetime.today()
-        self.ui.qtBidDateEdit.setDate( self.obj_current_date.date() )
-        self.ui.qtStartDateEdit.setDate( self.obj_current_date.date() )
-        self.ui.qtContractFinishDateEdit.setDate( self.obj_current_date.date() )
-        self.update_weekday_text()
 
         self.ui.qtBidDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtBidDateEdit, self.ui.qtBidWeekdayLabel ) )
-
         self.ui.qtStartDateEdit.dateChanged.connect( self.compute_contract_finish_date )
         self.ui.qtContractFinishDateEdit.dateChanged.connect( lambda: self.on_date_changed( self.ui.qtContractFinishDateEdit, self.ui.qtFinishWeekdayLabel ) )
-
         self.ui.qtWorkingDayRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtCalendarDayRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtFixedDeadlineRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtNoDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtOneDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
         self.ui.qtTwoDayOffRadioButton.toggled.connect( self.compute_contract_finish_date )
-
         self.ui.qtContractWorkingDaysDoubleSpinBox.valueChanged.connect( self.compute_contract_finish_date )
 
         self.ui.qtConstantConditionSettingPushButton.clicked.connect( self.constant_condition_setting )
         self.ui.qtVariableConditionSettingPushButton.clicked.connect( self.variable_condition_setting )
-
         self.ui.qtOkPushButton.clicked.connect( self.accept_data )
         self.ui.qtCancelPushButton.clicked.connect( self.cancel )
 
@@ -322,14 +316,45 @@ class CreateProjectDialog( QDialog ):
             self.ui.qtSupervisorLineEdit.setText( dict_single_project_data[ ProjectData.STR_SUPERSIOR ] )
             self.ui.qtDesignerLineEdit.setText( dict_single_project_data[ ProjectData.STR_DESIGNER ] )
             self.ui.qtContractorLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACTOR ] )
-            self.ui.qtBidDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_BID_DATE ], "%Y-%m-%d" ).date() )
-            self.ui.qtStartDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" ).date() )
+            self.ui.qtContractValueSpinBox.setValue( dict_single_project_data[ ProjectData.I_CONTRACT_VALUE ] )
+            with ( QSignalBlocker( self.ui.qtBidDateEdit ),
+                   QSignalBlocker( self.ui.qtStartDateEdit ),
+                   QSignalBlocker( self.ui.qtWorkingDayRadioButton ),
+                   QSignalBlocker( self.ui.qtCalendarDayRadioButton ),
+                   QSignalBlocker( self.ui.qtFixedDeadlineRadioButton ),
+                   QSignalBlocker( self.ui.qtNoDayOffRadioButton ),
+                   QSignalBlocker( self.ui.qtOneDayOffRadioButton ),
+                   QSignalBlocker( self.ui.qtTwoDayOffRadioButton ),
+                   QSignalBlocker( self.ui.qtContractWorkingDaysDoubleSpinBox ),
+                   QSignalBlocker( self.ui.qtContractFinishDateEdit ) ):
+                self.ui.qtBidDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_BID_DATE ], "%Y-%m-%d" ).date() )
+                self.ui.qtStartDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" ).date() )
+                self.ui.qtContractWorkingDaysDoubleSpinBox.setValue( dict_single_project_data[ ProjectData.F_CONTRACT_DURATION ] )
+                self.ui.qtContractFinishDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_CONTRACT_FINISH_DATE ], "%Y-%m-%d" ).date() )
+
+                e_contract_condition = dict_single_project_data[ ProjectData.E_CONTRACT_CONDITION ]
+                if e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_NO_DAYOFF:
+                    self.ui.qtWorkingDayRadioButton.setChecked( True )
+                    self.ui.qtNoDayOffRadioButton.setChecked( True )
+                elif e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_ONE_DAYOFF:
+                    self.ui.qtWorkingDayRadioButton.setChecked( True )
+                    self.ui.qtOneDayOffRadioButton.setChecked( True )
+                elif e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_TWO_DAYOFF:
+                    self.ui.qtWorkingDayRadioButton.setChecked( True )
+                    self.ui.qtTwoDayOffRadioButton.setChecked( True )
+                elif e_contract_condition == ScheduleCount.ContractCondition.CALENDAR_DAY:
+                    self.ui.qtCalendarDayRadioButton.setChecked( True )
+                elif e_contract_condition == ScheduleCount.ContractCondition.FIXED_DEADLINE:
+                    self.ui.qtFixedDeadlineRadioButton.setChecked( True )
+
             self.dict_variable_weather_condition_data = dict_single_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
             self.dict_variable_human_condition_data = dict_single_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
             self.dict_project_holiday_data = dict_single_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
         else:
+            self.ui.qtBidDateEdit.setDate( self.obj_current_date.date() )
+            self.ui.qtStartDateEdit.setDate( self.obj_current_date.date() )
+            self.ui.qtContractFinishDateEdit.setDate( self.obj_current_date.date() )
             self.ui.qtProjectNumberLineEdit.setEnabled( True ) 
-
             self.dict_variable_weather_condition_data = { ScheduleCount.WeatherCondition.MORNING_RAIN :            ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                           ScheduleCount.WeatherCondition.AFTERNOON_RAIN :          ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                           ScheduleCount.WeatherCondition.MORNING_HEAVYRAIN :       ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
@@ -342,7 +367,6 @@ class CreateProjectDialog( QDialog ):
                                                           ScheduleCount.WeatherCondition.AFTERNOON_MUDDY :         ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                           ScheduleCount.WeatherCondition.MORNING_WEATHER_OTHER :   ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                           ScheduleCount.WeatherCondition.AFTERNOON_WEATHER_OTHER : ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF }
-
             self.dict_variable_human_condition_data = { ScheduleCount.HumanCondition.MORNING_SUSPENSION :    ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                         ScheduleCount.HumanCondition.AFTERNOON_SUSPENSION :  ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                         ScheduleCount.HumanCondition.MORNING_POWER_OFF :     ScheduleCount.VariableConditionNoCount.COUNT_HALF_DAY_OFF,
@@ -352,7 +376,7 @@ class CreateProjectDialog( QDialog ):
             self.dict_project_holiday_data = {}
         
         self.dict_single_project_data = {}
-
+        self.update_weekday_text()
         self.compute_contract_finish_date()
 
     def load_stylesheet( self, file_path ):
@@ -410,10 +434,8 @@ class CreateProjectDialog( QDialog ):
         list_const_workday = []
         dict_weather_related_holiday = {}
         dict_extend_data = {}
-        dict_holiday_reason = {}
 
         e_contract_condition = self.get_contract_condition()
-            
         f_expect_total_workdays = self.ui.qtContractWorkingDaysDoubleSpinBox.value()
         obj_start_date = datetime.datetime.strptime( self.ui.qtStartDateEdit.date().toString( "yyyy-MM-dd" ), "%Y-%m-%d" )
 
@@ -454,6 +476,7 @@ class CreateProjectDialog( QDialog ):
         str_project_name = self.ui.qtProjectNameLineEdit.text()
         str_contract_number = self.ui.qtContractNumberLineEdit.text()
         str_project_location = self.ui.qtProjectLocationLineEdit.text()
+        f_contract_value = self.ui.qtContractValueSpinBox.value()
         str_owner = self.ui.qtOwnerLineEdit.text()
         str_supersior = self.ui.qtSupervisorLineEdit.text()
         str_designer = self.ui.qtDesignerLineEdit.text()
@@ -464,12 +487,12 @@ class CreateProjectDialog( QDialog ):
         e_contract_condition = self.get_contract_condition()
         f_contract_duration = self.ui.qtContractWorkingDaysDoubleSpinBox.value()
         str_contract_finish_date = self.ui.qtContractFinishDateEdit.date().toString( "yyyy-MM-dd" )
-
         
         self.dict_single_project_data[ str_project_number ] = Utility.create_project_data( str_project_number, 
                                                                                            str_project_name, 
                                                                                            str_contract_number,
                                                                                            str_project_location,
+                                                                                           f_contract_value,
                                                                                            str_owner,
                                                                                            str_supersior,
                                                                                            str_designer,
@@ -1388,6 +1411,7 @@ class MainWindow( QMainWindow ):
             dict_per_project_data[ "project_name" ] = value[ ProjectData.STR_PROJECT_NAME ]
             dict_per_project_data[ "contract_number" ] = value[ ProjectData.STR_CONTRACT_NUMBER ]
             dict_per_project_data[ "project_location" ] = value[ ProjectData.STR_PROJECT_LOCATION ]
+            dict_per_project_data[ "contract_value" ] = value[ ProjectData.I_CONTRACT_VALUE ]
             dict_per_project_data[ "owner" ] = value[ ProjectData.STR_OWNER ]
             dict_per_project_data[ "supervisor" ] = value[ ProjectData.STR_SUPERSIOR ]
             dict_per_project_data[ "designer" ] = value[ ProjectData.STR_DESIGNER ]
@@ -1484,6 +1508,7 @@ class MainWindow( QMainWindow ):
                                                                                                         value[ "project_name" ],
                                                                                                         value[ "contract_number" ],
                                                                                                         value[ "project_location" ],
+                                                                                                        value[ "contract_value" ],
                                                                                                         value[ "owner" ],
                                                                                                         value[ "supervisor" ],
                                                                                                         value[ "designer" ],

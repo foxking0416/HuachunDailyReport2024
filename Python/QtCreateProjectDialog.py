@@ -187,6 +187,7 @@ class Ui_Dialog(object):
 
         self.qtContractValueSpinBox = QSpinBox(Dialog)
         self.qtContractValueSpinBox.setObjectName(u"qtContractValueSpinBox")
+        self.qtContractValueSpinBox.setMaximum(999999999)
 
         self.horizontalLayout_7.addWidget(self.qtContractValueSpinBox)
 

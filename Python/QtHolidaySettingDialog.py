@@ -15,16 +15,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDateEdit, QDialog, QHBoxLayout,
-    QHeaderView, QLabel, QLineEdit, QPushButton,
-    QRadioButton, QSizePolicy, QTableView, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDateEdit, QDialog,
+    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
+    QPushButton, QRadioButton, QSizePolicy, QSpacerItem,
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(400, 653)
+        Dialog.resize(450, 653)
+        Dialog.setMinimumSize(QSize(450, 0))
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.qtImportFromMainDBPushButton = QPushButton(Dialog)
@@ -46,29 +47,64 @@ class Ui_Dialog(object):
 
         self.qtReasonLineEdit = QLineEdit(Dialog)
         self.qtReasonLineEdit.setObjectName(u"qtReasonLineEdit")
+        self.qtReasonLineEdit.setMinimumSize(QSize(125, 0))
 
         self.horizontalLayout.addWidget(self.qtReasonLineEdit)
+
+        self.qtHolidayRadioButton = QRadioButton(Dialog)
+        self.qtHolidayRadioButton.setObjectName(u"qtHolidayRadioButton")
+        self.qtHolidayRadioButton.setChecked(True)
+
+        self.horizontalLayout.addWidget(self.qtHolidayRadioButton)
+
+        self.qtWorkdayRadioButton = QRadioButton(Dialog)
+        self.qtWorkdayRadioButton.setObjectName(u"qtWorkdayRadioButton")
+
+        self.horizontalLayout.addWidget(self.qtWorkdayRadioButton)
+
+        self.qtAddPushButton = QPushButton(Dialog)
+        self.qtAddPushButton.setObjectName(u"qtAddPushButton")
+        self.qtAddPushButton.setMinimumSize(QSize(75, 0))
+
+        self.horizontalLayout.addWidget(self.qtAddPushButton)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.qtHolidayRadioButton = QRadioButton(Dialog)
-        self.qtHolidayRadioButton.setObjectName(u"qtHolidayRadioButton")
-        self.qtHolidayRadioButton.setChecked(True)
+        self.label_2 = QLabel(Dialog)
+        self.label_2.setObjectName(u"label_2")
 
-        self.horizontalLayout_2.addWidget(self.qtHolidayRadioButton)
+        self.horizontalLayout_2.addWidget(self.label_2)
 
-        self.qtWorkdayRadioButton = QRadioButton(Dialog)
-        self.qtWorkdayRadioButton.setObjectName(u"qtWorkdayRadioButton")
+        self.qtOrderComboBox = QComboBox(Dialog)
+        self.qtOrderComboBox.addItem("")
+        self.qtOrderComboBox.addItem("")
+        self.qtOrderComboBox.setObjectName(u"qtOrderComboBox")
+        self.qtOrderComboBox.setMinimumSize(QSize(80, 0))
 
-        self.horizontalLayout_2.addWidget(self.qtWorkdayRadioButton)
+        self.horizontalLayout_2.addWidget(self.qtOrderComboBox)
 
-        self.qtAddPushButton = QPushButton(Dialog)
-        self.qtAddPushButton.setObjectName(u"qtAddPushButton")
+        self.horizontalSpacer_2 = QSpacerItem(10, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_2.addWidget(self.qtAddPushButton)
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.label_3 = QLabel(Dialog)
+        self.label_3.setObjectName(u"label_3")
+
+        self.horizontalLayout_2.addWidget(self.label_3)
+
+        self.qtByYearComboBox = QComboBox(Dialog)
+        self.qtByYearComboBox.addItem("")
+        self.qtByYearComboBox.setObjectName(u"qtByYearComboBox")
+        self.qtByYearComboBox.setMinimumSize(QSize(80, 0))
+
+        self.horizontalLayout_2.addWidget(self.qtByYearComboBox)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -121,6 +157,13 @@ class Ui_Dialog(object):
         self.qtHolidayRadioButton.setText(QCoreApplication.translate("Dialog", u"\u653e\u5047", None))
         self.qtWorkdayRadioButton.setText(QCoreApplication.translate("Dialog", u"\u88dc\u73ed", None))
         self.qtAddPushButton.setText(QCoreApplication.translate("Dialog", u"\u65b0\u589e", None))
+        self.label_2.setText(QCoreApplication.translate("Dialog", u"\u9806\u5e8f", None))
+        self.qtOrderComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u7531\u65b0\u5230\u820a", None))
+        self.qtOrderComboBox.setItemText(1, QCoreApplication.translate("Dialog", u"\u7531\u820a\u5230\u65b0", None))
+
+        self.label_3.setText(QCoreApplication.translate("Dialog", u"\u5e74\u4efd", None))
+        self.qtByYearComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u5168\u90e8", None))
+
         self.qtExportFilePushButton.setText(QCoreApplication.translate("Dialog", u"\u532f\u51fa", None))
         self.qtImportFilePushButton.setText(QCoreApplication.translate("Dialog", u"\u532f\u5165", None))
         self.qtExitPushButton.setText(QCoreApplication.translate("Dialog", u"\u96e2\u958b", None))
