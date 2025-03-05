@@ -259,6 +259,12 @@ class Utility():
         else:
             return "(日)"
 
+    def get_concatenate_date_and_weekday_text( str_date ):
+        obj_date = datetime.datetime.strptime( str_date, "%Y-%m-%d" )
+        n_weekday = obj_date.weekday()
+        str_weekday = Utility.get_obj_datetime_weekday_text( n_weekday )
+        return str_date + " " + str_weekday
+
     def get_contract_condition_text( e_contract_condition ):
         if e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_NO_DAYOFF:
             return "工作天_無週休"
@@ -1003,7 +1009,7 @@ class MainWindow( QMainWindow ):
             self.progress_bar.setVisible( False )
         
         delegate = CenterIconDelegate()
-        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件','開工日期', '預期完工日', '編輯', '刪除' ]
+        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件', '開工日期', '契約工期', '預計完工日', '預計完工天數', '編輯', '刪除' ]
         self.project_data_model = QStandardItemModel( 0, 0 ) 
         self.project_data_model.setHorizontalHeaderLabels( self.list_project_list_table_horizontal_header )
         self.ui.qtProjectListTableView.setModel( self.project_data_model )
@@ -1126,59 +1132,27 @@ class MainWindow( QMainWindow ):
             self.refresh_project_list_table()
 
     def refresh_project_list_table( self ):
-        # [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件','開工日期', '編輯', '刪除' ]
+        # [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件', '開工日期', '契約工期', '預計完工日', '預計完工天數', '編輯', '刪除' ]
         list_vertical_labels = ["   "] * len( self.dict_all_project_data )
         for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
-            project_number_item = QStandardItem( key_project_number )
-            project_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            project_number_item.setFlags( project_number_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 0, project_number_item ) 
+            list_item_value = []
+            list_item_value.append( key_project_number ) #工程編號
+            list_item_value.append( value_dict_project_data[ ProjectData.STR_PROJECT_NAME ] ) #工程名稱
+            list_item_value.append( value_dict_project_data[ ProjectData.STR_CONTRACT_NUMBER ] ) #案號及契約號
+            list_item_value.append( value_dict_project_data[ ProjectData.STR_PROJECT_LOCATION ] ) #工程地點
+            list_item_value.append( value_dict_project_data[ ProjectData.STR_OWNER ] ) #業主
+            list_item_value.append( value_dict_project_data[ ProjectData.STR_DESIGNER ] ) #設計單位
+            list_item_value.append( Utility.get_contract_condition_text( value_dict_project_data[ ProjectData.E_CONTRACT_CONDITION ] ) ) #工期條件
+            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_START_DATE ] ) ) #開工日期
+            list_item_value.append( str( value_dict_project_data[ ProjectData.F_CONTRACT_DURATION ] ) ) #契約工期
+            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_CONTRACT_FINISH_DATE ] ) ) #預計完工日
 
-            str_project_name = value_dict_project_data[ ProjectData.STR_PROJECT_NAME ]
-            project_name_item = QStandardItem( str_project_name )
-            project_name_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            project_name_item.setFlags( project_name_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 1, project_name_item ) 
-
-            str_contract_number = value_dict_project_data[ ProjectData.STR_CONTRACT_NUMBER ]
-            contract_number_item = QStandardItem( str_contract_number )
-            contract_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            contract_number_item.setFlags( contract_number_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 2, contract_number_item ) 
-
-            str_project_location = value_dict_project_data[ ProjectData.STR_PROJECT_LOCATION ]
-            project_location_item = QStandardItem( str_project_location )
-            project_location_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            project_location_item.setFlags( project_location_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 3, project_location_item ) 
-
-            str_owner = value_dict_project_data[ ProjectData.STR_OWNER ]
-            owner_item = QStandardItem( str_owner )
-            owner_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            owner_item.setFlags( owner_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 4, owner_item ) 
-
-            str_designer = value_dict_project_data[ ProjectData.STR_DESIGNER ]
-            designer_item = QStandardItem( str_designer )
-            designer_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            designer_item.setFlags( designer_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 5, designer_item ) 
-
-            str_condition = Utility.get_contract_condition_text( value_dict_project_data[ ProjectData.E_CONTRACT_CONDITION ] )
-            contract_condition_item = QStandardItem( str_condition )
-            contract_condition_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            contract_condition_item.setFlags( contract_condition_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 6, contract_condition_item ) 
-
-            str_start_date = value_dict_project_data[ ProjectData.STR_START_DATE ]
-            obj_start_date = datetime.datetime.strptime( str_start_date, "%Y-%m-%d" )
-            n_start_weekday = obj_start_date.weekday()
-            str_start_weekday = Utility.get_obj_datetime_weekday_text( n_start_weekday )
-
-            start_date_item = QStandardItem( str_start_date + " " + str_start_weekday )
-            start_date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            start_date_item.setFlags( start_date_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, 7, start_date_item ) 
+            for index_column, str_item_value in enumerate( list_item_value ):
+                item = QStandardItem( str_item_value )
+                item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+                item.setFlags( item.flags() & ~Qt.ItemIsEditable )
+                self.project_data_model.setItem( index_row, index_column, item )
+            
 
             edit_icon_item = QStandardItem("")
             edit_icon_item.setIcon( edit_icon )
@@ -1345,7 +1319,6 @@ class MainWindow( QMainWindow ):
         dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ project_number ]
         for key in sorted( dict_per_project_dailyreport_data.keys() ):
             dict_per_project_dailyreport_data[ key ] = dict_per_project_dailyreport_data.pop( key )
-        pass
 
     def save_UI_state( self ): 
         # 確保目錄存在，若不存在則遞歸創建
