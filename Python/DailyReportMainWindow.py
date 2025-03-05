@@ -137,7 +137,7 @@ class ProjectData( Enum ):
     STR_PROJECT_NAME = auto()
     STR_CONTRACT_NUMBER = auto() #合約號碼
     STR_PROJECT_LOCATION = auto()
-    I_CONTRACT_VALUE = auto() #合約金額
+    N_CONTRACT_VALUE = auto() #合約金額
     STR_OWNER = auto() #業主
     STR_SUPERSIOR = auto() #監造
     STR_DESIGNER = auto() #設計
@@ -147,10 +147,19 @@ class ProjectData( Enum ):
     E_CONTRACT_CONDITION = auto() #工期條件
     F_INITIAL_CONTRACT_WORKING_DAYS = auto() #契約工期
     STR_INITIAL_CONTRACT_FINISH_DATE = auto() #合約完工日期
-    I_INITIAL_CONTRACT_CALENDAR_DAYS = auto() #合約日曆天數
+    N_INITIAL_CONTRACT_CALENDAR_DAYS = auto() #合約日曆天數
     DICT_HOLIDAY_DATA = auto() #專案假日資料
     DICT_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
     DICT_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
+
+class Weekday( Enum ):
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
 
 class DailyReportData( Enum ):
     STR_DATE = 0
@@ -258,7 +267,7 @@ class Utility():
         dict_per_project_data[ ProjectData.STR_PROJECT_NAME ] = str_project_name
         dict_per_project_data[ ProjectData.STR_CONTRACT_NUMBER ] = str_contract_number
         dict_per_project_data[ ProjectData.STR_PROJECT_LOCATION ] = str_project_location
-        dict_per_project_data[ ProjectData.I_CONTRACT_VALUE ] = i_contract_value
+        dict_per_project_data[ ProjectData.N_CONTRACT_VALUE ] = i_contract_value
         dict_per_project_data[ ProjectData.STR_OWNER ] = str_owner
         dict_per_project_data[ ProjectData.STR_SUPERSIOR ] = str_supersior
         dict_per_project_data[ ProjectData.STR_DESIGNER ] = str_designer
@@ -335,6 +344,63 @@ class Utility():
         else:
             return ""
 
+    def get_is_work_day( list_const_holiday, list_const_workday, obj_date, e_contract_condition, ret_b_is_weekend, ret_b_is_holiday, ret_b_is_makeup_workday ):
+        ret_b_is_weekend[0] = False
+        ret_b_is_holiday[0] = False
+        ret_b_is_makeup_workday[0] = False
+        n_weekday = obj_date.weekday()
+        if n_weekday == Weekday.SUNDAY.value:
+            if ( e_contract_condition == ContractCondition.WORKING_DAY_ONE_DAYOFF or 
+                 e_contract_condition == ContractCondition.WORKING_DAY_TWO_DAYOFF ):
+                if obj_date in list_const_workday:
+                    ret_b_is_makeup_workday[0] = True
+                    return True
+                else:
+                    ret_b_is_weekend[0] = True
+                    return False
+            elif obj_date in list_const_holiday:
+                ret_b_is_holiday[0] = True
+                return False
+            else:
+                return True
+        elif n_weekday == Weekday.SATURDAY.value:
+            if e_contract_condition == ContractCondition.WORKING_DAY_TWO_DAYOFF:
+                if obj_date in list_const_workday:
+                    ret_b_is_makeup_workday[0] = True
+                    return True
+                else:
+                    ret_b_is_weekend[0] = True
+                    return False
+            elif obj_date in list_const_holiday:
+                ret_b_is_holiday[0] = True
+                return False
+            else:
+                return True
+        else:
+            if obj_date in list_const_holiday:
+                ret_b_is_holiday[0] = True
+                return False
+            else:
+                return True
+        
+    def get_expect_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, list_const_holiday, list_const_workday ):
+        obj_expect_end_date = obj_start_date
+        while( True ):
+            
+            b_is_weekend = [False]
+            b_is_holiday = [False]
+            b_is_make_up_workday = [False]
+            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_expect_end_date, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+                n_expect_total_workdays -= 1
+            if( n_expect_total_workdays <= 0 ):
+                break
+            obj_expect_end_date += datetime.timedelta( days = 1 )
+        obj_return_value = {}
+        obj_return_value[ 'ExpectFinishDate' ] = obj_expect_end_date
+        obj_return_value[ 'ExpectTotalCalendarDays' ] = ( obj_expect_end_date - obj_start_date ).days + 1
+
+        return obj_return_value
+
 class CreateProjectDialog( QDialog ):
     def __init__( self, parent, dict_global_holiday_data, b_edit_mode, dict_single_project_data ):
         super().__init__( parent )
@@ -378,7 +444,7 @@ class CreateProjectDialog( QDialog ):
             self.ui.qtSupervisorLineEdit.setText( dict_single_project_data[ ProjectData.STR_SUPERSIOR ] )
             self.ui.qtDesignerLineEdit.setText( dict_single_project_data[ ProjectData.STR_DESIGNER ] )
             self.ui.qtContractorLineEdit.setText( dict_single_project_data[ ProjectData.STR_CONTRACTOR ] )
-            self.ui.qtContractValueSpinBox.setValue( dict_single_project_data[ ProjectData.I_CONTRACT_VALUE ] )
+            self.ui.qtContractValueSpinBox.setValue( dict_single_project_data[ ProjectData.N_CONTRACT_VALUE ] )
             with ( QSignalBlocker( self.ui.qtBidDateEdit ),
                    QSignalBlocker( self.ui.qtStartDateEdit ),
                    QSignalBlocker( self.ui.qtWorkingDayRadioButton ),
@@ -1441,7 +1507,7 @@ class MainWindow( QMainWindow ):
             dict_per_project_data[ "project_name" ] = value[ ProjectData.STR_PROJECT_NAME ]
             dict_per_project_data[ "contract_number" ] = value[ ProjectData.STR_CONTRACT_NUMBER ]
             dict_per_project_data[ "project_location" ] = value[ ProjectData.STR_PROJECT_LOCATION ]
-            dict_per_project_data[ "contract_value" ] = value[ ProjectData.I_CONTRACT_VALUE ]
+            dict_per_project_data[ "contract_value" ] = value[ ProjectData.N_CONTRACT_VALUE ]
             dict_per_project_data[ "owner" ] = value[ ProjectData.STR_OWNER ]
             dict_per_project_data[ "supervisor" ] = value[ ProjectData.STR_SUPERSIOR ]
             dict_per_project_data[ "designer" ] = value[ ProjectData.STR_DESIGNER ]
