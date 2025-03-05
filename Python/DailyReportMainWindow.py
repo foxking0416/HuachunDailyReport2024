@@ -255,6 +255,20 @@ class Utility():
         else:
             return "(日)"
 
+    def get_contract_condition_text( e_contract_condition ):
+        if e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_NO_DAYOFF:
+            return "工作天_無週休"
+        elif e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_ONE_DAYOFF:
+            return "工作天_週休一日"
+        elif e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_TWO_DAYOFF:
+            return "工作天_週休二日"
+        elif e_contract_condition == ScheduleCount.ContractCondition.CALENDAR_DAY:
+            return "日曆天"
+        elif e_contract_condition == ScheduleCount.ContractCondition.FIXED_DEADLINE:
+            return "限期完工"
+        else:
+            return ""
+
 class CreateProjectDialog( QDialog ):
     def __init__( self, parent, dict_global_holiday_data, b_edit_mode, dict_single_project_data ):
         super().__init__( parent )
@@ -925,6 +939,7 @@ class MainWindow( QMainWindow ):
         self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
         self.global_project_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_project_file )
         self.global_dialyreport_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_dailyreport_file )
+        self.UISetting_file_path = os.path.join( g_data_dir, 'DailyReport', 'UISetting.config' )
 
         if not b_unit_test:
             self.progress_bar = QProgressBar( self )
@@ -933,21 +948,25 @@ class MainWindow( QMainWindow ):
             self.progress_bar.setVisible( False )
         
         delegate = CenterIconDelegate()
-        self.project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點','工期條件','開工日期', '編輯', '刪除' ]
+        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件','開工日期', '編輯', '刪除' ]
         self.project_data_model = QStandardItemModel( 0, 0 ) 
-        self.project_data_model.setHorizontalHeaderLabels( self.project_list_table_horizontal_header )
+        self.project_data_model.setHorizontalHeaderLabels( self.list_project_list_table_horizontal_header )
         self.ui.qtProjectListTableView.setModel( self.project_data_model )
         self.ui.qtProjectListTableView.setItemDelegate( delegate )
-        # self.ui.qtProjectListTableView.verticalHeader().hide()
+        self.ui.qtProjectListTableView.horizontalHeader().sectionResized.connect( self.on_project_list_table_horizontal_section_resized )
+        self.ui.qtProjectListTableView.verticalHeader().setSectionsMovable( True )
+        self.ui.qtProjectListTableView.verticalHeader().sectionMoved.connect( self.on_project_list_table_vertical_header_section_moved )
+        self.ui.qtProjectListTableView.verticalHeader().sectionClicked.connect( self.on_project_list_table_vertical_section_clicked )
         self.ui.qtProjectListTableView.clicked.connect( lambda index: self.on_project_list_table_item_clicked( index, self.project_data_model ) )
         self.pick_up_project( None )
 
-        self.dailyreport_list_table_horizontal_header = [ '日期', '上午天氣', '下午天氣', '上午人為', '下午人為','工期總計','開工迄今天數', '編輯', '刪除' ]
+        self.list_dailyreport_list_table_horizontal_header = [ '日期', '上午天氣', '下午天氣', '上午人為', '下午人為','工期總計','開工迄今天數', '編輯', '刪除' ]
         self.dailyreport_data_model = QStandardItemModel( 0, 0 ) 
-        self.dailyreport_data_model.setHorizontalHeaderLabels( self.dailyreport_list_table_horizontal_header )
+        self.dailyreport_data_model.setHorizontalHeaderLabels( self.list_dailyreport_list_table_horizontal_header )
         self.ui.qtDailyReportListTableView.setModel( self.dailyreport_data_model )
         self.ui.qtDailyReportListTableView.setItemDelegate( delegate )
         self.ui.qtDailyReportListTableView.verticalHeader().hide()
+        self.ui.qtDailyReportListTableView.horizontalHeader().sectionResized.connect( self.on_dailyreport_list_table_horizontal_section_resized )
         self.ui.qtDailyReportListTableView.clicked.connect( lambda index: self.on_dailyreport_list_table_item_clicked( index, self.dailyreport_data_model ) )
 
         self.ui.qtMainHolidayDBSettingAction.triggered.connect( self.on_trigger_main_holiday_db_setting )
@@ -955,6 +974,14 @@ class MainWindow( QMainWindow ):
 
         self.ui.qtAddDailyReportPushButton.clicked.connect( self.on_add_daily_report_data_push_button_clicked )
 
+        self.list_project_list_column_width = [ 85 ] * len( self.list_project_list_table_horizontal_header )
+        self.list_project_list_column_width[ len( self.list_project_list_table_horizontal_header ) - 2 ] = 40
+        self.list_project_list_column_width[ len( self.list_project_list_table_horizontal_header ) - 1 ] = 40
+
+        self.list_dailyreport_list_column_width = [ 85 ] * len( self.list_dailyreport_list_table_horizontal_header )
+        self.list_dailyreport_list_column_width[ len( self.list_dailyreport_list_table_horizontal_header ) - 2 ] = 40
+        self.list_dailyreport_list_column_width[ len( self.list_dailyreport_list_table_horizontal_header ) - 1 ] = 40
+        
         self.str_picked_project_number = ""
         self.dict_global_holiday_data = {}
         self.dict_all_project_data = {}
@@ -1021,6 +1048,7 @@ class MainWindow( QMainWindow ):
     def load_initialize_data( self ):
         self.manual_load_global_holiday_data( self.global_holiday_file_path )
         self.manual_load_project_data( self.global_project_data_file_path )
+        self.load_UI_state()
         self.process_all_dailyreport_data()
         self.refresh_project_list_table()
 
@@ -1038,6 +1066,7 @@ class MainWindow( QMainWindow ):
             self.refresh_project_list_table()
 
     def refresh_project_list_table( self ):
+        # [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件','開工日期', '編輯', '刪除' ]
         list_vertical_labels = ["   "] * len( self.dict_all_project_data )
         for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
             project_number_item = QStandardItem( key_project_number )
@@ -1051,27 +1080,78 @@ class MainWindow( QMainWindow ):
             project_name_item.setFlags( project_name_item.flags() & ~Qt.ItemIsEditable )
             self.project_data_model.setItem( index_row, 1, project_name_item ) 
 
+            str_contract_number = value_dict_project_data[ ProjectData.STR_CONTRACT_NUMBER ]
+            contract_number_item = QStandardItem( str_contract_number )
+            contract_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            contract_number_item.setFlags( contract_number_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 2, contract_number_item ) 
+
+            str_project_location = value_dict_project_data[ ProjectData.STR_PROJECT_LOCATION ]
+            project_location_item = QStandardItem( str_project_location )
+            project_location_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            project_location_item.setFlags( project_location_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 3, project_location_item ) 
+
+            str_owner = value_dict_project_data[ ProjectData.STR_OWNER ]
+            owner_item = QStandardItem( str_owner )
+            owner_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            owner_item.setFlags( owner_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 4, owner_item ) 
+
+            str_designer = value_dict_project_data[ ProjectData.STR_DESIGNER ]
+            designer_item = QStandardItem( str_designer )
+            designer_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            designer_item.setFlags( designer_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 5, designer_item ) 
+
+            str_condition = Utility.get_contract_condition_text( value_dict_project_data[ ProjectData.E_CONTRACT_CONDITION ] )
+            contract_condition_item = QStandardItem( str_condition )
+            contract_condition_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            contract_condition_item.setFlags( contract_condition_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 6, contract_condition_item ) 
+
             edit_icon_item = QStandardItem("")
             edit_icon_item.setIcon( edit_icon )
             edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, len( self.project_list_table_horizontal_header ) - 2, edit_icon_item ) 
+            self.project_data_model.setItem( index_row, len( self.list_project_list_table_horizontal_header ) - 2, edit_icon_item ) 
 
             delete_icon_item = QStandardItem("")
             delete_icon_item.setIcon( delete_icon )
             delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
-            self.project_data_model.setItem( index_row, len( self.project_list_table_horizontal_header ) - 1, delete_icon_item ) 
+            self.project_data_model.setItem( index_row, len( self.list_project_list_table_horizontal_header ) - 1, delete_icon_item ) 
+        
+        for column in range( len( self.list_project_list_table_horizontal_header ) ):
+            if column < len( self.list_project_list_column_width ):
+                self.ui.qtProjectListTableView.setColumnWidth( column, self.list_project_list_column_width[ column ] )
+            else:
+                self.ui.qtProjectListTableView.setColumnWidth( column, 85 )
+                self.list_project_list_column_width.append( 85 )
+        
         self.project_data_model.setVerticalHeaderLabels( list_vertical_labels )
+
+    def on_project_list_table_horizontal_section_resized( self, n_logical_index, n_old_size, n_new_size ): 
+        self.list_project_list_column_width[ n_logical_index ] = n_new_size
+        self.save_UI_state()
+
+    def on_project_list_table_vertical_header_section_moved( self, n_logical_index, n_old_visual_index, n_new_visual_index ):
+        pass
+
+    def on_project_list_table_vertical_section_clicked( self, n_logical_index ):
+        pass
 
     def on_project_list_table_item_clicked( self, index, stock_list_model ):
         project_number_item = self.project_data_model.item( index.row(), 0 )
         str_project_number = project_number_item.text()
-        if index.column() == len( self.project_list_table_horizontal_header ) - 2:# edit
+        if index.column() == len( self.list_project_list_table_horizontal_header ) - 2:# edit
             dict_single_project_data = self.dict_all_project_data[ str_project_number ]
             edit_dialog = CreateProjectDialog( self, self.dict_global_holiday_data, True, dict_single_project_data )
             if edit_dialog.exec():
                 self.dict_all_project_data.update( edit_dialog.dict_single_project_data )
                 self.auto_save_project_data()
-        elif index.column() == len( self.project_list_table_horizontal_header ) - 1:# delete
+                self.refresh_project_list_table()
+                self.pick_up_project( str_project_number )
+                self.refresh_dailyreport_list_table()
+        elif index.column() == len( self.list_project_list_table_horizontal_header ) - 1:# delete
             result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆專案資料嗎?" )
             if result:
                 del self.dict_all_project_data[ str_project_number ]
@@ -1132,12 +1212,19 @@ class MainWindow( QMainWindow ):
             edit_icon_item = QStandardItem("")
             edit_icon_item.setIcon( edit_icon )
             edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, len( self.dailyreport_list_table_horizontal_header ) - 2, edit_icon_item ) 
+            self.dailyreport_data_model.setItem( index_row, len( self.list_dailyreport_list_table_horizontal_header ) - 2, edit_icon_item ) 
 
             delete_icon_item = QStandardItem("")
             delete_icon_item.setIcon( delete_icon )
             delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, len( self.dailyreport_list_table_horizontal_header ) - 1, delete_icon_item ) 
+            self.dailyreport_data_model.setItem( index_row, len( self.list_dailyreport_list_table_horizontal_header ) - 1, delete_icon_item ) 
+        
+        for column in range( len( self.list_dailyreport_list_table_horizontal_header ) ):
+            if column < len( self.list_dailyreport_list_column_width ):
+                self.ui.qtDailyReportListTableView.setColumnWidth( column, self.list_dailyreport_list_column_width[ column ] )
+            else:
+                self.ui.qtDailyReportListTableView.setColumnWidth( column, 85 )
+                self.list_dailyreport_list_column_width.append( 85 )
 
     def get_weather_text( self, e_weather ):
         if e_weather == ScheduleCount.Weather.SUN:
@@ -1165,6 +1252,10 @@ class MainWindow( QMainWindow ):
         elif e_human == ScheduleCount.Human.OTHER:
             return "其他"
 
+    def on_dailyreport_list_table_horizontal_section_resized( self, n_logical_index, n_old_size, n_new_size ): 
+        self.list_dailyreport_list_column_width[ n_logical_index ] = n_new_size
+        self.save_UI_state()
+
     def on_dailyreport_list_table_item_clicked( self, index, stock_list_model ):
         pass
 
@@ -1186,6 +1277,60 @@ class MainWindow( QMainWindow ):
         for key in sorted( dict_per_project_dailyreport_data.keys() ):
             dict_per_project_dailyreport_data[ key ] = dict_per_project_dailyreport_data.pop( key )
         pass
+
+    def save_UI_state( self ): 
+        # 確保目錄存在，若不存在則遞歸創建
+        os.makedirs( os.path.dirname( self.UISetting_file_path ), exist_ok = True )
+
+        with open( self.UISetting_file_path, 'w', encoding='utf-8' ) as f:
+            f.write( "版本," + 'v1.0.0' + '\n' )
+            f.write( "顯示排序," + str( self.ui.qtFromNewToOldAction.isChecked() ) + '\n' )
+            f.write( "年度顯示," + str( self.ui.qtADYearAction.isChecked() ) + '\n' )
+            f.write( "工程列表欄寬" )
+            for i in range( len( self.list_project_list_column_width ) ):
+                f.write( f",{ self.list_project_list_column_width[ i ] }" )
+            f.write( "\n" )
+            f.write( "日報列表欄寬" )
+            for i in range( len( self.list_dailyreport_list_column_width ) ):
+                f.write( f",{ self.list_dailyreport_list_column_width[ i ] }" )
+            f.write( "\n" )
+
+    def load_UI_state( self ): 
+        with ( QSignalBlocker( self.ui.qtFromNewToOldAction ),
+               QSignalBlocker( self.ui.qtFromOldToNewAction ), 
+               QSignalBlocker( self.ui.qtADYearAction ), 
+               QSignalBlocker( self.ui.qtROCYearAction )
+               ):
+
+            if os.path.exists( self.UISetting_file_path ):
+                with open( self.UISetting_file_path, 'r', encoding='utf-8' ) as f:
+                    data = f.readlines()
+                    for i, row in enumerate( data ):
+                        row = row.strip().split( ',' )
+                        if row[0] == "版本":
+                            continue
+                        elif row[0] == "顯示排序":
+                            if row[ 1 ] == 'True':
+                                self.ui.qtFromNewToOldAction.setChecked( True )
+                                self.ui.qtFromOldToNewAction.setChecked( False )
+                            else:
+                                self.ui.qtFromNewToOldAction.setChecked( False )
+                                self.ui.qtFromOldToNewAction.setChecked( True )
+                        elif row[0] == "年度顯示":
+                            if row[ 1 ] == 'True':
+                                self.ui.qtADYearAction.setChecked( True )
+                                self.ui.qtROCYearAction.setChecked( False )
+                            else:
+                                self.ui.qtADYearAction.setChecked( False )
+                                self.ui.qtROCYearAction.setChecked( True )
+                        elif row[0] == '工程列表欄寬':
+                            self.list_project_list_column_width = []
+                            for i in range( 1, len( row ) ):
+                                self.list_project_list_column_width.append( int( row[ i ] ) )
+                        elif row[0] == '日報列表欄寬':
+                            self.list_dailyreport_list_column_width = []
+                            for i in range( 1, len( row ) ):
+                                self.list_dailyreport_list_column_width.append( int( row[ i ] ) )
 
     def auto_save_project_data( self ): 
         self.manual_save_project_data( self.global_project_data_file_path )

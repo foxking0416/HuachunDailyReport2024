@@ -1,13 +1,13 @@
 v1.0.0
 {
-    "123": {
-        "project_name": "1",
-        "contract_number": "2",
-        "project_location": "3",
-        "owner": "4",
-        "supervisor": "5",
-        "designer": "6",
-        "contractor": "7",
+    "A123": {
+        "project_name": "復仇者聯盟總部興建工程",
+        "contract_number": "Avenger002",
+        "project_location": "曼哈頓 1st Street",
+        "owner": "神盾局",
+        "supervisor": "復仇者聯盟",
+        "designer": "東尼史塔克",
+        "contractor": "賈維斯",
         "bid_date": "2025-03-04",
         "start_date": "2025-03-04",
         "contract_condition": 1,
@@ -50,17 +50,17 @@ v1.0.0
             "afternoon_human_other": 1
         },
         "dailyreport_data": {
-            "2025-03-05": {
-                "morning_weather": 0,
-                "afternoon_weather": 0,
-                "morning_human": 0,
-                "afternoon_human": 0
-            },
             "2025-02-27": {
                 "morning_weather": 2,
                 "afternoon_weather": 1,
                 "morning_human": 1,
                 "afternoon_human": 1
+            },
+            "2025-03-05": {
+                "morning_weather": 0,
+                "afternoon_weather": 0,
+                "morning_human": 0,
+                "afternoon_human": 0
             },
             "2025-03-17": {
                 "morning_weather": 0,
