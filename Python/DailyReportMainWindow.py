@@ -145,8 +145,9 @@ class ProjectData( Enum ):
     STR_BID_DATE = auto() #決標日期
     STR_START_DATE = auto() #開工日期
     E_CONTRACT_CONDITION = auto() #工期條件
-    F_CONTRACT_DURATION = auto() #契約工期
-    STR_CONTRACT_FINISH_DATE = auto() #合約完工日期
+    F_INITIAL_CONTRACT_WORKING_DAYS = auto() #契約工期
+    STR_INITIAL_CONTRACT_FINISH_DATE = auto() #合約完工日期
+    I_INITIAL_CONTRACT_CALENDAR_DAYS = auto() #合約日曆天數
     DICT_HOLIDAY_DATA = auto() #專案假日資料
     DICT_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
     DICT_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
@@ -210,8 +211,8 @@ class Utility():
         dict_per_project_data[ ProjectData.STR_BID_DATE ] = str_bid_date
         dict_per_project_data[ ProjectData.STR_START_DATE ] = str_start_date
         dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ] = e_contract_condition
-        dict_per_project_data[ ProjectData.F_CONTRACT_DURATION ] = f_contract_duration
-        dict_per_project_data[ ProjectData.STR_CONTRACT_FINISH_DATE ] = str_contract_finish_date
+        dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ] = f_contract_duration
+        dict_per_project_data[ ProjectData.STR_INITIAL_CONTRACT_FINISH_DATE ] = str_contract_finish_date
         dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ] = dict_project_holiday_data
         dict_per_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ] = dict_variable_weather_condition_data
         dict_per_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ] = dict_variable_human_condition_data
@@ -335,8 +336,8 @@ class CreateProjectDialog( QDialog ):
                    QSignalBlocker( self.ui.qtContractFinishDateEdit ) ):
                 self.ui.qtBidDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_BID_DATE ], "%Y-%m-%d" ).date() )
                 self.ui.qtStartDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" ).date() )
-                self.ui.qtContractWorkingDaysDoubleSpinBox.setValue( dict_single_project_data[ ProjectData.F_CONTRACT_DURATION ] )
-                self.ui.qtContractFinishDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_CONTRACT_FINISH_DATE ], "%Y-%m-%d" ).date() )
+                self.ui.qtContractWorkingDaysDoubleSpinBox.setValue( dict_single_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ] )
+                self.ui.qtContractFinishDateEdit.setDate( datetime.datetime.strptime( dict_single_project_data[ ProjectData.STR_INITIAL_CONTRACT_FINISH_DATE ], "%Y-%m-%d" ).date() )
 
                 e_contract_condition = dict_single_project_data[ ProjectData.E_CONTRACT_CONDITION ]
                 if e_contract_condition == ScheduleCount.ContractCondition.WORKING_DAY_NO_DAYOFF:
@@ -421,17 +422,17 @@ class CreateProjectDialog( QDialog ):
             self.ui.qtWorkingDayGroupBox.setEnabled( True )
             self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( True )
             self.ui.qtContractFinishDateEdit.setEnabled( False )
-            self.ui.qtTotalDaysDoubleSpinBox.setEnabled( False )
+            self.ui.qtContractCalendarDaysDoubleSpinBox.setEnabled( False )
         elif self.ui.qtCalendarDayRadioButton.isChecked():
             self.ui.qtWorkingDayGroupBox.setEnabled( False )
             self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( True )
             self.ui.qtContractFinishDateEdit.setEnabled( False )
-            self.ui.qtTotalDaysDoubleSpinBox.setEnabled( False )
+            self.ui.qtContractCalendarDaysDoubleSpinBox.setEnabled( False )
         elif self.ui.qtFixedDeadlineRadioButton.isChecked():
             self.ui.qtWorkingDayGroupBox.setEnabled( False )
             self.ui.qtContractWorkingDaysDoubleSpinBox.setEnabled( False )
             self.ui.qtContractFinishDateEdit.setEnabled( True )
-            self.ui.qtTotalDaysDoubleSpinBox.setEnabled( False )
+            self.ui.qtContractCalendarDaysDoubleSpinBox.setEnabled( False )
 
     def compute_contract_finish_date( self ):
         self.update_ui()
@@ -1144,8 +1145,8 @@ class MainWindow( QMainWindow ):
             list_item_value.append( value_dict_project_data[ ProjectData.STR_DESIGNER ] ) #設計單位
             list_item_value.append( Utility.get_contract_condition_text( value_dict_project_data[ ProjectData.E_CONTRACT_CONDITION ] ) ) #工期條件
             list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_START_DATE ] ) ) #開工日期
-            list_item_value.append( str( value_dict_project_data[ ProjectData.F_CONTRACT_DURATION ] ) ) #契約工期
-            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_CONTRACT_FINISH_DATE ] ) ) #預計完工日
+            list_item_value.append( str( value_dict_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ] ) ) #契約工期
+            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_INITIAL_CONTRACT_FINISH_DATE ] ) ) #預計完工日
 
             for index_column, str_item_value in enumerate( list_item_value ):
                 item = QStandardItem( str_item_value )
@@ -1392,8 +1393,8 @@ class MainWindow( QMainWindow ):
             dict_per_project_data[ "bid_date" ] = value[ ProjectData.STR_BID_DATE ]
             dict_per_project_data[ "start_date" ] = value[ ProjectData.STR_START_DATE ]
             dict_per_project_data[ "contract_condition" ] = int( value[ ProjectData.E_CONTRACT_CONDITION ].value )
-            dict_per_project_data[ "contract_duration" ] = value[ ProjectData.F_CONTRACT_DURATION ]
-            dict_per_project_data[ "contract_finish_date" ] = value[ ProjectData.STR_CONTRACT_FINISH_DATE ]
+            dict_per_project_data[ "contract_working_days" ] = value[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
+            dict_per_project_data[ "contract_finish_date" ] = value[ ProjectData.STR_INITIAL_CONTRACT_FINISH_DATE ]
             dict_holiday_data = value[ ProjectData.DICT_HOLIDAY_DATA ]
             json_holiday_data = {}
             for key_holiday, value_holiday in dict_holiday_data.items():
@@ -1489,7 +1490,7 @@ class MainWindow( QMainWindow ):
                                                                                                         value[ "bid_date" ],
                                                                                                         value[ "start_date" ],
                                                                                                         ScheduleCount.ContractCondition( value[ "contract_condition" ] ),
-                                                                                                        value[ "contract_duration" ],
+                                                                                                        value[ "contract_working_days" ],
                                                                                                         value[ "contract_finish_date" ],
                                                                                                         dict_holiday_data,
                                                                                                         dict_weather_condition_data,

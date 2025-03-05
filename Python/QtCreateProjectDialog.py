@@ -440,14 +440,14 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_15.addWidget(self.label_13)
 
-        self.qtTotalDaysDoubleSpinBox = QDoubleSpinBox(Dialog)
-        self.qtTotalDaysDoubleSpinBox.setObjectName(u"qtTotalDaysDoubleSpinBox")
-        self.qtTotalDaysDoubleSpinBox.setDecimals(1)
-        self.qtTotalDaysDoubleSpinBox.setMinimum(1.000000000000000)
-        self.qtTotalDaysDoubleSpinBox.setMaximum(10000.000000000000000)
-        self.qtTotalDaysDoubleSpinBox.setValue(1.000000000000000)
+        self.qtContractCalendarDaysDoubleSpinBox = QDoubleSpinBox(Dialog)
+        self.qtContractCalendarDaysDoubleSpinBox.setObjectName(u"qtContractCalendarDaysDoubleSpinBox")
+        self.qtContractCalendarDaysDoubleSpinBox.setDecimals(1)
+        self.qtContractCalendarDaysDoubleSpinBox.setMinimum(1.000000000000000)
+        self.qtContractCalendarDaysDoubleSpinBox.setMaximum(10000.000000000000000)
+        self.qtContractCalendarDaysDoubleSpinBox.setValue(1.000000000000000)
 
-        self.horizontalLayout_15.addWidget(self.qtTotalDaysDoubleSpinBox)
+        self.horizontalLayout_15.addWidget(self.qtContractCalendarDaysDoubleSpinBox)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -524,10 +524,10 @@ class Ui_Dialog(object):
         self.qtVariableConditionSettingPushButton.setText(QCoreApplication.translate("Dialog", u"\u8b8a\u52d5\u56e0\u7d20\u8a2d\u5b9a(\u5929\u5019\u3001\u4eba\u70ba)", None))
         self.label_2.setText(QCoreApplication.translate("Dialog", u"\u958b\u5de5\u65e5\u671f", None))
         self.qtStartWeekdayLabel.setText(QCoreApplication.translate("Dialog", u"TextLabel", None))
-        self.label_3.setText(QCoreApplication.translate("Dialog", u"\u5951\u7d04\u5de5\u671f", None))
-        self.label_12.setText(QCoreApplication.translate("Dialog", u"\u5951\u7d04\u5b8c\u5de5\u65e5", None))
+        self.label_3.setText(QCoreApplication.translate("Dialog", u"\u5951\u7d04\u5de5\u4f5c\u5929\u6578", None))
+        self.label_12.setText(QCoreApplication.translate("Dialog", u"\u9810\u8a08\u5b8c\u5de5\u65e5", None))
         self.qtFinishWeekdayLabel.setText(QCoreApplication.translate("Dialog", u"TextLabel", None))
-        self.label_13.setText(QCoreApplication.translate("Dialog", u"\u5de5\u7a0b\u7e3d\u5929\u6578", None))
+        self.label_13.setText(QCoreApplication.translate("Dialog", u"\u9810\u8a08\u5b8c\u5de5\u65e5\u66c6\u5929\u6578", None))
         self.qtOkPushButton.setText(QCoreApplication.translate("Dialog", u"\u78ba\u5b9a", None))
         self.qtCancelPushButton.setText(QCoreApplication.translate("Dialog", u"\u53d6\u6d88", None))
     # retranslateUi

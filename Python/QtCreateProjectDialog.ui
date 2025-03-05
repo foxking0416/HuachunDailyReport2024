@@ -501,7 +501,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>契約工期</string>
+            <string>契約工作天數</string>
            </property>
           </widget>
          </item>
@@ -541,7 +541,7 @@
          <item>
           <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>契約完工日</string>
+            <string>預計完工日</string>
            </property>
           </widget>
          </item>
@@ -579,12 +579,12 @@
          <item>
           <widget class="QLabel" name="label_13">
            <property name="text">
-            <string>工程總天數</string>
+            <string>預計完工日曆天數</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="qtTotalDaysDoubleSpinBox">
+          <widget class="QDoubleSpinBox" name="qtContractCalendarDaysDoubleSpinBox">
            <property name="decimals">
             <number>1</number>
            </property>

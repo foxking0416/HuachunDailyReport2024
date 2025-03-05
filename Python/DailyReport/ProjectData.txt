@@ -12,7 +12,7 @@ v1.0.0
         "bid_date": "2022-03-04",
         "start_date": "2023-01-03",
         "contract_condition": 2,
-        "contract_duration": 100.0,
+        "contract_working_days": 100.0,
         "contract_finish_date": "2023-06-01",
         "holiday_data": {
             "2025-03-03": {
@@ -303,7 +303,7 @@ v1.0.0
         "bid_date": "2025-03-04",
         "start_date": "2025-03-04",
         "contract_condition": 1,
-        "contract_duration": 1.0,
+        "contract_working_days": 1.0,
         "contract_finish_date": "2025-03-04",
         "holiday_data": {},
         "weather_condition_data": {
