@@ -149,6 +149,13 @@ class ProjectData( Enum ):
     DICT_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
     DICT_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
 
+class DailyReportData( Enum ):
+    STR_DATE = 0
+    E_MORNING_WEATHER = auto()
+    E_AFTERNOON_WEATHER = auto()
+    E_MORNING_HUMAN = auto()
+    E_AFTERNOON_HUMAN = auto()
+
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
         # 获取单元格数据
@@ -213,6 +220,40 @@ class Utility():
     def is_valid_english_chinese_number_string( s ):
         pattern = r'^[a-zA-Z0-9_\-\u4e00-\u9fff]+$'  # 允許: 英文、數字、中文、_、-
         return bool( re.fullmatch( pattern, s ) )
+
+    def get_qt_weekday_text( n_weekday ):
+        if n_weekday == 0:
+            return "(日)"
+        elif n_weekday == 1:
+            return "(一)"
+        elif n_weekday == 2:    
+            return "(二)"
+        elif n_weekday == 3:
+            return "(三)"
+        elif n_weekday == 4:
+            return "(四)"
+        elif n_weekday == 5:
+            return "(五)"
+        elif n_weekday == 6:
+            return "(六)"
+        else:
+            return ""
+    
+    def get_obj_datetime_weekday_text( n_weekday ):
+        if n_weekday == 0:
+            return "(一)"
+        elif n_weekday == 1:
+            return "(二)"
+        elif n_weekday == 2:
+            return "(三)"
+        elif n_weekday == 3:
+            return "(四)"
+        elif n_weekday == 4:
+            return "(五)"
+        elif n_weekday == 5:
+            return "(六)"
+        else:
+            return "(日)"
 
 class CreateProjectDialog( QDialog ):
     def __init__( self, parent, dict_global_holiday_data, b_edit_mode, dict_single_project_data ):
@@ -308,29 +349,11 @@ class CreateProjectDialog( QDialog ):
             print(f"CSS 檔案 {file_path} 找不到")
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
-
-    def get_weekday_text( self, n_weekday ):
-        if n_weekday == 0:
-            return "(日)"
-        elif n_weekday == 1:
-            return "(一)"
-        elif n_weekday == 2:    
-            return "(二)"
-        elif n_weekday == 3:
-            return "(三)"
-        elif n_weekday == 4:
-            return "(四)"
-        elif n_weekday == 5:
-            return "(五)"
-        elif n_weekday == 6:
-            return "(六)"
-        else:
-            return ""
         
     def on_date_changed( self, qt_date_edit, qt_weekday_label ):
         obj_date = qt_date_edit.date()
         n_weekday = obj_date.dayOfWeek()
-        str_weekday = self.get_weekday_text( n_weekday )
+        str_weekday = Utility.get_qt_weekday_text( n_weekday )
         qt_weekday_label.setText( str_weekday )
 
     def update_weekday_text( self ):
@@ -825,7 +848,7 @@ class VariableConditionSettingDialog( QDialog ):
         self.reject()
 
 class DailyReportPerDayDialog( QDialog ):
-    def __init__( self, parent = None ):
+    def __init__( self, parent, dict_per_project_data, dict_per_project_dailyreport_data ):
         super().__init__( parent )
 
         self.ui = Ui_DailyReportPerDayDialog()
@@ -833,6 +856,16 @@ class DailyReportPerDayDialog( QDialog ):
         
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
+
+        obj_current_date = datetime.datetime.today()
+        self.ui.qtTodayDateEdit.setDate( obj_current_date.date() )
+        self.ui.qtTodayDateEdit.setCalendarPopup( True )
+
+        self.ui.qtOkPushButton.clicked.connect( self.accept_data )
+        self.ui.qtCancelPushButton.clicked.connect( self.cancel )
+
+        self.dict_all_project_data = dict_per_project_data
+        self.dict_all_project_dailyreport_data = dict_per_project_dailyreport_data
 
     def load_stylesheet( self, file_path ):
         try:
@@ -845,10 +878,18 @@ class DailyReportPerDayDialog( QDialog ):
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
     def accept_data( self ):
-        if True:
-            self.accept()
-        else:
-            self.reject()
+        e_morning_weather = ScheduleCount.Weather( self.ui.qtMorningWeatherComboBox.currentIndex() )
+        e_afternoon_weather = ScheduleCount.Weather( self.ui.qtAfternoonWeatherComboBox.currentIndex() )
+
+        e_morning_human = ScheduleCount.Human( self.ui.qtMorningHumanComboBox.currentIndex() )
+        e_afternoon_human = ScheduleCount.Human( self.ui.qtAfternoonHumanComboBox.currentIndex() )
+        str_today_date = self.ui.qtTodayDateEdit.date().toString( "yyyy-MM-dd" )
+        self.dict_all_project_dailyreport_data[ str_today_date ] = { DailyReportData.E_MORNING_WEATHER: e_morning_weather,
+                                                                     DailyReportData.E_AFTERNOON_WEATHER: e_afternoon_weather,
+                                                                     DailyReportData.E_MORNING_HUMAN: e_morning_human,
+                                                                     DailyReportData.E_AFTERNOON_HUMAN: e_afternoon_human}
+
+        self.accept()
     
     def cancel( self ):
         self.reject()
@@ -873,13 +914,18 @@ class MainWindow( QMainWindow ):
     def __init__( self, b_unit_test = False, 
                   str_UI_setting_file = 'UISetting.config',
                   str_global_holiday_file = 'GlobalHoliday.txt',
-                  str_global_project_file = 'ProjectData.txt'  ):
+                  str_global_project_file = 'ProjectData.txt',
+                  str_global_dailyreport_file = 'DailyReportData.txt' ):
         super( MainWindow, self ).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi( self )  # 設置 UI
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
         
+        self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
+        self.global_project_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_project_file )
+        self.global_dialyreport_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_dailyreport_file )
+
         if not b_unit_test:
             self.progress_bar = QProgressBar( self )
             self.progress_bar.setGeometry( 400, 350, 300, 25 )  # Adjust position and size as needed
@@ -892,19 +938,27 @@ class MainWindow( QMainWindow ):
         self.project_data_model.setHorizontalHeaderLabels( self.project_list_table_horizontal_header )
         self.ui.qtProjectListTableView.setModel( self.project_data_model )
         self.ui.qtProjectListTableView.setItemDelegate( delegate )
-        self.ui.qtProjectListTableView.verticalHeader().hide()
+        # self.ui.qtProjectListTableView.verticalHeader().hide()
         self.ui.qtProjectListTableView.clicked.connect( lambda index: self.on_project_list_table_item_clicked( index, self.project_data_model ) )
-        self.ui.qtAddDailyReportPushButton.clicked.connect( self.on_add_daily_report_data_push_button_clicked )
+        self.pick_up_project( None )
 
+        self.dailyreport_list_table_horizontal_header = [ '日期', '上午天氣', '下午天氣', '上午人為', '下午人為','工期總計','開工迄今天數', '編輯', '刪除' ]
+        self.dailyreport_data_model = QStandardItemModel( 0, 0 ) 
+        self.dailyreport_data_model.setHorizontalHeaderLabels( self.dailyreport_list_table_horizontal_header )
+        self.ui.qtDailyReportListTableView.setModel( self.dailyreport_data_model )
+        self.ui.qtDailyReportListTableView.setItemDelegate( delegate )
+        self.ui.qtDailyReportListTableView.verticalHeader().hide()
+        self.ui.qtDailyReportListTableView.clicked.connect( lambda index: self.on_dailyreport_list_table_item_clicked( index, self.dailyreport_data_model ) )
 
         self.ui.qtMainHolidayDBSettingAction.triggered.connect( self.on_trigger_main_holiday_db_setting )
         self.ui.qtCreateNewProjectAction.triggered.connect( self.on_trigger_create_new_project )
 
-        self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
-        self.global_project_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_project_file )
+        self.ui.qtAddDailyReportPushButton.clicked.connect( self.on_add_daily_report_data_push_button_clicked )
 
+        self.str_picked_project_number = ""
         self.dict_global_holiday_data = {}
         self.dict_all_project_data = {}
+        self.dict_all_project_dailyreport_data = {}
 
         self.load_stylesheet( styles_css_path )
         if b_unit_test:
@@ -978,9 +1032,12 @@ class MainWindow( QMainWindow ):
         dialog = CreateProjectDialog( self, self.dict_global_holiday_data, False, {} )
         if dialog.exec():
             self.dict_all_project_data.update( dialog.dict_single_project_data )
+            self.dict_all_project_dailyreport_data[ dialog.dict_single_project_data[ ProjectData.STR_PROJECT_NUMBER ] ] = {}
             self.auto_save_project_data()
+            self.refresh_project_list_table()
 
     def refresh_project_list_table( self ):
+        list_vertical_labels = ["   "] * len( self.dict_all_project_data )
         for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
             project_number_item = QStandardItem( key_project_number )
             project_number_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
@@ -1002,11 +1059,11 @@ class MainWindow( QMainWindow ):
             delete_icon_item.setIcon( delete_icon )
             delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
             self.project_data_model.setItem( index_row, len( self.project_list_table_horizontal_header ) - 1, delete_icon_item ) 
+        self.project_data_model.setVerticalHeaderLabels( list_vertical_labels )
 
     def on_project_list_table_item_clicked( self, index, stock_list_model ):
         project_number_item = self.project_data_model.item( index.row(), 0 )
         str_project_number = project_number_item.text()
-
         if index.column() == len( self.project_list_table_horizontal_header ) - 2:# edit
             dict_single_project_data = self.dict_all_project_data[ str_project_number ]
             edit_dialog = CreateProjectDialog( self, self.dict_global_holiday_data, True, dict_single_project_data )
@@ -1018,16 +1075,113 @@ class MainWindow( QMainWindow ):
             if result:
                 del self.dict_all_project_data[ str_project_number ]
                 self.project_data_model.removeRow( index.row() )
+        else:
+            if str_project_number != self.str_picked_project_number:
+                self.pick_up_project( str_project_number )
+                self.refresh_dailyreport_list_table()
+
+    def pick_up_project( self, str_project_number ):
+        self.str_picked_project_number = str_project_number
+        if str_project_number is not None:
+            str_stock_name = 'Test'# self.dict_all_project_data[ str_project_number ][ 0 ]
+            self.ui.qtCurrentSelectProjectLabel.setText( f"目前選擇專案：{ str_project_number } { str_stock_name }" )
+            self.ui.qtCurrentSelectProjectLabel.setStyleSheet("color: yellow; ")
+        else:
+            self.ui.qtCurrentSelectProjectLabel.setText( "" )
+
+    def refresh_dailyreport_list_table( self ):
+        dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
+        
+        for index_row,( key_date, value_dict_dailyreport_data ) in enumerate( dict_per_project_dailyreport_data.items() ):
+
+            obj_date = datetime.datetime.strptime( key_date, "%Y-%m-%d" )
+            n_weekday = obj_date.weekday()
+            str_weekday = Utility.get_obj_datetime_weekday_text( n_weekday )
+
+            date_item = QStandardItem( key_date + " " + str_weekday )
+            date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, 0, date_item ) 
+
+            e_morning_weather = value_dict_dailyreport_data[ DailyReportData.E_MORNING_WEATHER ]
+            e_afternoon_weather = value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_WEATHER ]
+            e_morning_human = value_dict_dailyreport_data[ DailyReportData.E_MORNING_HUMAN ]
+            e_afternoon_human = value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_HUMAN ]
+
+            morning_weather_item = QStandardItem( self.get_weather_text( e_morning_weather ) )
+            morning_weather_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            morning_weather_item.setFlags( morning_weather_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, 1, morning_weather_item ) 
+
+            afternoon_weather_item = QStandardItem( self.get_weather_text( e_afternoon_weather ) )
+            afternoon_weather_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            afternoon_weather_item.setFlags( afternoon_weather_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, 2, afternoon_weather_item ) 
+
+            morning_human_item = QStandardItem( self.get_human_text( e_morning_human ) )
+            morning_human_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            morning_human_item.setFlags( morning_human_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, 3, morning_human_item ) 
+
+            afternoon_human_item = QStandardItem( self.get_human_text( e_afternoon_human ) )
+            afternoon_human_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            afternoon_human_item.setFlags( afternoon_human_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, 4, afternoon_human_item ) 
+
+            edit_icon_item = QStandardItem("")
+            edit_icon_item.setIcon( edit_icon )
+            edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, len( self.dailyreport_list_table_horizontal_header ) - 2, edit_icon_item ) 
+
+            delete_icon_item = QStandardItem("")
+            delete_icon_item.setIcon( delete_icon )
+            delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.dailyreport_data_model.setItem( index_row, len( self.dailyreport_list_table_horizontal_header ) - 1, delete_icon_item ) 
+
+    def get_weather_text( self, e_weather ):
+        if e_weather == ScheduleCount.Weather.SUN:
+            return "晴"
+        elif e_weather == ScheduleCount.Weather.RAIN:
+            return "雨"
+        elif e_weather == ScheduleCount.Weather.HEAVY_RAIN:
+            return "豪雨"
+        elif e_weather == ScheduleCount.Weather.TYPHOON:
+            return "颱風"
+        elif e_weather == ScheduleCount.Weather.HOT:
+            return "酷熱"
+        elif e_weather == ScheduleCount.Weather.MUDDY:
+            return "泥濘"
+        elif e_weather == ScheduleCount.Weather.OTHER:
+            return "其他"
+
+    def get_human_text( self, e_human ):
+        if e_human == ScheduleCount.Human.NONE:
+            return "無"
+        elif e_human == ScheduleCount.Human.SUSPENSION:
+            return "停工"
+        elif e_human == ScheduleCount.Human.POWER_OFF:
+            return "停電"
+        elif e_human == ScheduleCount.Human.OTHER:
+            return "其他"
+
+    def on_dailyreport_list_table_item_clicked( self, index, stock_list_model ):
+        pass
 
     def on_add_daily_report_data_push_button_clicked( self ):
-        pass
+        dict_per_project_data = self.dict_all_project_data[ self.str_picked_project_number ]
+        dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
+
+        dialog = DailyReportPerDayDialog( self, dict_per_project_data, dict_per_project_dailyreport_data )
+        if dialog.exec():
+            self.auto_save_project_data()
+            self.refresh_dailyreport_list_table()
 
     def auto_save_project_data( self ): 
         self.manual_save_project_data( self.global_project_data_file_path )
 
     def manual_save_project_data( self, file_path ): 
         export_json_data = {}
-        for key, value in self.dict_all_project_data.items():
+        for key_project_number, value in self.dict_all_project_data.items():
             dict_per_project_data = {}
             dict_per_project_data[ "project_name" ] = value[ ProjectData.STR_PROJECT_NAME ]
             dict_per_project_data[ "contract_number" ] = value[ ProjectData.STR_CONTRACT_NUMBER ]
@@ -1073,7 +1227,16 @@ class MainWindow( QMainWindow ):
             export_json_human_condition_data[ "afternoon_human_other" ]     = int( dict_human_condition_data[ ScheduleCount.HumanCondition.AFTERNOON_HUMAN_OTHER].value )
             dict_per_project_data[ "human_condition_data" ] = export_json_human_condition_data
             
-            export_json_data[ key ] = dict_per_project_data
+            export_json_dailyreport_data = {}
+            dict_daily_report = self.dict_all_project_dailyreport_data[ key_project_number ]
+            for key_date, value_dailyreport_data in dict_daily_report.items():
+                export_json_dailyreport_data[ key_date ] = { "morning_weather": int( value_dailyreport_data[ DailyReportData.E_MORNING_WEATHER ].value ),
+                                                             "afternoon_weather": int( value_dailyreport_data[ DailyReportData.E_AFTERNOON_WEATHER ].value ),
+                                                             "morning_human": int( value_dailyreport_data[ DailyReportData.E_MORNING_HUMAN ].value ),
+                                                             "afternoon_human": int( value_dailyreport_data[ DailyReportData.E_AFTERNOON_HUMAN ].value ) }
+            dict_per_project_data[ "dailyreport_data" ] = export_json_dailyreport_data
+
+            export_json_data[ key_project_number ] = dict_per_project_data
 
         with open( file_path, 'w', encoding='utf-8' ) as f:
             f.write( "v1.0.0" '\n' )
@@ -1131,7 +1294,15 @@ class MainWindow( QMainWindow ):
                                                                                                         dict_holiday_data,
                                                                                                         dict_weather_condition_data,
                                                                                                         dict_human_condition_data )
-                        pass
+                        export_json_dailyreport_data = {}
+                        import_json_daily_report = value[ "dailyreport_data" ]
+                        for key_date, value_dailyreport_data in import_json_daily_report.items():
+                            export_json_dailyreport_data[ key_date ] = { DailyReportData.E_MORNING_WEATHER : ScheduleCount.Weather( value_dailyreport_data[ "morning_weather" ] ),
+                                                                         DailyReportData.E_AFTERNOON_WEATHER : ScheduleCount.Weather( value_dailyreport_data[ "afternoon_weather" ] ),
+                                                                         DailyReportData.E_MORNING_HUMAN : ScheduleCount.Human( value_dailyreport_data[ "morning_human" ] ),
+                                                                         DailyReportData.E_AFTERNOON_HUMAN : ScheduleCount.Human( value_dailyreport_data[ "afternoon_human" ] ) }
+
+                        self.dict_all_project_dailyreport_data[ key_project_number ] = export_json_dailyreport_data
         except FileNotFoundError:
             print(f"檔案 {file_path} 找不到")
 

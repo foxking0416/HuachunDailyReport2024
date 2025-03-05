@@ -16,25 +16,25 @@ class ContractCondition( Enum ):
 
 class WeatherCondition( Enum ):
     MORNING_RAIN = 0
-    AFTERNOON_RAIN = auto()
-    MORNING_HEAVYRAIN = auto()
-    AFTERNOON_HEAVYRAIN = auto()
-    MORNING_TYPHOON = auto()
-    AFTERNOON_TYPHOON = auto()
-    MORNING_HOT = auto()
-    AFTERNOON_HOT = auto()
-    MORNING_MUDDY = auto()
-    AFTERNOON_MUDDY = auto()
-    MORNING_WEATHER_OTHER = auto()
-    AFTERNOON_WEATHER_OTHER = auto()
+    AFTERNOON_RAIN = 1
+    MORNING_HEAVYRAIN = 2
+    AFTERNOON_HEAVYRAIN = 3
+    MORNING_TYPHOON = 4
+    AFTERNOON_TYPHOON = 5
+    MORNING_HOT = 6
+    AFTERNOON_HOT = 7
+    MORNING_MUDDY = 8
+    AFTERNOON_MUDDY = 9
+    MORNING_WEATHER_OTHER = 10
+    AFTERNOON_WEATHER_OTHER = 11
 
 class HumanCondition( Enum ):
     MORNING_SUSPENSION = 0
-    AFTERNOON_SUSPENSION = auto()
-    MORNING_POWER_OFF = auto()
-    AFTERNOON_POWER_OFF = auto()
-    MORNING_HUMAN_OTHER = auto()
-    AFTERNOON_HUMAN_OTHER = auto()
+    AFTERNOON_SUSPENSION = 1
+    MORNING_POWER_OFF = 2
+    AFTERNOON_POWER_OFF = 3
+    MORNING_HUMAN_OTHER = 4
+    AFTERNOON_HUMAN_OTHER = 5
 
 class VariableConditionNoCount( Enum ):
     COUNT_ONE_DAY_OFF = 0
@@ -46,7 +46,7 @@ class SyspendWork(IntEnum):
     SUSPEND_WORK = 1
     TOTAL = 2
 
-class Weather(IntEnum):
+class Weather( Enum ):
     SUN = 0
     RAIN = 1
     HEAVY_RAIN = 2
@@ -56,13 +56,14 @@ class Weather(IntEnum):
     OTHER = 6
     TOTAL = 7
 
-class Human(IntEnum):
+class Human( Enum ):
     NONE = 0
-    POWER_OFF = 1
-    OTHER = 2
-    TOTAL = 3
+    SUSPENSION = 1
+    POWER_OFF = 2
+    OTHER = 3
+    TOTAL = 4
 
-class Weekday(Enum):
+class Weekday( Enum ):
     MONDAY = 0
     TUESDAY = 1
     WEDNESDAY = 2

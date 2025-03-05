@@ -24,7 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_13"/>
+      <widget class="QLineEdit" name="qtProjectNumberLineEdit"/>
      </item>
      <item>
       <widget class="QLabel" name="label_21">
@@ -34,7 +34,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_14"/>
+      <widget class="QLineEdit" name="qtProjectNameLineEdit"/>
      </item>
      <item>
       <widget class="QGroupBox" name="groupBox">
@@ -50,7 +50,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QComboBox" name="qtMorningWeatherComboBox">
           <item>
            <property name="text">
             <string>晴</string>
@@ -96,7 +96,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_2">
+         <widget class="QComboBox" name="qtAfternoonWeatherComboBox">
           <item>
            <property name="text">
             <string>晴</string>
@@ -151,7 +151,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_3">
+         <widget class="QComboBox" name="qtMorningHumanComboBox">
+          <item>
+           <property name="text">
+            <string>無</string>
+           </property>
+          </item>
           <item>
            <property name="text">
             <string>停工</string>
@@ -177,7 +182,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_4">
+         <widget class="QComboBox" name="qtAfternoonHumanComboBox">
+          <item>
+           <property name="text">
+            <string>無</string>
+           </property>
+          </item>
           <item>
            <property name="text">
             <string>停工</string>
@@ -210,7 +220,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDateEdit" name="dateEdit_4"/>
+      <widget class="QDateEdit" name="qtTodayDateEdit"/>
      </item>
      <item>
       <widget class="QLabel" name="label_11">
@@ -234,7 +244,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDateEdit" name="dateEdit_3"/>
+      <widget class="QDateEdit" name="qtStartDateEdit"/>
      </item>
      <item>
       <widget class="QLabel" name="label_18">
@@ -414,25 +424,22 @@
     <widget class="QTextEdit" name="textEdit"/>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_2">
-     <property name="text">
-      <string>儲存</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton_3">
-     <property name="text">
-      <string>回前一頁</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>回首頁</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QPushButton" name="qtOkPushButton">
+       <property name="text">
+        <string>確認</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="qtCancelPushButton">
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

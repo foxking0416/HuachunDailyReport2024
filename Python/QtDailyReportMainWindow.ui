@@ -41,7 +41,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="qtCurrentSelectProjectLabel">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -148,6 +148,26 @@
   <action name="qtCreateNewProjectAction">
    <property name="text">
     <string>新增工程資料</string>
+   </property>
+  </action>
+  <action name="qtEditProjectAction">
+   <property name="text">
+    <string>修改現有工程資料</string>
+   </property>
+  </action>
+  <action name="qtSelectProjectAction">
+   <property name="text">
+    <string>選取工程</string>
+   </property>
+  </action>
+  <action name="qtCreateNewDailyReportAction">
+   <property name="text">
+    <string>新增日報表</string>
+   </property>
+  </action>
+  <action name="qtEditDailyReportAction">
+   <property name="text">
+    <string>修改現有日報表</string>
    </property>
   </action>
   <action name="qtCheckDailyReportAction">

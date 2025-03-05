@@ -34,20 +34,20 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_5.addWidget(self.label_20)
 
-        self.lineEdit_13 = QLineEdit(Dialog)
-        self.lineEdit_13.setObjectName(u"lineEdit_13")
+        self.qtProjectNumberLineEdit = QLineEdit(Dialog)
+        self.qtProjectNumberLineEdit.setObjectName(u"qtProjectNumberLineEdit")
 
-        self.horizontalLayout_5.addWidget(self.lineEdit_13)
+        self.horizontalLayout_5.addWidget(self.qtProjectNumberLineEdit)
 
         self.label_21 = QLabel(Dialog)
         self.label_21.setObjectName(u"label_21")
 
         self.horizontalLayout_5.addWidget(self.label_21)
 
-        self.lineEdit_14 = QLineEdit(Dialog)
-        self.lineEdit_14.setObjectName(u"lineEdit_14")
+        self.qtProjectNameLineEdit = QLineEdit(Dialog)
+        self.qtProjectNameLineEdit.setObjectName(u"qtProjectNameLineEdit")
 
-        self.horizontalLayout_5.addWidget(self.lineEdit_14)
+        self.horizontalLayout_5.addWidget(self.qtProjectNameLineEdit)
 
         self.groupBox = QGroupBox(Dialog)
         self.groupBox.setObjectName(u"groupBox")
@@ -58,34 +58,34 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_6.addWidget(self.label_22)
 
-        self.comboBox = QComboBox(self.groupBox)
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.setObjectName(u"comboBox")
+        self.qtMorningWeatherComboBox = QComboBox(self.groupBox)
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.addItem("")
+        self.qtMorningWeatherComboBox.setObjectName(u"qtMorningWeatherComboBox")
 
-        self.horizontalLayout_6.addWidget(self.comboBox)
+        self.horizontalLayout_6.addWidget(self.qtMorningWeatherComboBox)
 
         self.label_23 = QLabel(self.groupBox)
         self.label_23.setObjectName(u"label_23")
 
         self.horizontalLayout_6.addWidget(self.label_23)
 
-        self.comboBox_2 = QComboBox(self.groupBox)
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.addItem("")
-        self.comboBox_2.setObjectName(u"comboBox_2")
+        self.qtAfternoonWeatherComboBox = QComboBox(self.groupBox)
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.addItem("")
+        self.qtAfternoonWeatherComboBox.setObjectName(u"qtAfternoonWeatherComboBox")
 
-        self.horizontalLayout_6.addWidget(self.comboBox_2)
+        self.horizontalLayout_6.addWidget(self.qtAfternoonWeatherComboBox)
 
 
         self.horizontalLayout_5.addWidget(self.groupBox)
@@ -99,26 +99,28 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_7.addWidget(self.label_24)
 
-        self.comboBox_3 = QComboBox(self.groupBox_2)
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.setObjectName(u"comboBox_3")
+        self.qtMorningHumanComboBox = QComboBox(self.groupBox_2)
+        self.qtMorningHumanComboBox.addItem("")
+        self.qtMorningHumanComboBox.addItem("")
+        self.qtMorningHumanComboBox.addItem("")
+        self.qtMorningHumanComboBox.addItem("")
+        self.qtMorningHumanComboBox.setObjectName(u"qtMorningHumanComboBox")
 
-        self.horizontalLayout_7.addWidget(self.comboBox_3)
+        self.horizontalLayout_7.addWidget(self.qtMorningHumanComboBox)
 
         self.label_25 = QLabel(self.groupBox_2)
         self.label_25.setObjectName(u"label_25")
 
         self.horizontalLayout_7.addWidget(self.label_25)
 
-        self.comboBox_4 = QComboBox(self.groupBox_2)
-        self.comboBox_4.addItem("")
-        self.comboBox_4.addItem("")
-        self.comboBox_4.addItem("")
-        self.comboBox_4.setObjectName(u"comboBox_4")
+        self.qtAfternoonHumanComboBox = QComboBox(self.groupBox_2)
+        self.qtAfternoonHumanComboBox.addItem("")
+        self.qtAfternoonHumanComboBox.addItem("")
+        self.qtAfternoonHumanComboBox.addItem("")
+        self.qtAfternoonHumanComboBox.addItem("")
+        self.qtAfternoonHumanComboBox.setObjectName(u"qtAfternoonHumanComboBox")
 
-        self.horizontalLayout_7.addWidget(self.comboBox_4)
+        self.horizontalLayout_7.addWidget(self.qtAfternoonHumanComboBox)
 
 
         self.horizontalLayout_5.addWidget(self.groupBox_2)
@@ -133,10 +135,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_4.addWidget(self.label_19)
 
-        self.dateEdit_4 = QDateEdit(Dialog)
-        self.dateEdit_4.setObjectName(u"dateEdit_4")
+        self.qtTodayDateEdit = QDateEdit(Dialog)
+        self.qtTodayDateEdit.setObjectName(u"qtTodayDateEdit")
 
-        self.horizontalLayout_4.addWidget(self.dateEdit_4)
+        self.horizontalLayout_4.addWidget(self.qtTodayDateEdit)
 
         self.label_11 = QLabel(Dialog)
         self.label_11.setObjectName(u"label_11")
@@ -153,10 +155,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_4.addWidget(self.label_17)
 
-        self.dateEdit_3 = QDateEdit(Dialog)
-        self.dateEdit_3.setObjectName(u"dateEdit_3")
+        self.qtStartDateEdit = QDateEdit(Dialog)
+        self.qtStartDateEdit.setObjectName(u"qtStartDateEdit")
 
-        self.horizontalLayout_4.addWidget(self.dateEdit_3)
+        self.horizontalLayout_4.addWidget(self.qtStartDateEdit)
 
         self.label_18 = QLabel(Dialog)
         self.label_18.setObjectName(u"label_18")
@@ -330,20 +332,20 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addWidget(self.textEdit)
 
-        self.pushButton_2 = QPushButton(Dialog)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.qtOkPushButton = QPushButton(Dialog)
+        self.qtOkPushButton.setObjectName(u"qtOkPushButton")
 
-        self.verticalLayout.addWidget(self.pushButton_2)
+        self.horizontalLayout_8.addWidget(self.qtOkPushButton)
 
-        self.pushButton_3 = QPushButton(Dialog)
-        self.pushButton_3.setObjectName(u"pushButton_3")
+        self.qtCancelPushButton = QPushButton(Dialog)
+        self.qtCancelPushButton.setObjectName(u"qtCancelPushButton")
 
-        self.verticalLayout.addWidget(self.pushButton_3)
+        self.horizontalLayout_8.addWidget(self.qtCancelPushButton)
 
-        self.pushButton = QPushButton(Dialog)
-        self.pushButton.setObjectName(u"pushButton")
 
-        self.verticalLayout.addWidget(self.pushButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_8)
 
 
         self.retranslateUi(Dialog)
@@ -357,33 +359,35 @@ class Ui_Dialog(object):
         self.label_21.setText(QCoreApplication.translate("Dialog", u"\u5de5\u7a0b\u540d\u7a31", None))
         self.groupBox.setTitle(QCoreApplication.translate("Dialog", u"\u5929\u6c23\u72c0\u6cc1", None))
         self.label_22.setText(QCoreApplication.translate("Dialog", u"\u4e0a\u5348", None))
-        self.comboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u6674", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("Dialog", u"\u96e8", None))
-        self.comboBox.setItemText(2, QCoreApplication.translate("Dialog", u"\u8c6a\u96e8", None))
-        self.comboBox.setItemText(3, QCoreApplication.translate("Dialog", u"\u98b1\u98a8", None))
-        self.comboBox.setItemText(4, QCoreApplication.translate("Dialog", u"\u9177\u71b1", None))
-        self.comboBox.setItemText(5, QCoreApplication.translate("Dialog", u"\u6ce5\u6fd8", None))
-        self.comboBox.setItemText(6, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
+        self.qtMorningWeatherComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u6674", None))
+        self.qtMorningWeatherComboBox.setItemText(1, QCoreApplication.translate("Dialog", u"\u96e8", None))
+        self.qtMorningWeatherComboBox.setItemText(2, QCoreApplication.translate("Dialog", u"\u8c6a\u96e8", None))
+        self.qtMorningWeatherComboBox.setItemText(3, QCoreApplication.translate("Dialog", u"\u98b1\u98a8", None))
+        self.qtMorningWeatherComboBox.setItemText(4, QCoreApplication.translate("Dialog", u"\u9177\u71b1", None))
+        self.qtMorningWeatherComboBox.setItemText(5, QCoreApplication.translate("Dialog", u"\u6ce5\u6fd8", None))
+        self.qtMorningWeatherComboBox.setItemText(6, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
 
         self.label_23.setText(QCoreApplication.translate("Dialog", u"\u4e0b\u5348", None))
-        self.comboBox_2.setItemText(0, QCoreApplication.translate("Dialog", u"\u6674", None))
-        self.comboBox_2.setItemText(1, QCoreApplication.translate("Dialog", u"\u96e8", None))
-        self.comboBox_2.setItemText(2, QCoreApplication.translate("Dialog", u"\u8c6a\u96e8", None))
-        self.comboBox_2.setItemText(3, QCoreApplication.translate("Dialog", u"\u98b1\u98a8", None))
-        self.comboBox_2.setItemText(4, QCoreApplication.translate("Dialog", u"\u9177\u71b1", None))
-        self.comboBox_2.setItemText(5, QCoreApplication.translate("Dialog", u"\u6ce5\u6fd8", None))
-        self.comboBox_2.setItemText(6, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
+        self.qtAfternoonWeatherComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u6674", None))
+        self.qtAfternoonWeatherComboBox.setItemText(1, QCoreApplication.translate("Dialog", u"\u96e8", None))
+        self.qtAfternoonWeatherComboBox.setItemText(2, QCoreApplication.translate("Dialog", u"\u8c6a\u96e8", None))
+        self.qtAfternoonWeatherComboBox.setItemText(3, QCoreApplication.translate("Dialog", u"\u98b1\u98a8", None))
+        self.qtAfternoonWeatherComboBox.setItemText(4, QCoreApplication.translate("Dialog", u"\u9177\u71b1", None))
+        self.qtAfternoonWeatherComboBox.setItemText(5, QCoreApplication.translate("Dialog", u"\u6ce5\u6fd8", None))
+        self.qtAfternoonWeatherComboBox.setItemText(6, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
 
         self.groupBox_2.setTitle(QCoreApplication.translate("Dialog", u"\u5176\u4ed6\u72c0\u6cc1", None))
         self.label_24.setText(QCoreApplication.translate("Dialog", u"\u4e0a\u5348", None))
-        self.comboBox_3.setItemText(0, QCoreApplication.translate("Dialog", u"\u505c\u5de5", None))
-        self.comboBox_3.setItemText(1, QCoreApplication.translate("Dialog", u"\u505c\u96fb", None))
-        self.comboBox_3.setItemText(2, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
+        self.qtMorningHumanComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u7121", None))
+        self.qtMorningHumanComboBox.setItemText(1, QCoreApplication.translate("Dialog", u"\u505c\u5de5", None))
+        self.qtMorningHumanComboBox.setItemText(2, QCoreApplication.translate("Dialog", u"\u505c\u96fb", None))
+        self.qtMorningHumanComboBox.setItemText(3, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
 
         self.label_25.setText(QCoreApplication.translate("Dialog", u"\u4e0b\u5348", None))
-        self.comboBox_4.setItemText(0, QCoreApplication.translate("Dialog", u"\u505c\u5de5", None))
-        self.comboBox_4.setItemText(1, QCoreApplication.translate("Dialog", u"\u505c\u96fb", None))
-        self.comboBox_4.setItemText(2, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
+        self.qtAfternoonHumanComboBox.setItemText(0, QCoreApplication.translate("Dialog", u"\u7121", None))
+        self.qtAfternoonHumanComboBox.setItemText(1, QCoreApplication.translate("Dialog", u"\u505c\u5de5", None))
+        self.qtAfternoonHumanComboBox.setItemText(2, QCoreApplication.translate("Dialog", u"\u505c\u96fb", None))
+        self.qtAfternoonHumanComboBox.setItemText(3, QCoreApplication.translate("Dialog", u"\u5176\u4ed6", None))
 
         self.label_19.setText(QCoreApplication.translate("Dialog", u"\u4eca\u65e5\u65e5\u671f", None))
         self.label_11.setText(QCoreApplication.translate("Dialog", u"\u5de5\u671f\u8a08\u7b97\u65b9\u5f0f\u70ba\uff1a", None))
@@ -404,8 +408,7 @@ class Ui_Dialog(object):
         self.label_4.setText(QCoreApplication.translate("Dialog", u"\u5269\u9918\u5de5\u671f", None))
         self.label_5.setText(QCoreApplication.translate("Dialog", u"\u5269\u9918\u5929\u6578", None))
         self.label_6.setText(QCoreApplication.translate("Dialog", u"\u903e\u671f\u5929\u6578", None))
-        self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"\u5132\u5b58", None))
-        self.pushButton_3.setText(QCoreApplication.translate("Dialog", u"\u56de\u524d\u4e00\u9801", None))
-        self.pushButton.setText(QCoreApplication.translate("Dialog", u"\u56de\u9996\u9801", None))
+        self.qtOkPushButton.setText(QCoreApplication.translate("Dialog", u"\u78ba\u8a8d", None))
+        self.qtCancelPushButton.setText(QCoreApplication.translate("Dialog", u"\u53d6\u6d88", None))
     # retranslateUi
 
