@@ -504,10 +504,9 @@ class HolidaySettingDialog( QDialog ):
 
         delegate = CenterIconDelegate()
 
-        self.list_table_horizontal_header = [ '日期', '星期', '理由', '放假/補班', '刪除' ]
+        self.list_table_horizontal_header = [ '日期', '理由', '放假/補班', '刪除' ]
         self.holiday_data_model = QStandardItemModel( 0, 0 ) 
         self.holiday_data_model.setHorizontalHeaderLabels( self.list_table_horizontal_header )
-        # self.holiday_data_model.setHorizontalHeaderLabels( self.get_trading_data_header() )
         self.ui.qtTableView.setModel( self.holiday_data_model )
         self.ui.qtTableView.setItemDelegate( delegate )
         self.ui.qtTableView.verticalHeader().hide()
@@ -515,6 +514,8 @@ class HolidaySettingDialog( QDialog ):
 
         self.ui.qtImportFromMainDBPushButton.clicked.connect( self.import_from_main_db_override )
         self.ui.qtAddPushButton.clicked.connect( self.add_data )
+        self.ui.qtExportFilePushButton.clicked.connect( self.on_export_push_button_clicked )
+        self.ui.qtImportFilePushButton.clicked.connect( self.on_import_push_button_clicked )
         self.ui.qtExitPushButton.clicked.connect( self.accept )
 
         self.dict_global_holiday_data = dict_global_holiday_data
@@ -523,11 +524,11 @@ class HolidaySettingDialog( QDialog ):
         if b_main_db:
             self.ui.qtImportFromMainDBPushButton.setVisible( False )
             self.setWindowTitle("主資料庫假日設定")
-            self.used_holiday_data = self.dict_global_holiday_data
+            self.dict_used_holiday_data = self.dict_global_holiday_data
         else:
             self.ui.qtImportFromMainDBPushButton.setVisible( True )
             self.setWindowTitle("專案假日設定")
-            self.used_holiday_data = self.dict_project_holiday_data
+            self.dict_used_holiday_data = self.dict_project_holiday_data
 
         self.refresh_table()
 
@@ -542,7 +543,7 @@ class HolidaySettingDialog( QDialog ):
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
     def import_from_main_db_override( self ):
-        self.used_holiday_data.update( self.dict_global_holiday_data )
+        self.dict_used_holiday_data.update( self.dict_global_holiday_data )
         self.refresh_table()
 
     def add_data( self ):
@@ -550,77 +551,56 @@ class HolidaySettingDialog( QDialog ):
         str_reason = self.ui.qtReasonLineEdit.text()
         b_holiday = self.ui.qtHolidayRadioButton.isChecked()
 
-        if str_date in self.used_holiday_data:
-            # TODO: show error message
+        if str_date in self.dict_used_holiday_data:
+            QMessageBox.warning( self, "警告", "該日期已經存在", QMessageBox.Ok )
             return
         else:
-            self.used_holiday_data[ str_date ] = {}
-            self.used_holiday_data[ str_date ][ ScheduleCount.HolidayData.REASON ] = str_reason
-            self.used_holiday_data[ str_date ][ ScheduleCount.HolidayData.HOLIDAY ] = b_holiday
+            self.dict_used_holiday_data[ str_date ] = {}
+            self.dict_used_holiday_data[ str_date ][ ScheduleCount.HolidayData.REASON ] = str_reason
+            self.dict_used_holiday_data[ str_date ][ ScheduleCount.HolidayData.HOLIDAY ] = b_holiday
+            self.process_data()
 
         self.refresh_table()
 
-    def on_table_item_clicked( self, index, stock_list_model ):
-        if index.column() == 4:
-            result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆假日/補班資料嗎?" )
-            if result:
-                # delete icon
-                date_item = self.holiday_data_model.item( index.row(), 0 )
-                str_date = date_item.text()
-                del self.used_holiday_data[ str_date ]
-                self.holiday_data_model.removeRow( index.row() )
-
     def refresh_table( self ):
-        for index_row,( key_date, value_dict_holiday_data ) in enumerate( self.used_holiday_data.items() ):
-            date_item = QStandardItem( key_date )
+        for index_row,( key_date, value_dict_holiday_data ) in enumerate( self.dict_used_holiday_data.items() ):
+            obj_date = datetime.datetime.strptime( key_date, "%Y-%m-%d" )
+            n_weekday = obj_date.weekday()
+            str_weekday = Utility.get_obj_datetime_weekday_text( n_weekday )
+            date_item = QStandardItem( key_date + " " + str_weekday )
             date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
             date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
-            # standard_item.setData( key_stock_number, Qt.UserRole )
             self.holiday_data_model.setItem( index_row, 0, date_item ) 
-
-            obj_date = datetime.datetime.strptime( key_date, "%Y-%m-%d")
-            n_weekday = obj_date.weekday()
-            if n_weekday == 0:
-                str_weekday = "(一)"
-            elif n_weekday == 1:
-                str_weekday = "(二)"
-            elif n_weekday == 2:
-                str_weekday = "(三)"
-            elif n_weekday == 3:
-                str_weekday = "(四)"
-            elif n_weekday == 4:
-                str_weekday = "(五)"
-            elif n_weekday == 5:
-                str_weekday = "(六)"
-            else:
-                str_weekday = "(日)"
-
-            weekday_item = QStandardItem( str_weekday )
-            weekday_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            weekday_item.setFlags( weekday_item.flags() & ~Qt.ItemIsEditable )
-            # standard_item.setData( key_stock_number, Qt.UserRole )
-            self.holiday_data_model.setItem( index_row, 1, weekday_item ) 
 
             reason_item = QStandardItem( value_dict_holiday_data[ ScheduleCount.HolidayData.REASON ] )
             reason_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
             reason_item.setFlags( reason_item.flags() & ~Qt.ItemIsEditable )
-            # standard_item.setData( key_stock_number, Qt.UserRole )
-            self.holiday_data_model.setItem( index_row, 2, reason_item ) 
+            self.holiday_data_model.setItem( index_row, 1, reason_item ) 
 
             if value_dict_holiday_data[ ScheduleCount.HolidayData.HOLIDAY ]:
                 is_holiday_item = QStandardItem( "放假" )
+                is_holiday_item.setForeground( QBrush( QBrush( '#FF0000' ) ) )
             else:
                 is_holiday_item = QStandardItem( "補班" )
+                is_holiday_item.setForeground( QBrush( QBrush( '#00AA00' ) ) )
             is_holiday_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
             is_holiday_item.setFlags( is_holiday_item.flags() & ~Qt.ItemIsEditable )
-            # standard_item.setData( key_stock_number, Qt.UserRole )
-            self.holiday_data_model.setItem( index_row, 3, is_holiday_item ) 
+            self.holiday_data_model.setItem( index_row, 2, is_holiday_item ) 
 
             delete_icon_item = QStandardItem("")
             delete_icon_item.setIcon( delete_icon )
             delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
-            # standard_item.setData( key_stock_number, Qt.UserRole )
-            self.holiday_data_model.setItem( index_row, 4, delete_icon_item ) 
+            self.holiday_data_model.setItem( index_row, len( self.list_table_horizontal_header ) - 1, delete_icon_item ) 
+
+    def on_table_item_clicked( self, index, stock_list_model ):
+        if index.column() == len( self.list_table_horizontal_header ) - 1:
+            result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆假日/補班資料嗎?" )
+            if result:
+                # delete icon
+                date_item = self.holiday_data_model.item( index.row(), 0 )
+                str_date = date_item.text().split(" ")[0]
+                del self.dict_used_holiday_data[ str_date ]
+                self.holiday_data_model.removeRow( index.row() )
 
     def show_warning_message_box_with_ok_cancel_button( self, str_title, str_message ): 
         message_box = QMessageBox( self )
@@ -638,7 +618,56 @@ class HolidaySettingDialog( QDialog ):
             return True
         elif message_box.clickedButton() == button_cancel:
             return False
-        
+
+    def open_load_json_file_dialog( self ): 
+        # 彈出讀取檔案對話框
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "匯入假日資料",     # 對話框標題
+            "",                # 預設路徑
+            "JSON (*.json);;"  # 檔案類型過濾
+        )
+        return file_path
+
+    def open_save_json_file_dialog( self ): 
+        # 彈出儲存檔案對話框
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "匯出假日資料",     # 對話框標題
+            "",                # 預設路徑
+            "JSON (*.json);;"  # 檔案類型過濾
+        )
+        return file_path 
+
+    def on_export_push_button_clicked( self ):
+        file_path = self.open_save_json_file_dialog()
+        if file_path:
+            dict_save_holiday_data = {}
+            for key, value in self.dict_used_holiday_data.items():
+                dict_save_holiday_data[ key ] = { "reason" : str( value[ ScheduleCount.HolidayData.REASON ] ), 
+                                                  "holiday" : bool( value[ ScheduleCount.HolidayData.HOLIDAY ] ) }
+
+            with open( file_path, 'w', encoding='utf-8' ) as f:
+                f.write( "v1.0.0" '\n' )
+                json.dump( dict_save_holiday_data, f, ensure_ascii=False, indent=4 )
+
+    def on_import_push_button_clicked( self ):
+        file_path = self.open_load_json_file_dialog()
+        if file_path:
+            with open( file_path, 'r', encoding='utf-8' ) as f:
+                str_version = f.readline().strip()
+                if str_version == "v1.0.0":
+                    dict_load_holiday_data = json.load( f )
+                    for key,value in dict_load_holiday_data.items():
+                        self.dict_used_holiday_data[ key ] = { ScheduleCount.HolidayData.REASON : value[ "reason" ], 
+                                                               ScheduleCount.HolidayData.HOLIDAY : value[ "holiday" ] }
+                self.process_data()
+            self.refresh_table()
+    
+    def process_data( self ):
+        for key in sorted( self.dict_used_holiday_data.keys() ):
+            self.dict_used_holiday_data[ key ] = self.dict_used_holiday_data.pop( key )
+
     def accept_data( self ):
         self.accept()
     
@@ -951,7 +980,7 @@ class MainWindow( QMainWindow ):
             self.progress_bar.setVisible( False )
         
         delegate = CenterIconDelegate()
-        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件','開工日期', '編輯', '刪除' ]
+        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件','開工日期', '預期完工日', '編輯', '刪除' ]
         self.project_data_model = QStandardItemModel( 0, 0 ) 
         self.project_data_model.setHorizontalHeaderLabels( self.list_project_list_table_horizontal_header )
         self.ui.qtProjectListTableView.setModel( self.project_data_model )
@@ -1118,6 +1147,16 @@ class MainWindow( QMainWindow ):
             contract_condition_item.setFlags( contract_condition_item.flags() & ~Qt.ItemIsEditable )
             self.project_data_model.setItem( index_row, 6, contract_condition_item ) 
 
+            str_start_date = value_dict_project_data[ ProjectData.STR_START_DATE ]
+            obj_start_date = datetime.datetime.strptime( str_start_date, "%Y-%m-%d" )
+            n_start_weekday = obj_start_date.weekday()
+            str_start_weekday = Utility.get_obj_datetime_weekday_text( n_start_weekday )
+
+            start_date_item = QStandardItem( str_start_date + " " + str_start_weekday )
+            start_date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            start_date_item.setFlags( start_date_item.flags() & ~Qt.ItemIsEditable )
+            self.project_data_model.setItem( index_row, 7, start_date_item ) 
+
             edit_icon_item = QStandardItem("")
             edit_icon_item.setIcon( edit_icon )
             edit_icon_item.setFlags( edit_icon_item.flags() & ~Qt.ItemIsEditable )
@@ -1182,7 +1221,6 @@ class MainWindow( QMainWindow ):
         dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
         
         for index_row,( key_date, value_dict_dailyreport_data ) in enumerate( dict_per_project_dailyreport_data.items() ):
-
             obj_date = datetime.datetime.strptime( key_date, "%Y-%m-%d" )
             n_weekday = obj_date.weekday()
             str_weekday = Utility.get_obj_datetime_weekday_text( n_weekday )
