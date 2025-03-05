@@ -1021,6 +1021,7 @@ class MainWindow( QMainWindow ):
     def load_initialize_data( self ):
         self.manual_load_global_holiday_data( self.global_holiday_file_path )
         self.manual_load_project_data( self.global_project_data_file_path )
+        self.process_all_dailyreport_data()
         self.refresh_project_list_table()
 
     def on_trigger_main_holiday_db_setting( self ):
@@ -1175,6 +1176,16 @@ class MainWindow( QMainWindow ):
         if dialog.exec():
             self.auto_save_project_data()
             self.refresh_dailyreport_list_table()
+
+    def process_all_dailyreport_data( self ): 
+        for key_project_number, value_dict_per_project_dailyreport_data in self.dict_all_project_dailyreport_data.items():
+            self.process_dailyreport_data( key_project_number )
+
+    def process_dailyreport_data( self, project_number ):
+        dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ project_number ]
+        for key in sorted( dict_per_project_dailyreport_data.keys() ):
+            dict_per_project_dailyreport_data[ key ] = dict_per_project_dailyreport_data.pop( key )
+        pass
 
     def auto_save_project_data( self ): 
         self.manual_save_project_data( self.global_project_data_file_path )
