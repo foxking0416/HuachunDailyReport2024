@@ -1,0 +1,111 @@
+v1.0.0
+{
+    "123": {
+        "project_name": "1",
+        "contract_number": "2",
+        "project_location": "3",
+        "owner": "4",
+        "supervisor": "5",
+        "designer": "6",
+        "contractor": "7",
+        "bid_date": "2025-03-04",
+        "start_date": "2025-03-04",
+        "contract_condition": 1,
+        "contract_duration": 1.0,
+        "contract_finish_date": "2025-03-04",
+        "holiday_data": {
+            "2025-02-19": {
+                "reason": "123",
+                "holiday": true
+            },
+            "2025-02-20": {
+                "reason": "134",
+                "holiday": false
+            },
+            "2025-03-03": {
+                "reason": "清明",
+                "holiday": true
+            }
+        },
+        "weather_condition_data": {
+            "morning_rain": 0,
+            "afternoon_rain": 1,
+            "morning_heavyrain": 1,
+            "afternoon_heavyrain": 1,
+            "morning_typhoon": 0,
+            "afternoon_typhoon": 1,
+            "morning_hot": 0,
+            "afternoon_hot": 1,
+            "morning_muddy": 1,
+            "afternoon_muddy": 1,
+            "morning_weather_other": 0,
+            "afternoon_weather_other": 1
+        },
+        "human_condition_data": {
+            "morning_suspension": 1,
+            "afternoon_suspension": 1,
+            "morning_poweroff": 1,
+            "afternoon_poweroff": 1,
+            "morning_human_other": 1,
+            "afternoon_human_other": 1
+        },
+        "dailyreport_data": {
+            "2025-03-05": {
+                "morning_weather": 0,
+                "afternoon_weather": 0,
+                "morning_human": 0,
+                "afternoon_human": 0
+            },
+            "2025-02-27": {
+                "morning_weather": 2,
+                "afternoon_weather": 1,
+                "morning_human": 1,
+                "afternoon_human": 1
+            },
+            "2025-03-17": {
+                "morning_weather": 0,
+                "afternoon_weather": 0,
+                "morning_human": 2,
+                "afternoon_human": 2
+            }
+        }
+    },
+    "456": {
+        "project_name": "2",
+        "contract_number": "3",
+        "project_location": "4",
+        "owner": "",
+        "supervisor": "",
+        "designer": "",
+        "contractor": "",
+        "bid_date": "2025-03-04",
+        "start_date": "2025-03-04",
+        "contract_condition": 1,
+        "contract_duration": 1.0,
+        "contract_finish_date": "2025-03-04",
+        "holiday_data": {},
+        "weather_condition_data": {
+            "morning_rain": 1,
+            "afternoon_rain": 1,
+            "morning_heavyrain": 1,
+            "afternoon_heavyrain": 1,
+            "morning_typhoon": 1,
+            "afternoon_typhoon": 1,
+            "morning_hot": 1,
+            "afternoon_hot": 1,
+            "morning_muddy": 1,
+            "afternoon_muddy": 1,
+            "morning_weather_other": 1,
+            "afternoon_weather_other": 1
+        },
+        "human_condition_data": {
+            "morning_suspension": 1,
+            "afternoon_suspension": 1,
+            "morning_poweroff": 1,
+            "afternoon_poweroff": 1,
+            "morning_human_other": 1,
+            "afternoon_human_other": 1
+        },
+        "dailyreport_data": {}
+    }
+}

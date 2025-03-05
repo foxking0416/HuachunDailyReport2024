@@ -1,0 +1,15 @@
+v1.0.0
+{
+    "2025-02-19": {
+        "reason": "123",
+        "holiday": true
+    },
+    "2025-02-20": {
+        "reason": "134",
+        "holiday": false
+    },
+    "2025-03-03": {
+        "reason": "清明",
+        "holiday": true
+    }
+}
