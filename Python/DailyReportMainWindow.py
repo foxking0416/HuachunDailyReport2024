@@ -22,7 +22,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QButtonGroup, 
                               QLabel, QLineEdit, QDialogButtonBox, QTabBar, QWidget, QTableView, QComboBox, QPushButton, QSizePolicy, QSpacerItem, QCheckBox, QDoubleSpinBox, \
                               QProgressBar, QTabWidget
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QIcon, QBrush
-from PySide6.QtCore import Qt, QModelIndex, QRect, QSignalBlocker, QSize, QThread, QObject, Signal
+from PySide6.QtCore import Qt, QModelIndex, QRect, QSignalBlocker, QSize, QThread, QObject, Signal, QSettings
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
@@ -102,6 +102,7 @@ print( "g_exe_dir :" + g_exe_dir ) #開發模式下是D:\_2.code\PythonStockPric
 print( "g_exe2_dir :" + g_exe2_dir ) #開發模式下是C:\Users\foxki\AppData\Local\Programs\Python\Python312 #打包模式後是:D:\_2.code\PythonStockPrice\dist
 print( "g_abs_dir :" + g_abs_dir ) #開發模式下是D:\_2.code\PythonStockPrice #打包模式後是C:\Users\foxki\AppData\Local\Temp\_MEI60962 最後那個資料夾是暫時性的隨機名稱
 
+reg_settings = QSettings( "FoxInfo", "DailyReport" )
 
 if getattr( sys, 'frozen', False ):
     # PyInstaller 打包後執行時
@@ -935,6 +936,8 @@ class MainWindow( QMainWindow ):
         self.ui.setupUi( self )  # 設置 UI
         window_icon = QIcon( window_icon_file_path ) 
         self.setWindowIcon( window_icon )
+        size = reg_settings.value( "window_size", QSize( 1250, 893 ) )
+        self.resize(size)
         
         self.global_holiday_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_holiday_file )
         self.global_project_data_file_path = os.path.join( g_data_dir, 'DailyReport', str_global_project_file )
@@ -1003,6 +1006,11 @@ class MainWindow( QMainWindow ):
             print(f"CSS 檔案 {file_path} 找不到")
         except Exception as e:
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
+
+    def closeEvent( self, event ):
+        """當視窗關閉時，儲存當前大小"""
+        reg_settings.setValue( "window_size", self.size() )
+        super().closeEvent( event )
 
     def initialize( self, b_unit_test, update_progress_callback ):
         self.setEnabled( False ) # 資料下載前先Disable整個視窗
