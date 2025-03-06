@@ -11,7 +11,6 @@ import copy
 import re
 from logging.handlers import TimedRotatingFileHandler
 import logging
-import ScheduleCount
 from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
 from QtCreateProjectDialog import Ui_Dialog as Ui_CreateProjectDialog
 from QtDailyReportPerDayDialog import Ui_Dialog as Ui_DailyReportPerDayDialog
@@ -223,6 +222,11 @@ class VariableConditionNoCount( Enum ):
     COUNT_HALF_DAY_OFF = 1
     COUNT_NO_DAY_OFF = 2
 
+class CountWorkingDay(Enum):
+    COUNT_ALL_DAY = 0
+    COUNT_HALF_DAY = 1
+    NO_COUNT = 2
+
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
         # 获取单元格数据
@@ -383,21 +387,111 @@ class Utility():
             else:
                 return True
         
-    def get_expect_finish_date( e_count_type, n_expect_total_workdays, obj_start_date, list_const_holiday, list_const_workday ):
+    def get_expect_finish_date( e_contract_condition, n_contract_working_days, obj_start_date, list_const_holiday, list_const_workday ):
         obj_expect_end_date = obj_start_date
         while( True ):
             
             b_is_weekend = [False]
             b_is_holiday = [False]
             b_is_make_up_workday = [False]
-            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_expect_end_date, e_count_type, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
-                n_expect_total_workdays -= 1
-            if( n_expect_total_workdays <= 0 ):
+            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_expect_end_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+                n_contract_working_days -= 1
+            if( n_contract_working_days <= 0 ):
                 break
             obj_expect_end_date += datetime.timedelta( days = 1 )
         obj_return_value = {}
         obj_return_value[ 'ExpectFinishDate' ] = obj_expect_end_date
         obj_return_value[ 'ExpectTotalCalendarDays' ] = ( obj_expect_end_date - obj_start_date ).days + 1
+
+        return obj_return_value
+
+    # e_count_type 工期計算方式 0:周休一日  1:周休二日  2:日曆天
+    # n_expect_total_workdays 工期天數
+    # obj_start_date 開工日，如 '2023-01-01'
+    # obj_today_date 今天日期，如 '2023-01-01'
+    # arr_const_holiday 固定因素放假日
+    # arr_const_workday 固定因素補班日
+    # dict_weather_and_human_related_holiday 因為天氣停工資料
+    # dict_extend_data 追加工期資料
+    def get_real_finish_date( e_contract_condition, 
+                              n_contract_working_days, 
+                              obj_start_date, 
+                              obj_today_date, 
+                              list_const_holiday, 
+                              list_const_workday, 
+                              dict_weather_and_human_related_holiday, 
+                              dict_extend_data ):
+        obj_real_end_date = obj_start_date 
+        obj_expect_end_date = obj_start_date
+        n_real_rest_workdays = n_contract_working_days
+        n_expect_rest_workdays = n_contract_working_days
+        n_past_workdays = 0
+        n_total_extend_days = 0
+
+        #讀入追加工期資料
+        for key, value in dict_extend_data.items():
+            obj_extend_start_date = key
+            if obj_today_date >= obj_extend_start_date:
+                n_total_extend_days += value
+
+        n_real_rest_workdays += n_total_extend_days
+
+        while( True ):
+            n_weekday = obj_real_end_date.weekday()
+
+            b_is_weekend = [False]
+            b_is_holiday = [False]
+            b_is_make_up_workday = [False]
+            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_real_end_date, n_weekday, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+                if obj_real_end_date <= obj_today_date:
+                    if obj_real_end_date in dict_weather_and_human_related_holiday:
+                        if dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
+                            pass
+                        elif dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.COUNT_HALF_DAY:
+                            n_past_workdays += 0.5
+                            n_real_rest_workdays -= 0.5
+                        else:
+                            n_past_workdays += 1
+                            n_real_rest_workdays -= 1
+                    else:
+                        n_past_workdays += 1
+                        n_real_rest_workdays -= 1#沒填日報表就當作一般晴天
+                else:
+                    n_real_rest_workdays -= 1#未來的日子還沒有日報表
+                n_expect_rest_workdays -= 1
+
+            if n_real_rest_workdays <= 0:
+                break
+
+            if n_expect_rest_workdays > 0:
+                obj_expect_end_date += datetime.timedelta( days = 1 )
+
+            obj_real_end_date += datetime.timedelta( days = 1 )
+
+        obj_return_value = {}
+        obj_return_value['ExpectFinishDate']        = obj_expect_end_date
+        obj_return_value['ExpectTotalCalendarDays'] = ( obj_expect_end_date - obj_start_date ).days + 1
+        obj_return_value['RealFinishDate']          = obj_real_end_date
+        obj_return_value['RealTotalCalendarDays']   = ( obj_real_end_date - obj_start_date ).days + 1
+        obj_return_value['FromStartCalendarDays']   = ( obj_today_date - obj_start_date ).days + 1
+        obj_return_value['FromStartWorkDays']       = n_past_workdays
+        obj_return_value['ExpectRestWorkDays']      = n_contract_working_days - n_past_workdays
+        obj_return_value['ExpectRestCalendarkDays'] = ( obj_expect_end_date - obj_today_date ).days
+        obj_return_value['RealRestWorkDays']        = n_contract_working_days + n_total_extend_days - n_past_workdays
+        obj_return_value['RealRestCalendarkDays']   = ( obj_real_end_date - obj_today_date ).days 
+        #契約工期         合約給定
+        #契約完工日       ExpectFinishDate
+        #契約天數         ExpectTotalCalendarDays
+
+        #開工迄今工作天數  FromStartWorkDays
+        #開工迄今日曆天數  FromStartCalendarDays
+        #變動完工日       RealFinishDate
+        #變動完工天數     RealTotalCalendarDays
+        #預計剩餘工期     ExpectRestWorkDays
+        #預計剩餘天數     ExpectRestCalendarkDays
+        #實際剩餘工期     RealRestWorkDays
+        #實際剩餘天數     RealRestCalendarkDays
+
 
         return obj_return_value
 
@@ -558,29 +652,26 @@ class CreateProjectDialog( QDialog ):
     def compute_contract_finish_date( self ):
         self.update_ui()
 
-        list_const_holiday = []
-        list_const_workday = []
-        dict_weather_related_holiday = {}
-        dict_extend_data = {}
-
         e_contract_condition = self.get_contract_condition()
-        f_expect_total_workdays = self.ui.qtContractWorkingDaysDoubleSpinBox.value()
+        f_contract_working_days = self.ui.qtContractWorkingDaysDoubleSpinBox.value()
         obj_start_date = datetime.datetime.strptime( self.ui.qtStartDateEdit.date().toString( "yyyy-MM-dd" ), "%Y-%m-%d" )
 
+        list_const_holiday = []
+        list_const_workday = []
         for key_str_date, value in self.dict_project_holiday_data.items():
             if value[ HolidayData.HOLIDAY ]:
                 list_const_holiday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
             else:
                 list_const_workday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
 
-        returnValue = ScheduleCount.func_count_real_finish_date( e_contract_condition, 
-                                                                 f_expect_total_workdays, 
-                                                                 obj_start_date, 
-                                                                 self.obj_current_date, 
-                                                                 list_const_holiday, 
-                                                                 list_const_workday, 
-                                                                 dict_weather_related_holiday, 
-                                                                 dict_extend_data )
+        returnValue = Utility.get_real_finish_date( e_contract_condition, 
+                                                    f_contract_working_days, 
+                                                    obj_start_date, 
+                                                    self.obj_current_date, 
+                                                    list_const_holiday, 
+                                                    list_const_workday, 
+                                                    {}, 
+                                                    {} )
         
         self.ui.qtContractCalendarDaysDoubleSpinBox.setValue( returnValue['ExpectTotalCalendarDays'] )
         self.ui.qtContractFinishDateEdit.setDate( returnValue['ExpectFinishDate'] )
