@@ -1343,7 +1343,6 @@ class ExtendWorkingDaysSettingDialog( QDialog ):
     def cancel( self ):
         self.reject()
 
-
 class DailyReportPerDayDialog( QDialog ):
     def __init__( self, parent, dict_per_project_data, dict_per_project_dailyreport_data ):
         super().__init__( parent )

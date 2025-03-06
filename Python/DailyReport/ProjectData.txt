@@ -13,10 +13,10 @@ v1.0.0
         "start_date": "2023-01-03",
         "contract_condition": 2,
         "contract_working_days": 100.0,
-        "contract_finish_date": "2023-06-01",
+        "contract_finish_date": "2023-05-31",
         "holiday_data": {
-            "2025-03-03": {
-                "reason": "清明",
+            "2023-01-01": {
+                "reason": "元旦",
                 "holiday": true
             },
             "2023-01-02": {
@@ -115,10 +115,6 @@ v1.0.0
                 "reason": "清明節",
                 "holiday": true
             },
-            "2023-05-01": {
-                "reason": "勞動節",
-                "holiday": true
-            },
             "2023-06-17": {
                 "reason": "端午補班",
                 "holiday": false
@@ -175,10 +171,6 @@ v1.0.0
                 "reason": "元旦",
                 "holiday": true
             },
-            "2024-02-03": {
-                "reason": "春節補班",
-                "holiday": false
-            },
             "2024-02-08": {
                 "reason": "春節",
                 "holiday": true
@@ -206,6 +198,10 @@ v1.0.0
             "2024-02-14": {
                 "reason": "春節",
                 "holiday": true
+            },
+            "2024-02-17": {
+                "reason": "春節補班",
+                "holiday": false
             },
             "2024-02-28": {
                 "reason": "228和平紀念日",
@@ -249,31 +245,39 @@ v1.0.0
             }
         },
         "weather_condition_data": {
-            "morning_rain": 0,
+            "morning_rain": 1,
             "afternoon_rain": 1,
-            "morning_heavyrain": 1,
+            "morning_heavyrain": 0,
             "afternoon_heavyrain": 1,
             "morning_typhoon": 0,
             "afternoon_typhoon": 1,
-            "morning_hot": 0,
-            "afternoon_hot": 1,
-            "morning_muddy": 1,
-            "afternoon_muddy": 1,
-            "morning_weather_other": 0,
-            "afternoon_weather_other": 1
+            "morning_hot": 2,
+            "afternoon_hot": 2,
+            "morning_muddy": 2,
+            "afternoon_muddy": 2,
+            "morning_weather_other": 2,
+            "afternoon_weather_other": 2
         },
         "human_condition_data": {
-            "morning_suspension": 1,
+            "morning_suspension": 0,
             "afternoon_suspension": 1,
-            "morning_poweroff": 1,
+            "morning_poweroff": 0,
             "afternoon_poweroff": 1,
             "morning_human_other": 1,
             "afternoon_human_other": 1
         },
         "extension_data": {
-            "2025-03-06": {
-                "extension_days": 100,
-                "reason": "變更設計"
+            "2023-03-14": {
+                "extension_days": 15,
+                "reason": "變更設計1"
+            },
+            "2023-04-01": {
+                "extension_days": 10,
+                "reason": "變更設計2"
+            },
+            "2023-07-01": {
+                "extension_days": 8,
+                "reason": "變更設計3"
             }
         },
         "dailyreport_data": {

@@ -235,6 +235,11 @@
     "holiday":false
   },
   {
+    "date":"2024-02-28",
+    "reason":"228和平紀念日",
+    "holiday":true
+  },
+  {
     "date":"2024-04-04",
     "reason":"清明",
     "holiday":true
