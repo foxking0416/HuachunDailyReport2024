@@ -150,8 +150,10 @@ class ProjectData( Enum ):
     STR_INITIAL_CONTRACT_FINISH_DATE = auto() #合約完工日期
     N_INITIAL_CONTRACT_CALENDAR_DAYS = auto() #合約日曆天數
     DICT_HOLIDAY_DATA = auto() #專案假日資料
-    DICT_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
-    DICT_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
+    DICT_MORNING_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
+    DICT_AFTERNOON_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
+    DICT_MORNING_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
+    DICT_AFTERNOON_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
     DICT_EXTENSION_DATA = auto() #追加工期資料
 
 class Weekday( Enum ):
@@ -177,15 +179,13 @@ class Weather( Enum ):
     TYPHOON = 3
     HOT = 4
     MUDDY = 5
-    OTHER = 6
-    TOTAL = 7
+    WEATHER_OTHER = 6
 
 class Human( Enum ):
     NONE = 0
     SUSPENSION = 1
     POWER_OFF = 2
-    OTHER = 3
-    TOTAL = 4
+    HUMAN_OTHER = 3
 
 class HolidayData( Enum ):
     REASON = 0
@@ -202,37 +202,10 @@ class ContractCondition( Enum ):
     CALENDAR_DAY = 3
     FIXED_DEADLINE = 4
 
-class WeatherCondition( Enum ):
-    MORNING_RAIN = 0
-    AFTERNOON_RAIN = 1
-    MORNING_HEAVYRAIN = 2
-    AFTERNOON_HEAVYRAIN = 3
-    MORNING_TYPHOON = 4
-    AFTERNOON_TYPHOON = 5
-    MORNING_HOT = 6
-    AFTERNOON_HOT = 7
-    MORNING_MUDDY = 8
-    AFTERNOON_MUDDY = 9
-    MORNING_WEATHER_OTHER = 10
-    AFTERNOON_WEATHER_OTHER = 11
-
-class HumanCondition( Enum ):
-    MORNING_SUSPENSION = 0
-    AFTERNOON_SUSPENSION = 1
-    MORNING_POWER_OFF = 2
-    AFTERNOON_POWER_OFF = 3
-    MORNING_HUMAN_OTHER = 4
-    AFTERNOON_HUMAN_OTHER = 5
-
 class VariableConditionNoCount( Enum ):
     COUNT_ONE_DAY_OFF = 0
     COUNT_HALF_DAY_OFF = 1
     COUNT_NO_DAY_OFF = 2
-
-class CountWorkingDay(Enum):
-    COUNT_ALL_DAY = 0
-    COUNT_HALF_DAY = 1
-    NO_COUNT = 2
 
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
@@ -271,8 +244,10 @@ class Utility():
                              f_contract_duration,
                              str_contract_finish_date,
                              dict_project_holiday_data,
-                             dict_variable_weather_condition_data, 
-                             dict_variable_human_condition_data,
+                             dict_morning_weather_condition_data,
+                             dict_afternoon_weather_condition_data,
+                             dict_morning_human_condition_data,
+                             dict_afternoon_human_condition_data,
                              dict_extension_data ):
         dict_per_project_data = {}
         dict_per_project_data[ ProjectData.STR_PROJECT_NUMBER ] = str_project_number
@@ -290,8 +265,10 @@ class Utility():
         dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ] = f_contract_duration
         dict_per_project_data[ ProjectData.STR_INITIAL_CONTRACT_FINISH_DATE ] = str_contract_finish_date
         dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ] = dict_project_holiday_data
-        dict_per_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ] = dict_variable_weather_condition_data
-        dict_per_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ] = dict_variable_human_condition_data
+        dict_per_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ] = dict_morning_weather_condition_data
+        dict_per_project_data[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ] = dict_afternoon_weather_condition_data
+        dict_per_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ] = dict_morning_human_condition_data
+        dict_per_project_data[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ] = dict_afternoon_human_condition_data
         dict_per_project_data[ ProjectData.DICT_EXTENSION_DATA ] = dict_extension_data
         return dict_per_project_data
 
@@ -657,8 +634,10 @@ class CreateProjectDialog( QDialog ):
                 elif e_contract_condition == ContractCondition.FIXED_DEADLINE:
                     self.ui.qtFixedDeadlineRadioButton.setChecked( True )
 
-            self.dict_variable_weather_condition_data = dict_single_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
-            self.dict_variable_human_condition_data = dict_single_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
+            self.dict_morning_weather_condition_data = dict_single_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
+            self.dict_afternoon_weather_condition_data = dict_single_project_data[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ]
+            self.dict_morning_human_condition_data = dict_single_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
+            self.dict_afternoon_human_condition_data = dict_single_project_data[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ]
             self.dict_project_holiday_data = dict_single_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
             self.dict_extension_data = dict_single_project_data[ ProjectData.DICT_EXTENSION_DATA ]
         else:
@@ -666,24 +645,24 @@ class CreateProjectDialog( QDialog ):
             self.ui.qtStartDateEdit.setDate( self.obj_current_date.date() )
             self.ui.qtContractFinishDateEdit.setDate( self.obj_current_date.date() )
             self.ui.qtProjectNumberLineEdit.setEnabled( True ) 
-            self.dict_variable_weather_condition_data = { WeatherCondition.MORNING_RAIN :            VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.AFTERNOON_RAIN :          VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.MORNING_HEAVYRAIN :       VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.AFTERNOON_HEAVYRAIN :     VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.MORNING_TYPHOON :         VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.AFTERNOON_TYPHOON :       VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.MORNING_HOT :             VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.AFTERNOON_HOT :           VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.MORNING_MUDDY :           VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.AFTERNOON_MUDDY :         VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.MORNING_WEATHER_OTHER :   VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                          WeatherCondition.AFTERNOON_WEATHER_OTHER : VariableConditionNoCount.COUNT_HALF_DAY_OFF }
-            self.dict_variable_human_condition_data = { HumanCondition.MORNING_SUSPENSION :    VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                        HumanCondition.AFTERNOON_SUSPENSION :  VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                        HumanCondition.MORNING_POWER_OFF :     VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                        HumanCondition.AFTERNOON_POWER_OFF :   VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                        HumanCondition.MORNING_HUMAN_OTHER :   VariableConditionNoCount.COUNT_HALF_DAY_OFF,
-                                                        HumanCondition.AFTERNOON_HUMAN_OTHER : VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+            self.dict_morning_weather_condition_data = { Weather.RAIN :          VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Weather.HEAVY_RAIN :    VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Weather.TYPHOON :       VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Weather.HOT :           VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Weather.MUDDY :         VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Weather.WEATHER_OTHER : VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+            self.dict_afternoon_weather_condition_data = { Weather.RAIN :          VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                           Weather.HEAVY_RAIN :    VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                           Weather.TYPHOON :       VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                           Weather.HOT :           VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                           Weather.MUDDY :         VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                           Weather.WEATHER_OTHER : VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+            self.dict_morning_human_condition_data = { Human.SUSPENSION :  VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                       Human.POWER_OFF :   VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                       Human.HUMAN_OTHER : VariableConditionNoCount.COUNT_HALF_DAY_OFF }
+            self.dict_afternoon_human_condition_data = { Human.SUSPENSION : VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Human.POWER_OFF :  VariableConditionNoCount.COUNT_HALF_DAY_OFF,
+                                                         Human.HUMAN_OTHER :VariableConditionNoCount.COUNT_HALF_DAY_OFF }
             self.dict_project_holiday_data = {}
             self.dict_extension_data = {}
         
@@ -718,7 +697,10 @@ class CreateProjectDialog( QDialog ):
             self.compute_contract_finish_date()
 
     def variable_condition_setting( self ):
-        dialog = VariableConditionSettingDialog( self, self.dict_variable_weather_condition_data, self.dict_variable_human_condition_data )
+        dialog = VariableConditionSettingDialog( self, self.dict_morning_weather_condition_data,
+                                                       self.dict_afternoon_weather_condition_data, 
+                                                       self.dict_morning_human_condition_data,
+                                                       self.dict_afternoon_human_condition_data )
         if dialog.exec():
             pass
     
@@ -818,8 +800,10 @@ class CreateProjectDialog( QDialog ):
                                                                                            f_contract_duration,
                                                                                            str_contract_finish_date,
                                                                                            self.dict_project_holiday_data,
-                                                                                           self.dict_variable_weather_condition_data, 
-                                                                                           self.dict_variable_human_condition_data,
+                                                                                           self.dict_morning_weather_condition_data,
+                                                                                           self.dict_afternoon_weather_condition_data,
+                                                                                           self.dict_morning_human_condition_data,
+                                                                                           self.dict_afternoon_human_condition_data,
                                                                                            self.dict_extension_data )
 
         self.accept()
@@ -1011,7 +995,10 @@ class HolidaySettingDialog( QDialog ):
         self.reject()
 
 class VariableConditionSettingDialog( QDialog ):
-    def __init__( self, parent, dict_variable_weather_condition_data, dict_variable_human_condition_data ):
+    def __init__( self, parent, dict_morning_weather_condition_data, 
+                                dict_afternoon_weather_condition_data,
+                                dict_morning_human_condition_data,
+                                dict_afternoon_human_condition_data ):
         super().__init__( parent )
 
         self.ui = Ui_VariableConditionSettingDialog()
@@ -1022,8 +1009,10 @@ class VariableConditionSettingDialog( QDialog ):
         self.ui.qtOkPushButton.clicked.connect( self.accept_data )
         self.ui.qtCancelPushButton.clicked.connect( self.cancel )
 
-        self.dict_variable_weather_condition_data = dict_variable_weather_condition_data
-        self.dict_variable_human_condition_data = dict_variable_human_condition_data
+        self.dict_morning_weather_condition_data = dict_morning_weather_condition_data
+        self.dict_afternoon_weather_condition_data = dict_afternoon_weather_condition_data
+        self.dict_morning_human_condition_data = dict_morning_human_condition_data
+        self.dict_afternoon_human_condition_data = dict_afternoon_human_condition_data
         self.update_ui()
 
     def load_stylesheet( self, file_path ):
@@ -1037,30 +1026,30 @@ class VariableConditionSettingDialog( QDialog ):
             print(f"讀取 CSS 檔案時發生錯誤: {e}")
 
     def update_ui( self ):
-        self.update_radio_button( self.ui.qtMorningRainOneDayOffRadioButton,           self.ui.qtMorningRainHalfDayOffRadioButton,           self.ui.qtMorningRainNoDayOffRadioButton,           self.dict_variable_weather_condition_data, WeatherCondition.MORNING_RAIN )
-        self.update_radio_button( self.ui.qtAfternoonRainOneDayOffRadioButton,         self.ui.qtAfternoonRainHalfDayOffRadioButton,         self.ui.qtAfternoonRainNoDayOffRadioButton,         self.dict_variable_weather_condition_data, WeatherCondition.AFTERNOON_RAIN )
-        self.update_radio_button( self.ui.qtMorningHeavyRainOneDayOffRadioButton,      self.ui.qtMorningHeavyRainHalfDayOffRadioButton,      self.ui.qtMorningHeavyRainNoDayOffRadioButton,      self.dict_variable_weather_condition_data, WeatherCondition.MORNING_HEAVYRAIN )
-        self.update_radio_button( self.ui.qtAfternoonHeavyRainOneDayOffRadioButton,    self.ui.qtAfternoonHeavyRainHalfDayOffRadioButton,    self.ui.qtAfternoonHeavyRainNoDayOffRadioButton,    self.dict_variable_weather_condition_data, WeatherCondition.AFTERNOON_HEAVYRAIN )
-        self.update_radio_button( self.ui.qtMorningTyphoonOneDayOffRadioButton,        self.ui.qtMorningTyphoonHalfDayOffRadioButton,        self.ui.qtMorningTyphoonNoDayOffRadioButton,        self.dict_variable_weather_condition_data, WeatherCondition.MORNING_TYPHOON )
-        self.update_radio_button( self.ui.qtAfternoonTyphoonOneDayOffRadioButton,      self.ui.qtAfternoonTyphoonHalfDayOffRadioButton,      self.ui.qtAfternoonTyphoonNoDayOffRadioButton,      self.dict_variable_weather_condition_data, WeatherCondition.AFTERNOON_TYPHOON )
-        self.update_radio_button( self.ui.qtMorningHotOneDayOffRadioButton,            self.ui.qtMorningHotHalfDayOffRadioButton,            self.ui.qtMorningHotNoDayOffRadioButton,            self.dict_variable_weather_condition_data, WeatherCondition.MORNING_HOT )
-        self.update_radio_button( self.ui.qtAfternoonHotOneDayOffRadioButton,          self.ui.qtAfternoonHotHalfDayOffRadioButton,          self.ui.qtAfternoonHotNoDayOffRadioButton,          self.dict_variable_weather_condition_data, WeatherCondition.AFTERNOON_HOT )
-        self.update_radio_button( self.ui.qtMorningMuddyOneDayOffRadioButton,          self.ui.qtMorningMuddyHalfDayOffRadioButton,          self.ui.qtMorningMuddyNoDayOffRadioButton,          self.dict_variable_weather_condition_data, WeatherCondition.MORNING_MUDDY )
-        self.update_radio_button( self.ui.qtAfternoonMuddyOneDayOffRadioButton,        self.ui.qtAfternoonMuddyHalfDayOffRadioButton,        self.ui.qtAfternoonMuddyNoDayOffRadioButton,        self.dict_variable_weather_condition_data, WeatherCondition.AFTERNOON_MUDDY )
-        self.update_radio_button( self.ui.qtMorningWeatherOtherOneDayOffRadioButton,   self.ui.qtMorningWeatherOtherHalfDayOffRadioButton,   self.ui.qtMorningWeatherOtherNoDayOffRadioButton,   self.dict_variable_weather_condition_data, WeatherCondition.MORNING_WEATHER_OTHER )
-        self.update_radio_button( self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton, self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton, self.ui.qtAfternoonWeatherOtherNoDayOffRadioButton, self.dict_variable_weather_condition_data, WeatherCondition.AFTERNOON_WEATHER_OTHER )
+        self.update_radio_button( self.ui.qtMorningRainOneDayOffRadioButton,           self.ui.qtMorningRainHalfDayOffRadioButton,           self.ui.qtMorningRainNoDayOffRadioButton,           self.dict_morning_weather_condition_data, Weather.RAIN )
+        self.update_radio_button( self.ui.qtMorningHeavyRainOneDayOffRadioButton,      self.ui.qtMorningHeavyRainHalfDayOffRadioButton,      self.ui.qtMorningHeavyRainNoDayOffRadioButton,      self.dict_morning_weather_condition_data, Weather.HEAVY_RAIN )
+        self.update_radio_button( self.ui.qtMorningTyphoonOneDayOffRadioButton,        self.ui.qtMorningTyphoonHalfDayOffRadioButton,        self.ui.qtMorningTyphoonNoDayOffRadioButton,        self.dict_morning_weather_condition_data, Weather.TYPHOON )
+        self.update_radio_button( self.ui.qtMorningHotOneDayOffRadioButton,            self.ui.qtMorningHotHalfDayOffRadioButton,            self.ui.qtMorningHotNoDayOffRadioButton,            self.dict_morning_weather_condition_data, Weather.HOT )
+        self.update_radio_button( self.ui.qtMorningMuddyOneDayOffRadioButton,          self.ui.qtMorningMuddyHalfDayOffRadioButton,          self.ui.qtMorningMuddyNoDayOffRadioButton,          self.dict_morning_weather_condition_data, Weather.MUDDY )
+        self.update_radio_button( self.ui.qtMorningWeatherOtherOneDayOffRadioButton,   self.ui.qtMorningWeatherOtherHalfDayOffRadioButton,   self.ui.qtMorningWeatherOtherNoDayOffRadioButton,   self.dict_morning_weather_condition_data, Weather.WEATHER_OTHER )
+        self.update_radio_button( self.ui.qtAfternoonRainOneDayOffRadioButton,         self.ui.qtAfternoonRainHalfDayOffRadioButton,         self.ui.qtAfternoonRainNoDayOffRadioButton,         self.dict_afternoon_weather_condition_data, Weather.RAIN )
+        self.update_radio_button( self.ui.qtAfternoonHeavyRainOneDayOffRadioButton,    self.ui.qtAfternoonHeavyRainHalfDayOffRadioButton,    self.ui.qtAfternoonHeavyRainNoDayOffRadioButton,    self.dict_afternoon_weather_condition_data, Weather.HEAVY_RAIN )
+        self.update_radio_button( self.ui.qtAfternoonTyphoonOneDayOffRadioButton,      self.ui.qtAfternoonTyphoonHalfDayOffRadioButton,      self.ui.qtAfternoonTyphoonNoDayOffRadioButton,      self.dict_afternoon_weather_condition_data, Weather.TYPHOON )
+        self.update_radio_button( self.ui.qtAfternoonHotOneDayOffRadioButton,          self.ui.qtAfternoonHotHalfDayOffRadioButton,          self.ui.qtAfternoonHotNoDayOffRadioButton,          self.dict_afternoon_weather_condition_data, Weather.HOT )
+        self.update_radio_button( self.ui.qtAfternoonMuddyOneDayOffRadioButton,        self.ui.qtAfternoonMuddyHalfDayOffRadioButton,        self.ui.qtAfternoonMuddyNoDayOffRadioButton,        self.dict_afternoon_weather_condition_data, Weather.MUDDY )
+        self.update_radio_button( self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton, self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton, self.ui.qtAfternoonWeatherOtherNoDayOffRadioButton, self.dict_afternoon_weather_condition_data, Weather.WEATHER_OTHER )
 
-        self.update_radio_button( self.ui.qtMorningSuspendOneDayOffRadioButton,      self.ui.qtMorningSuspendHalfDayOffRadioButton,      self.ui.qtMorningSuspendNoDayOffRadioButton,           self.dict_variable_human_condition_data, HumanCondition.MORNING_SUSPENSION )
-        self.update_radio_button( self.ui.qtAfternoonSuspendOneDayOffRadioButton,    self.ui.qtAfternoonSuspendHalfDayOffRadioButton,    self.ui.qtAfternoonSuspendNoDayOffRadioButton,         self.dict_variable_human_condition_data, HumanCondition.AFTERNOON_SUSPENSION )
-        self.update_radio_button( self.ui.qtMorningPowerOffOneDayOffRadioButton,     self.ui.qtMorningPowerOffHalfDayOffRadioButton,     self.ui.qtMorningPowerOffNoDayOffRadioButton,          self.dict_variable_human_condition_data, HumanCondition.MORNING_POWER_OFF )
-        self.update_radio_button( self.ui.qtAfternoonPowerOffOneDayOffRadioButton,   self.ui.qtAfternoonPowerOffHalfDayOffRadioButton,   self.ui.qtAfternoonPowerOffNoDayOffRadioButton,        self.dict_variable_human_condition_data, HumanCondition.AFTERNOON_POWER_OFF )
-        self.update_radio_button( self.ui.qtMorningHumanOtherOneDayOffRadioButton,   self.ui.qtMorningHumanOtherHalfDayOffRadioButton,   self.ui.qtMorningHumanOtherNoDayOffRadioButton,        self.dict_variable_human_condition_data, HumanCondition.MORNING_HUMAN_OTHER )
-        self.update_radio_button( self.ui.qtAfternoonHumanOtherOneDayOffRadioButton, self.ui.qtAfternoonHumanOtherHalfDayOffRadioButton, self.ui.qtAfternoonHumanOtherNoDayOffRadioButton,      self.dict_variable_human_condition_data, HumanCondition.AFTERNOON_HUMAN_OTHER )
+        self.update_radio_button( self.ui.qtMorningSuspendOneDayOffRadioButton,      self.ui.qtMorningSuspendHalfDayOffRadioButton,      self.ui.qtMorningSuspendNoDayOffRadioButton,           self.dict_morning_human_condition_data, Human.SUSPENSION )
+        self.update_radio_button( self.ui.qtMorningPowerOffOneDayOffRadioButton,     self.ui.qtMorningPowerOffHalfDayOffRadioButton,     self.ui.qtMorningPowerOffNoDayOffRadioButton,          self.dict_morning_human_condition_data, Human.POWER_OFF )
+        self.update_radio_button( self.ui.qtMorningHumanOtherOneDayOffRadioButton,   self.ui.qtMorningHumanOtherHalfDayOffRadioButton,   self.ui.qtMorningHumanOtherNoDayOffRadioButton,        self.dict_morning_human_condition_data, Human.HUMAN_OTHER )
+        self.update_radio_button( self.ui.qtAfternoonSuspendOneDayOffRadioButton,    self.ui.qtAfternoonSuspendHalfDayOffRadioButton,    self.ui.qtAfternoonSuspendNoDayOffRadioButton,         self.dict_afternoon_human_condition_data, Human.SUSPENSION )
+        self.update_radio_button( self.ui.qtAfternoonPowerOffOneDayOffRadioButton,   self.ui.qtAfternoonPowerOffHalfDayOffRadioButton,   self.ui.qtAfternoonPowerOffNoDayOffRadioButton,        self.dict_afternoon_human_condition_data, Human.POWER_OFF )
+        self.update_radio_button( self.ui.qtAfternoonHumanOtherOneDayOffRadioButton, self.ui.qtAfternoonHumanOtherHalfDayOffRadioButton, self.ui.qtAfternoonHumanOtherNoDayOffRadioButton,      self.dict_afternoon_human_condition_data, Human.HUMAN_OTHER )
 
     def update_radio_button( self, qtOneDayOffRadioButton, qtHalfDayOffRadioButton, qtNoDayOffRadioButton, dict_condition_data, e_condition ):
         with ( QSignalBlocker( qtOneDayOffRadioButton ),
                QSignalBlocker( qtHalfDayOffRadioButton ),
-               QSignalBlocker( self.ui.qtMorningRainNoDayOffRadioButton ) ):
+               QSignalBlocker( qtNoDayOffRadioButton ) ):
             if dict_condition_data[ e_condition ] == VariableConditionNoCount.COUNT_ONE_DAY_OFF:
                 qtOneDayOffRadioButton.setChecked( True )
             elif dict_condition_data[ e_condition ] == VariableConditionNoCount.COUNT_HALF_DAY_OFF:
@@ -1068,159 +1057,60 @@ class VariableConditionSettingDialog( QDialog ):
             else:
                 qtNoDayOffRadioButton.setChecked( True )
 
+    def get_day_off( self, qtOneDayOffRadioButton, qtHalfDayOffRadioButton ):
+        if qtOneDayOffRadioButton.isChecked():
+            return VariableConditionNoCount.COUNT_ONE_DAY_OFF
+        elif qtHalfDayOffRadioButton.isChecked():
+            return VariableConditionNoCount.COUNT_HALF_DAY_OFF
+        else:
+            return VariableConditionNoCount.COUNT_NO_DAY_OFF
+
     def accept_data( self ):
-        if self.ui.qtMorningRainOneDayOffRadioButton.isChecked():
-            e_morning_rain = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningRainHalfDayOffRadioButton.isChecked():
-            e_morning_rain = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_rain = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        e_morning_rain          = self.get_day_off( self.ui.qtMorningRainOneDayOffRadioButton,         self.ui.qtMorningRainHalfDayOffRadioButton )
+        e_morning_heavyrain     = self.get_day_off( self.ui.qtMorningHeavyRainOneDayOffRadioButton,    self.ui.qtMorningHeavyRainHalfDayOffRadioButton )
+        e_morning_typhoon       = self.get_day_off( self.ui.qtMorningTyphoonOneDayOffRadioButton,      self.ui.qtMorningTyphoonHalfDayOffRadioButton )
+        e_morning_hot           = self.get_day_off( self.ui.qtMorningHotOneDayOffRadioButton,          self.ui.qtMorningHotHalfDayOffRadioButton )
+        e_morning_muddy         = self.get_day_off( self.ui.qtMorningMuddyOneDayOffRadioButton,        self.ui.qtMorningMuddyHalfDayOffRadioButton )
+        e_morning_weather_other = self.get_day_off( self.ui.qtMorningWeatherOtherOneDayOffRadioButton, self.ui.qtMorningWeatherOtherHalfDayOffRadioButton )
 
-        if self.ui.qtAfternoonRainOneDayOffRadioButton.isChecked():
-            e_afternoon_rain = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonRainHalfDayOffRadioButton.isChecked():
-            e_afternoon_rain = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_rain = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        self.dict_morning_weather_condition_data[ Weather.SUN ]           = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        self.dict_morning_weather_condition_data[ Weather.RAIN ]          = e_morning_rain
+        self.dict_morning_weather_condition_data[ Weather.HEAVY_RAIN ]    = e_morning_heavyrain
+        self.dict_morning_weather_condition_data[ Weather.TYPHOON ]       = e_morning_typhoon
+        self.dict_morning_weather_condition_data[ Weather.HOT ]           = e_morning_hot
+        self.dict_morning_weather_condition_data[ Weather.MUDDY ]         = e_morning_muddy
+        self.dict_morning_weather_condition_data[ Weather.WEATHER_OTHER ] = e_morning_weather_other
 
+        e_afternoon_rain          = self.get_day_off( self.ui.qtAfternoonRainOneDayOffRadioButton,         self.ui.qtAfternoonRainHalfDayOffRadioButton )
+        e_afternoon_heavyrain     = self.get_day_off( self.ui.qtAfternoonHeavyRainOneDayOffRadioButton,    self.ui.qtAfternoonHeavyRainHalfDayOffRadioButton )
+        e_afternoon_typhoon       = self.get_day_off( self.ui.qtAfternoonTyphoonOneDayOffRadioButton,      self.ui.qtAfternoonTyphoonHalfDayOffRadioButton )
+        e_afternoon_hot           = self.get_day_off( self.ui.qtAfternoonHotOneDayOffRadioButton,          self.ui.qtAfternoonHotHalfDayOffRadioButton )
+        e_afternoon_muddy         = self.get_day_off( self.ui.qtAfternoonMuddyOneDayOffRadioButton,        self.ui.qtAfternoonMuddyHalfDayOffRadioButton )
+        e_afternoon_weather_other = self.get_day_off( self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton, self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton )
 
-        if self.ui.qtMorningHeavyRainOneDayOffRadioButton.isChecked():
-            e_morning_heavyrain = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningHeavyRainHalfDayOffRadioButton.isChecked():
-            e_morning_heavyrain = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_heavyrain = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        self.dict_afternoon_weather_condition_data[ Weather.SUN ]           = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        self.dict_afternoon_weather_condition_data[ Weather.RAIN ]          = e_afternoon_rain
+        self.dict_afternoon_weather_condition_data[ Weather.HEAVY_RAIN ]    = e_afternoon_heavyrain
+        self.dict_afternoon_weather_condition_data[ Weather.TYPHOON ]       = e_afternoon_typhoon
+        self.dict_afternoon_weather_condition_data[ Weather.HOT ]           = e_afternoon_hot
+        self.dict_afternoon_weather_condition_data[ Weather.MUDDY ]         = e_afternoon_muddy
+        self.dict_afternoon_weather_condition_data[ Weather.WEATHER_OTHER ] = e_afternoon_weather_other
 
-        if self.ui.qtAfternoonHeavyRainOneDayOffRadioButton.isChecked():
-            e_afternoon_heavyrain = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonHeavyRainHalfDayOffRadioButton.isChecked():
-            e_afternoon_heavyrain = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_heavyrain = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        e_morning_suspension  = self.get_day_off( self.ui.qtMorningSuspendOneDayOffRadioButton,    self.ui.qtMorningSuspendHalfDayOffRadioButton )
+        e_morning_power_off   = self.get_day_off( self.ui.qtMorningPowerOffOneDayOffRadioButton,   self.ui.qtMorningPowerOffHalfDayOffRadioButton )
+        e_morning_human_other = self.get_day_off( self.ui.qtMorningHumanOtherOneDayOffRadioButton, self.ui.qtMorningHumanOtherHalfDayOffRadioButton )
+        
+        self.dict_morning_human_condition_data[ Human.SUSPENSION ]  = e_morning_suspension
+        self.dict_morning_human_condition_data[ Human.POWER_OFF ]   = e_morning_power_off
+        self.dict_morning_human_condition_data[ Human.HUMAN_OTHER ] = e_morning_human_other
 
+        e_afternoon_suspension  = self.get_day_off( self.ui.qtAfternoonSuspendOneDayOffRadioButton,    self.ui.qtAfternoonSuspendHalfDayOffRadioButton )
+        e_afternoon_power_off   = self.get_day_off( self.ui.qtAfternoonPowerOffOneDayOffRadioButton,   self.ui.qtAfternoonPowerOffHalfDayOffRadioButton )
+        e_afternoon_human_other = self.get_day_off( self.ui.qtAfternoonHumanOtherOneDayOffRadioButton, self.ui.qtAfternoonHumanOtherHalfDayOffRadioButton )
 
-        if self.ui.qtMorningTyphoonOneDayOffRadioButton.isChecked():
-            e_morning_typhoon = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningTyphoonHalfDayOffRadioButton.isChecked():
-            e_morning_typhoon = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_typhoon = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonTyphoonOneDayOffRadioButton.isChecked():
-            e_afternoon_typhoon = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonTyphoonHalfDayOffRadioButton.isChecked():
-            e_afternoon_typhoon = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_typhoon = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-
-        if self.ui.qtMorningHotOneDayOffRadioButton.isChecked():
-            e_morning_hot = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningHotHalfDayOffRadioButton.isChecked():
-            e_morning_hot = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_hot = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonHotOneDayOffRadioButton.isChecked():
-            e_afternoon_hot = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonHotHalfDayOffRadioButton.isChecked():
-            e_afternoon_hot = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_hot = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-
-        if self.ui.qtMorningMuddyOneDayOffRadioButton.isChecked():
-            e_morning_muddy = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningMuddyHalfDayOffRadioButton.isChecked():
-            e_morning_muddy = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_muddy = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonMuddyOneDayOffRadioButton.isChecked():
-            e_afternoon_muddy = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonMuddyHalfDayOffRadioButton.isChecked():
-            e_afternoon_muddy = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_muddy = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-
-        if self.ui.qtMorningWeatherOtherOneDayOffRadioButton.isChecked():
-            e_morning_weather_other = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningWeatherOtherHalfDayOffRadioButton.isChecked():
-            e_morning_weather_other = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_weather_other = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton.isChecked():
-            e_afternoon_weather_other = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton.isChecked():
-            e_afternoon_weather_other = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_weather_other = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        self.dict_variable_weather_condition_data[ WeatherCondition.MORNING_RAIN ] = e_morning_rain
-        self.dict_variable_weather_condition_data[ WeatherCondition.AFTERNOON_RAIN ] = e_afternoon_rain
-        self.dict_variable_weather_condition_data[ WeatherCondition.MORNING_HEAVYRAIN ] = e_morning_heavyrain
-        self.dict_variable_weather_condition_data[ WeatherCondition.AFTERNOON_HEAVYRAIN ] = e_afternoon_heavyrain
-        self.dict_variable_weather_condition_data[ WeatherCondition.MORNING_TYPHOON ] = e_morning_typhoon
-        self.dict_variable_weather_condition_data[ WeatherCondition.AFTERNOON_TYPHOON ] = e_afternoon_typhoon
-        self.dict_variable_weather_condition_data[ WeatherCondition.MORNING_HOT ] =  e_morning_hot
-        self.dict_variable_weather_condition_data[ WeatherCondition.AFTERNOON_HOT ] = e_afternoon_hot
-        self.dict_variable_weather_condition_data[ WeatherCondition.MORNING_MUDDY ] = e_morning_muddy
-        self.dict_variable_weather_condition_data[ WeatherCondition.AFTERNOON_MUDDY ] = e_afternoon_muddy
-        self.dict_variable_weather_condition_data[ WeatherCondition.MORNING_WEATHER_OTHER ] = e_morning_weather_other
-        self.dict_variable_weather_condition_data[ WeatherCondition.AFTERNOON_WEATHER_OTHER ] = e_afternoon_weather_other 
-
-        if self.ui.qtMorningSuspendOneDayOffRadioButton.isChecked():
-            e_morning_suspension = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningSuspendHalfDayOffRadioButton.isChecked():
-            e_morning_suspension = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_suspension = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonSuspendOneDayOffRadioButton.isChecked():
-            e_afternoon_suspension = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonSuspendHalfDayOffRadioButton.isChecked():
-            e_afternoon_suspension = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_suspension = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-
-        if self.ui.qtMorningPowerOffOneDayOffRadioButton.isChecked():
-            e_morning_power_off = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningPowerOffHalfDayOffRadioButton.isChecked():
-            e_morning_power_off = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_power_off = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonPowerOffOneDayOffRadioButton.isChecked():
-            e_afternoon_power_off = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonPowerOffHalfDayOffRadioButton.isChecked():
-            e_afternoon_power_off = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_power_off = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-
-        if self.ui.qtMorningHumanOtherOneDayOffRadioButton.isChecked():
-            e_morning_human_other = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtMorningHumanOtherHalfDayOffRadioButton.isChecked():
-            e_morning_human_other = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_morning_human_other = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        if self.ui.qtAfternoonHumanOtherOneDayOffRadioButton.isChecked():
-            e_afternoon_human_other = VariableConditionNoCount.COUNT_ONE_DAY_OFF
-        elif self.ui.qtAfternoonHumanOtherHalfDayOffRadioButton.isChecked():
-            e_afternoon_human_other = VariableConditionNoCount.COUNT_HALF_DAY_OFF
-        else:
-            e_afternoon_human_other = VariableConditionNoCount.COUNT_NO_DAY_OFF
-
-        self.dict_variable_human_condition_data[ HumanCondition.MORNING_SUSPENSION ] = e_morning_suspension
-        self.dict_variable_human_condition_data[ HumanCondition.AFTERNOON_SUSPENSION ] = e_afternoon_suspension
-        self.dict_variable_human_condition_data[ HumanCondition.MORNING_POWER_OFF ] = e_morning_power_off
-        self.dict_variable_human_condition_data[ HumanCondition.AFTERNOON_POWER_OFF ] = e_afternoon_power_off
-        self.dict_variable_human_condition_data[ HumanCondition.MORNING_HUMAN_OTHER ] = e_morning_human_other
-        self.dict_variable_human_condition_data[ HumanCondition.AFTERNOON_HUMAN_OTHER ] = e_afternoon_human_other
+        self.dict_afternoon_human_condition_data[ Human.SUSPENSION ]  = e_afternoon_suspension
+        self.dict_afternoon_human_condition_data[ Human.POWER_OFF ]   = e_afternoon_power_off
+        self.dict_afternoon_human_condition_data[ Human.HUMAN_OTHER ] = e_afternoon_human_other
         
         self.accept()
 
@@ -1742,8 +1632,8 @@ class MainWindow( QMainWindow ):
 
         e_contract_condition = dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ]
         n_contract_working_days = dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
-        dict_weather_condition = dict_per_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
-        dict_human_condition = dict_per_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
+        dict_weather_condition = dict_per_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
+        dict_human_condition = dict_per_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
         obj_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
         dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
         list_const_holiday = []
@@ -1870,31 +1760,40 @@ class MainWindow( QMainWindow ):
                 json_holiday_data[ key_holiday ] = { "reason" : value_holiday[ HolidayData.REASON ], 
                                                      "holiday" : bool( value_holiday[ HolidayData.HOLIDAY ] ) }
             dict_per_project_data[ "holiday_data" ] = json_holiday_data
-            dict_weather_condition_data = value[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
-            export_json_weather_condition_data = {}
-            export_json_weather_condition_data[ "morning_rain" ]            = int( dict_weather_condition_data[ WeatherCondition.MORNING_RAIN].value )
-            export_json_weather_condition_data[ "afternoon_rain" ]          = int( dict_weather_condition_data[ WeatherCondition.AFTERNOON_RAIN].value )
-            export_json_weather_condition_data[ "morning_heavyrain" ]       = int( dict_weather_condition_data[ WeatherCondition.MORNING_HEAVYRAIN].value )
-            export_json_weather_condition_data[ "afternoon_heavyrain" ]     = int( dict_weather_condition_data[ WeatherCondition.AFTERNOON_HEAVYRAIN].value )
-            export_json_weather_condition_data[ "morning_typhoon" ]         = int( dict_weather_condition_data[ WeatherCondition.MORNING_TYPHOON].value )
-            export_json_weather_condition_data[ "afternoon_typhoon" ]       = int( dict_weather_condition_data[ WeatherCondition.AFTERNOON_TYPHOON].value )
-            export_json_weather_condition_data[ "morning_hot" ]             = int( dict_weather_condition_data[ WeatherCondition.MORNING_HOT].value )
-            export_json_weather_condition_data[ "afternoon_hot" ]           = int( dict_weather_condition_data[ WeatherCondition.AFTERNOON_HOT].value )
-            export_json_weather_condition_data[ "morning_muddy" ]           = int( dict_weather_condition_data[ WeatherCondition.MORNING_MUDDY].value )
-            export_json_weather_condition_data[ "afternoon_muddy" ]         = int( dict_weather_condition_data[ WeatherCondition.AFTERNOON_MUDDY].value )
-            export_json_weather_condition_data[ "morning_weather_other" ]   = int( dict_weather_condition_data[ WeatherCondition.MORNING_WEATHER_OTHER].value )
-            export_json_weather_condition_data[ "afternoon_weather_other" ] = int( dict_weather_condition_data[ WeatherCondition.AFTERNOON_WEATHER_OTHER].value )
-            dict_per_project_data[ "weather_condition_data" ] = export_json_weather_condition_data
 
-            dict_human_condition_data = value[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
-            export_json_human_condition_data = {}
-            export_json_human_condition_data[ "morning_suspension" ]        = int( dict_human_condition_data[ HumanCondition.MORNING_SUSPENSION].value )
-            export_json_human_condition_data[ "afternoon_suspension" ]      = int( dict_human_condition_data[ HumanCondition.AFTERNOON_SUSPENSION].value )
-            export_json_human_condition_data[ "morning_poweroff" ]        = int( dict_human_condition_data[ HumanCondition.MORNING_POWER_OFF].value )
-            export_json_human_condition_data[ "afternoon_poweroff" ]      = int( dict_human_condition_data[ HumanCondition.AFTERNOON_POWER_OFF].value )
-            export_json_human_condition_data[ "morning_human_other" ]       = int( dict_human_condition_data[ HumanCondition.MORNING_HUMAN_OTHER].value )
-            export_json_human_condition_data[ "afternoon_human_other" ]     = int( dict_human_condition_data[ HumanCondition.AFTERNOON_HUMAN_OTHER].value )
-            dict_per_project_data[ "human_condition_data" ] = export_json_human_condition_data
+            dict_morning_weather_condition_data = value[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
+            export_json_morning_weather_condition_data = {}
+            export_json_morning_weather_condition_data[ "rain" ]          = int( dict_morning_weather_condition_data[ Weather.RAIN].value )
+            export_json_morning_weather_condition_data[ "heavyrain" ]     = int( dict_morning_weather_condition_data[ Weather.HEAVY_RAIN].value )
+            export_json_morning_weather_condition_data[ "typhoon" ]       = int( dict_morning_weather_condition_data[ Weather.TYPHOON].value )
+            export_json_morning_weather_condition_data[ "hot" ]           = int( dict_morning_weather_condition_data[ Weather.HOT].value )
+            export_json_morning_weather_condition_data[ "muddy" ]         = int( dict_morning_weather_condition_data[ Weather.MUDDY].value )
+            export_json_morning_weather_condition_data[ "weather_other" ] = int( dict_morning_weather_condition_data[ Weather.WEATHER_OTHER].value )
+            dict_per_project_data[ "morning_weather_condition_data" ] = export_json_morning_weather_condition_data
+
+            dict_afternoon_weather_condition_data = value[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ]
+            export_json_afternoon_weather_condition_data = {}
+            export_json_afternoon_weather_condition_data[ "rain" ]          = int( dict_afternoon_weather_condition_data[ Weather.RAIN].value )
+            export_json_afternoon_weather_condition_data[ "heavyrain" ]     = int( dict_afternoon_weather_condition_data[ Weather.HEAVY_RAIN].value )
+            export_json_afternoon_weather_condition_data[ "typhoon" ]       = int( dict_afternoon_weather_condition_data[ Weather.TYPHOON].value )
+            export_json_afternoon_weather_condition_data[ "hot" ]           = int( dict_afternoon_weather_condition_data[ Weather.HOT].value )
+            export_json_afternoon_weather_condition_data[ "muddy" ]         = int( dict_afternoon_weather_condition_data[ Weather.MUDDY].value )
+            export_json_afternoon_weather_condition_data[ "weather_other" ] = int( dict_afternoon_weather_condition_data[ Weather.WEATHER_OTHER].value )
+            dict_per_project_data[ "afternoon_weather_condition_data" ] = export_json_afternoon_weather_condition_data
+
+            dict_morning_human_condition_data = value[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
+            export_json_morning_human_condition_data = {}
+            export_json_morning_human_condition_data[ "suspension" ]  = int( dict_morning_human_condition_data[ Human.SUSPENSION].value )
+            export_json_morning_human_condition_data[ "poweroff" ]    = int( dict_morning_human_condition_data[ Human.POWER_OFF].value )
+            export_json_morning_human_condition_data[ "human_other" ] = int( dict_morning_human_condition_data[ Human.HUMAN_OTHER].value )
+            dict_per_project_data[ "morning_human_condition_data" ] = export_json_morning_human_condition_data
+
+            dict_afternoon_human_condition_data = value[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ]
+            export_json_afternoon_human_condition_data = {}
+            export_json_afternoon_human_condition_data[ "suspension" ]  = int( dict_afternoon_human_condition_data[ Human.SUSPENSION].value )
+            export_json_afternoon_human_condition_data[ "poweroff" ]    = int( dict_afternoon_human_condition_data[ Human.POWER_OFF].value )
+            export_json_afternoon_human_condition_data[ "human_other" ] = int( dict_afternoon_human_condition_data[ Human.HUMAN_OTHER].value )
+            dict_per_project_data[ "afternoon_human_condition_data" ] = export_json_afternoon_human_condition_data
 
             dict_extension_data = value[ ProjectData.DICT_EXTENSION_DATA ]
             json_extension_data = {}
@@ -1930,29 +1829,36 @@ class MainWindow( QMainWindow ):
                         for key_holiday, value_holiday in import_json_holiday_data.items():
                             dict_holiday_data[ key_holiday ] = { HolidayData.REASON : value_holiday[ "reason" ], 
                                                                  HolidayData.HOLIDAY : value_holiday[ "holiday" ] }
-                        import_json_weather_condition_data = value[ "weather_condition_data" ]
-                        dict_weather_condition_data = {}
-                        dict_weather_condition_data[ WeatherCondition.MORNING_RAIN ]            = VariableConditionNoCount( import_json_weather_condition_data[ "morning_rain" ] )
-                        dict_weather_condition_data[ WeatherCondition.AFTERNOON_RAIN ]          = VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_rain" ] )
-                        dict_weather_condition_data[ WeatherCondition.MORNING_HEAVYRAIN ]       = VariableConditionNoCount( import_json_weather_condition_data[ "morning_heavyrain" ] )
-                        dict_weather_condition_data[ WeatherCondition.AFTERNOON_HEAVYRAIN ]     = VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_heavyrain" ] )
-                        dict_weather_condition_data[ WeatherCondition.MORNING_TYPHOON ]         = VariableConditionNoCount( import_json_weather_condition_data[ "morning_typhoon" ] )
-                        dict_weather_condition_data[ WeatherCondition.AFTERNOON_TYPHOON ]       = VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_typhoon" ] )
-                        dict_weather_condition_data[ WeatherCondition.MORNING_HOT ]             = VariableConditionNoCount( import_json_weather_condition_data[ "morning_hot" ] )
-                        dict_weather_condition_data[ WeatherCondition.AFTERNOON_HOT ]           = VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_hot" ] )
-                        dict_weather_condition_data[ WeatherCondition.MORNING_MUDDY ]           = VariableConditionNoCount( import_json_weather_condition_data[ "morning_muddy" ] )
-                        dict_weather_condition_data[ WeatherCondition.AFTERNOON_MUDDY ]         = VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_muddy" ] )
-                        dict_weather_condition_data[ WeatherCondition.MORNING_WEATHER_OTHER ]   = VariableConditionNoCount( import_json_weather_condition_data[ "morning_weather_other" ] )
-                        dict_weather_condition_data[ WeatherCondition.AFTERNOON_WEATHER_OTHER ] = VariableConditionNoCount( import_json_weather_condition_data[ "afternoon_weather_other" ] )
+                        import_json_morning_weather_condition_data = value[ "morning_weather_condition_data" ]
+                        dict_morning_weather_condition_data = {}
+                        dict_morning_weather_condition_data[ Weather.RAIN ]          = VariableConditionNoCount( import_json_morning_weather_condition_data[ "rain" ] )
+                        dict_morning_weather_condition_data[ Weather.HEAVY_RAIN ]    = VariableConditionNoCount( import_json_morning_weather_condition_data[ "heavyrain" ] )
+                        dict_morning_weather_condition_data[ Weather.TYPHOON ]       = VariableConditionNoCount( import_json_morning_weather_condition_data[ "typhoon" ] )
+                        dict_morning_weather_condition_data[ Weather.HOT ]           = VariableConditionNoCount( import_json_morning_weather_condition_data[ "hot" ] )
+                        dict_morning_weather_condition_data[ Weather.MUDDY ]         = VariableConditionNoCount( import_json_morning_weather_condition_data[ "muddy" ] )
+                        dict_morning_weather_condition_data[ Weather.WEATHER_OTHER ] = VariableConditionNoCount( import_json_morning_weather_condition_data[ "weather_other" ] )
                         
-                        import_json_human_condition_data = value[ "human_condition_data" ]
-                        dict_human_condition_data = {}
-                        dict_human_condition_data[ HumanCondition.MORNING_SUSPENSION ]    = VariableConditionNoCount( import_json_human_condition_data[ "morning_suspension" ] )
-                        dict_human_condition_data[ HumanCondition.AFTERNOON_SUSPENSION ]  = VariableConditionNoCount( import_json_human_condition_data[ "afternoon_suspension" ] )
-                        dict_human_condition_data[ HumanCondition.MORNING_POWER_OFF ]     = VariableConditionNoCount( import_json_human_condition_data[ "morning_poweroff" ] )
-                        dict_human_condition_data[ HumanCondition.AFTERNOON_POWER_OFF ]   = VariableConditionNoCount( import_json_human_condition_data[ "afternoon_poweroff" ] )
-                        dict_human_condition_data[ HumanCondition.MORNING_HUMAN_OTHER ]   = VariableConditionNoCount( import_json_human_condition_data[ "morning_human_other" ] )
-                        dict_human_condition_data[ HumanCondition.AFTERNOON_HUMAN_OTHER ] = VariableConditionNoCount( import_json_human_condition_data[ "afternoon_human_other" ] )
+                        import_json_afternoon_weather_condition_data = value[ "afternoon_weather_condition_data" ]
+                        dict_afternoon_weather_condition_data = {}
+                        dict_afternoon_weather_condition_data[ Weather.RAIN ]          = VariableConditionNoCount( import_json_afternoon_weather_condition_data[ "rain" ] )
+                        dict_afternoon_weather_condition_data[ Weather.HEAVY_RAIN ]    = VariableConditionNoCount( import_json_afternoon_weather_condition_data[ "heavyrain" ] )
+                        dict_afternoon_weather_condition_data[ Weather.TYPHOON ]       = VariableConditionNoCount( import_json_afternoon_weather_condition_data[ "typhoon" ] )
+                        dict_afternoon_weather_condition_data[ Weather.HOT ]           = VariableConditionNoCount( import_json_afternoon_weather_condition_data[ "hot" ] )
+                        dict_afternoon_weather_condition_data[ Weather.MUDDY ]         = VariableConditionNoCount( import_json_afternoon_weather_condition_data[ "muddy" ] )
+                        dict_afternoon_weather_condition_data[ Weather.WEATHER_OTHER ] = VariableConditionNoCount( import_json_afternoon_weather_condition_data[ "weather_other" ] )
+
+                        import_json_morning_human_condition_data = value[ "morning_human_condition_data" ]
+                        dict_morning_human_condition_data = {}
+                        dict_morning_human_condition_data[ Human.SUSPENSION ]  = VariableConditionNoCount( import_json_morning_human_condition_data[ "suspension" ] )
+                        dict_morning_human_condition_data[ Human.POWER_OFF ]   = VariableConditionNoCount( import_json_morning_human_condition_data[ "poweroff" ] )
+                        dict_morning_human_condition_data[ Human.HUMAN_OTHER ] = VariableConditionNoCount( import_json_morning_human_condition_data[ "human_other" ] )
+
+                        import_json_afternoon_human_condition_data = value[ "afternoon_human_condition_data" ]
+                        dict_afternoon_human_condition_data = {}
+                        dict_afternoon_human_condition_data[ Human.SUSPENSION ]  = VariableConditionNoCount( import_json_afternoon_human_condition_data[ "suspension" ] )
+                        dict_afternoon_human_condition_data[ Human.POWER_OFF ]   = VariableConditionNoCount( import_json_afternoon_human_condition_data[ "poweroff" ] )
+                        dict_afternoon_human_condition_data[ Human.HUMAN_OTHER ] = VariableConditionNoCount( import_json_afternoon_human_condition_data[ "human_other" ] )
+
 
                         dict_extension_data = {}
                         import_json_extension_data = value[ "extension_data" ]
@@ -1975,8 +1881,10 @@ class MainWindow( QMainWindow ):
                                                                                                         value[ "contract_working_days" ],
                                                                                                         value[ "contract_finish_date" ],
                                                                                                         dict_holiday_data,
-                                                                                                        dict_weather_condition_data,
-                                                                                                        dict_human_condition_data,
+                                                                                                        dict_morning_weather_condition_data,
+                                                                                                        dict_afternoon_weather_condition_data,
+                                                                                                        dict_morning_human_condition_data,
+                                                                                                        dict_afternoon_human_condition_data,
                                                                                                         dict_extension_data )
                         export_json_dailyreport_data = {}
                         import_json_daily_report = value[ "dailyreport_data" ]

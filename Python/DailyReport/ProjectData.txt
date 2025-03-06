@@ -244,27 +244,31 @@ v1.0.0
                 "holiday": true
             }
         },
-        "weather_condition_data": {
-            "morning_rain": 1,
-            "afternoon_rain": 1,
-            "morning_heavyrain": 0,
-            "afternoon_heavyrain": 1,
-            "morning_typhoon": 0,
-            "afternoon_typhoon": 1,
-            "morning_hot": 2,
-            "afternoon_hot": 2,
-            "morning_muddy": 2,
-            "afternoon_muddy": 2,
-            "morning_weather_other": 2,
-            "afternoon_weather_other": 2
+        "morning_weather_condition_data": {
+            "rain": 1,
+            "heavyrain": 0,
+            "typhoon": 0,
+            "hot": 2,
+            "muddy": 2,
+            "weather_other": 2
         },
-        "human_condition_data": {
-            "morning_suspension": 0,
-            "afternoon_suspension": 1,
-            "morning_poweroff": 0,
-            "afternoon_poweroff": 1,
-            "morning_human_other": 1,
-            "afternoon_human_other": 1
+		"afternoon_weather_condition_data": {
+            "rain": 1,
+            "heavyrain": 1,
+            "typhoon": 1,
+            "hot": 2,
+            "muddy": 2,
+            "weather_other": 2
+        },
+        "morning_human_condition_data": {
+            "suspension": 0,
+            "poweroff": 0,
+            "human_other": 1
+        },
+		"afternoon_human_condition_data": {
+            "suspension": 1,
+            "poweroff": 1,
+            "human_other": 1
         },
         "extension_data": {
             "2023-03-14": {
@@ -4690,27 +4694,31 @@ v1.0.0
         "contract_working_days": 1.0,
         "contract_finish_date": "2025-03-04",
         "holiday_data": {},
-        "weather_condition_data": {
-            "morning_rain": 1,
-            "afternoon_rain": 1,
-            "morning_heavyrain": 1,
-            "afternoon_heavyrain": 1,
-            "morning_typhoon": 1,
-            "afternoon_typhoon": 1,
-            "morning_hot": 1,
-            "afternoon_hot": 1,
-            "morning_muddy": 1,
-            "afternoon_muddy": 1,
-            "morning_weather_other": 1,
-            "afternoon_weather_other": 1
+        "morning_weather_condition_data": {
+            "rain": 1,
+            "heavyrain": 0,
+            "typhoon": 0,
+            "hot": 2,
+            "muddy": 2,
+            "weather_other": 2
         },
-        "human_condition_data": {
-            "morning_suspension": 1,
-            "afternoon_suspension": 1,
-            "morning_poweroff": 1,
-            "afternoon_poweroff": 1,
-            "morning_human_other": 1,
-            "afternoon_human_other": 1
+		"afternoon_weather_condition_data": {
+            "rain": 1,
+            "heavyrain": 1,
+            "typhoon": 1,
+            "hot": 2,
+            "muddy": 2,
+            "weather_other": 2
+        },
+        "morning_human_condition_data": {
+            "suspension": 0,
+            "poweroff": 0,
+            "human_other": 1
+        },
+		"afternoon_human_condition_data": {
+            "suspension": 1,
+            "poweroff": 1,
+            "human_other": 1
         },
         "extension_data": {},
         "dailyreport_data": {}
