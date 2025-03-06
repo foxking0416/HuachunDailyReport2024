@@ -1742,6 +1742,8 @@ class MainWindow( QMainWindow ):
 
         e_contract_condition = dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ]
         n_contract_working_days = dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
+        dict_weather_condition = dict_per_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
+        dict_human_condition = dict_per_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
         obj_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
         dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
         list_const_holiday = []
@@ -1755,11 +1757,28 @@ class MainWindow( QMainWindow ):
         # while( True ):
         #     if n_contract_working_days <= 0:
         #         break
+        #     str_date = obj_date.strftime( "%Y-%m-%d" )
+        #     e_morning_weather = Weather.SUN
+        #     e_afternoon_weather = Weather.SUN
+        #     e_morning_human = Human.NONE
+        #     e_afternoon_human = Human.NONE
+        #     if str_date in dict_per_project_dailyreport_data:
+        #         e_morning_weather = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_MORNING_WEATHER ]
+        #         e_afternoon_weather = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_AFTERNOON_WEATHER ]
+        #         e_morning_human = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_MORNING_HUMAN ]
+        #         e_afternoon_human = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_AFTERNOON_HUMAN ]
+
+        #     if( e_morning_weather != Weather.SUN or e_morning_human != Human.NONE ):
+        #         f_morning_weather_nocount = dict_weather_condition[ e_morning_weather ]
+        #         f_morning_human_nocount = dict_human_condition[ e_morning_human ]
+        #         pass
+
         #     b_is_weekend = [False]
         #     b_is_holiday = [False]
         #     b_is_make_up_workday = [False]
-        #     str_date = obj_date.strftime( "%Y-%m-%d" )
         #     if Utility.get_is_work_day( list_const_holiday, list_const_workday, str_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+                
+                
         #         if str_date in dict_per_project_dailyreport_data: #有填日報表
         #             pass
                 
