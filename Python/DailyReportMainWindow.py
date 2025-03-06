@@ -17,6 +17,7 @@ from QtDailyReportPerDayDialog import Ui_Dialog as Ui_DailyReportPerDayDialog
 from QtSelectEditProjectDialog import Ui_Dialog as Ui_SelectEditProjectDialog
 from QtHolidaySettingDialog import Ui_Dialog as Ui_HolidaySettingDialog
 from QtVariableConditionSettingDialog import Ui_Dialog as Ui_VariableConditionSettingDialog
+from QtExtendWorkingDaysSettingDialog import Ui_Dialog as Ui_ExtendWorkingDaysSettingDialog
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QButtonGroup, QMessageBox, QStyledItemDelegate, QFileDialog, QHeaderView, QVBoxLayout, QHBoxLayout, \
                               QLabel, QLineEdit, QDialogButtonBox, QTabBar, QWidget, QTableView, QComboBox, QPushButton, QSizePolicy, QSpacerItem, QCheckBox, QDoubleSpinBox, \
                               QProgressBar, QTabWidget
@@ -43,6 +44,7 @@ from scipy.optimize import newton
 # pyside6-uic QtCreateProjectDialog.ui -o QtCreateProjectDialog.py
 # pyside6-uic QtHolidaySettingDialog.ui -o QtHolidaySettingDialog.py
 # pyside6-uic QtVariableConditionSettingDialog.ui -o QtVariableConditionSettingDialog.py
+# pyside6-uic QtExtendWorkingDaysSettingDialog.ui -o QtExtendWorkingDaysSettingDialog.py
 # pyside6-uic QtSelectEditProjectDialog.ui -o QtSelectEditProjectDialog.py
 # pyside6-uic QtDailyReportPerDayDialog.ui -o QtDailyReportPerDayDialog.py
 
@@ -150,6 +152,7 @@ class ProjectData( Enum ):
     DICT_HOLIDAY_DATA = auto() #專案假日資料
     DICT_WEATHER_CONDITION_DATA = auto() #變動天候條件資料
     DICT_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
+    DICT_EXTENSION_DATA = auto() #追加工期資料
 
 class Weekday( Enum ):
     MONDAY = 0
@@ -187,6 +190,10 @@ class Human( Enum ):
 class HolidayData( Enum ):
     REASON = 0
     HOLIDAY = 1
+
+class ExtensionData( Enum ):
+    EXTENSION_DAYS = 0
+    EXTENSION_REASON = 1
 
 class ContractCondition( Enum ):
     WORKING_DAY_NO_DAYOFF = 0
@@ -265,7 +272,8 @@ class Utility():
                              str_contract_finish_date,
                              dict_project_holiday_data,
                              dict_variable_weather_condition_data, 
-                             dict_variable_human_condition_data ):
+                             dict_variable_human_condition_data,
+                             dict_extension_data ):
         dict_per_project_data = {}
         dict_per_project_data[ ProjectData.STR_PROJECT_NUMBER ] = str_project_number
         dict_per_project_data[ ProjectData.STR_PROJECT_NAME ] = str_project_name
@@ -284,6 +292,7 @@ class Utility():
         dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ] = dict_project_holiday_data
         dict_per_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ] = dict_variable_weather_condition_data
         dict_per_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ] = dict_variable_human_condition_data
+        dict_per_project_data[ ProjectData.DICT_EXTENSION_DATA ] = dict_extension_data
         return dict_per_project_data
 
     def is_valid_english_number_string( s ):
@@ -437,12 +446,90 @@ class Utility():
         n_real_rest_workdays += n_total_extend_days
 
         while( True ):
-            n_weekday = obj_real_end_date.weekday()
-
             b_is_weekend = [False]
             b_is_holiday = [False]
             b_is_make_up_workday = [False]
-            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_real_end_date, n_weekday, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_real_end_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+                if obj_real_end_date <= obj_today_date:
+                    if obj_real_end_date in dict_weather_and_human_related_holiday:
+                        if dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
+                            pass
+                        elif dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.COUNT_HALF_DAY:
+                            n_past_workdays += 0.5
+                            n_real_rest_workdays -= 0.5
+                        else:
+                            n_past_workdays += 1
+                            n_real_rest_workdays -= 1
+                    else:
+                        n_past_workdays += 1
+                        n_real_rest_workdays -= 1#沒填日報表就當作一般晴天
+                else:
+                    n_real_rest_workdays -= 1#未來的日子還沒有日報表
+                n_expect_rest_workdays -= 1
+
+            if n_real_rest_workdays <= 0:
+                break
+
+            if n_expect_rest_workdays > 0:
+                obj_expect_end_date += datetime.timedelta( days = 1 )
+
+            obj_real_end_date += datetime.timedelta( days = 1 )
+
+        obj_return_value = {}
+        obj_return_value['ExpectFinishDate']        = obj_expect_end_date
+        obj_return_value['ExpectTotalCalendarDays'] = ( obj_expect_end_date - obj_start_date ).days + 1
+        obj_return_value['RealFinishDate']          = obj_real_end_date
+        obj_return_value['RealTotalCalendarDays']   = ( obj_real_end_date - obj_start_date ).days + 1
+        obj_return_value['FromStartCalendarDays']   = ( obj_today_date - obj_start_date ).days + 1
+        obj_return_value['FromStartWorkDays']       = n_past_workdays
+        obj_return_value['ExpectRestWorkDays']      = n_contract_working_days - n_past_workdays
+        obj_return_value['ExpectRestCalendarkDays'] = ( obj_expect_end_date - obj_today_date ).days
+        obj_return_value['RealRestWorkDays']        = n_contract_working_days + n_total_extend_days - n_past_workdays
+        obj_return_value['RealRestCalendarkDays']   = ( obj_real_end_date - obj_today_date ).days 
+        #契約工期         合約給定
+        #契約完工日       ExpectFinishDate
+        #契約天數         ExpectTotalCalendarDays
+
+        #開工迄今工作天數  FromStartWorkDays
+        #開工迄今日曆天數  FromStartCalendarDays
+        #變動完工日       RealFinishDate
+        #變動完工天數     RealTotalCalendarDays
+        #預計剩餘工期     ExpectRestWorkDays
+        #預計剩餘天數     ExpectRestCalendarkDays
+        #實際剩餘工期     RealRestWorkDays
+        #實際剩餘天數     RealRestCalendarkDays
+
+
+        return obj_return_value
+
+    def get_real_finish_date2( e_contract_condition, 
+                              n_contract_working_days, 
+                              obj_start_date, 
+                              obj_today_date, 
+                              list_const_holiday, 
+                              list_const_workday, 
+                              dict_weather_and_human_related_holiday, 
+                              dict_extend_data ):
+        obj_real_end_date = obj_start_date 
+        obj_expect_end_date = obj_start_date
+        n_real_rest_workdays = n_contract_working_days
+        n_expect_rest_workdays = n_contract_working_days
+        n_past_workdays = 0
+        n_total_extend_days = 0
+
+        #讀入追加工期資料
+        for key, value in dict_extend_data.items():
+            obj_extend_start_date = key
+            if obj_today_date >= obj_extend_start_date:
+                n_total_extend_days += value
+
+        n_real_rest_workdays += n_total_extend_days
+
+        while( True ):
+            b_is_weekend = [False]
+            b_is_holiday = [False]
+            b_is_make_up_workday = [False]
+            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_real_end_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
                 if obj_real_end_date <= obj_today_date:
                     if obj_real_end_date in dict_weather_and_human_related_holiday:
                         if dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
@@ -523,6 +610,7 @@ class CreateProjectDialog( QDialog ):
 
         self.ui.qtConstantConditionSettingPushButton.clicked.connect( self.constant_condition_setting )
         self.ui.qtVariableConditionSettingPushButton.clicked.connect( self.variable_condition_setting )
+        self.ui.qtExtendPushButton.clicked.connect( self.extend_working_days_setting )
         self.ui.qtOkPushButton.clicked.connect( self.accept_data )
         self.ui.qtCancelPushButton.clicked.connect( self.cancel )
 
@@ -572,6 +660,7 @@ class CreateProjectDialog( QDialog ):
             self.dict_variable_weather_condition_data = dict_single_project_data[ ProjectData.DICT_WEATHER_CONDITION_DATA ]
             self.dict_variable_human_condition_data = dict_single_project_data[ ProjectData.DICT_HUMAN_CONDITION_DATA ]
             self.dict_project_holiday_data = dict_single_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
+            self.dict_extension_data = dict_single_project_data[ ProjectData.DICT_EXTENSION_DATA ]
         else:
             self.ui.qtBidDateEdit.setDate( self.obj_current_date.date() )
             self.ui.qtStartDateEdit.setDate( self.obj_current_date.date() )
@@ -596,6 +685,7 @@ class CreateProjectDialog( QDialog ):
                                                         HumanCondition.MORNING_HUMAN_OTHER :   VariableConditionNoCount.COUNT_HALF_DAY_OFF,
                                                         HumanCondition.AFTERNOON_HUMAN_OTHER : VariableConditionNoCount.COUNT_HALF_DAY_OFF }
             self.dict_project_holiday_data = {}
+            self.dict_extension_data = {}
         
         self.dict_single_project_data = {}
         self.update_weekday_text()
@@ -632,6 +722,11 @@ class CreateProjectDialog( QDialog ):
         if dialog.exec():
             pass
     
+    def extend_working_days_setting( self ):
+        dialog = ExtendWorkingDaysSettingDialog( self, self.dict_extension_data )
+        if dialog.exec():
+            pass
+
     def update_ui( self ):
         if self.ui.qtWorkingDayRadioButton.isChecked():
             self.ui.qtWorkingDayGroupBox.setEnabled( True )
@@ -724,7 +819,8 @@ class CreateProjectDialog( QDialog ):
                                                                                            str_contract_finish_date,
                                                                                            self.dict_project_holiday_data,
                                                                                            self.dict_variable_weather_condition_data, 
-                                                                                           self.dict_variable_human_condition_data )
+                                                                                           self.dict_variable_human_condition_data,
+                                                                                           self.dict_extension_data )
 
         self.accept()
     
@@ -807,10 +903,7 @@ class HolidaySettingDialog( QDialog ):
 
     def refresh_table( self ):
         for index_row,( key_date, value_dict_holiday_data ) in enumerate( self.dict_used_holiday_data.items() ):
-            obj_date = datetime.datetime.strptime( key_date, "%Y-%m-%d" )
-            n_weekday = obj_date.weekday()
-            str_weekday = Utility.get_obj_datetime_weekday_text( n_weekday )
-            date_item = QStandardItem( key_date + " " + str_weekday )
+            date_item = QStandardItem( Utility.get_concatenate_date_and_weekday_text( key_date ) )
             date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
             date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
             self.holiday_data_model.setItem( index_row, 0, date_item ) 
@@ -1134,6 +1227,123 @@ class VariableConditionSettingDialog( QDialog ):
     def cancel( self ):
         self.reject()
 
+class ExtendWorkingDaysSettingDialog( QDialog ):
+    def __init__( self, parent, dict_project_extension_data ):
+        super().__init__( parent )
+
+        self.ui = Ui_ExtendWorkingDaysSettingDialog()
+        self.ui.setupUi( self )
+        
+        window_icon = QIcon( window_icon_file_path ) 
+        self.setWindowIcon( window_icon )
+
+        obj_current_date = datetime.datetime.today()
+        self.ui.qtDateEdit.setDate( obj_current_date.date() )
+        self.ui.qtDateEdit.setCalendarPopup( True )
+
+        delegate = CenterIconDelegate()
+
+        self.list_table_horizontal_header = [ '追加起始日', '追加天數', '理由', '刪除' ]
+        self.extension_data_model = QStandardItemModel( 0, 0 ) 
+        self.extension_data_model.setHorizontalHeaderLabels( self.list_table_horizontal_header )
+        self.ui.qtTableView.setModel( self.extension_data_model )
+        self.ui.qtTableView.setItemDelegate( delegate )
+        self.ui.qtTableView.verticalHeader().hide()
+        self.ui.qtTableView.clicked.connect( lambda index: self.on_table_item_clicked( index, self.extension_data_model ) )
+
+        self.ui.qtAddPushButton.clicked.connect( self.add_data )
+        self.ui.qtExitPushButton.clicked.connect( self.accept )
+
+        self.dict_project_extension_data = dict_project_extension_data
+
+        self.refresh_table()
+
+    def load_stylesheet( self, file_path ):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:  # 指定 UTF-8 編碼
+                stylesheet = file.read()
+                self.setStyleSheet(stylesheet)
+        except FileNotFoundError:
+            print(f"CSS 檔案 {file_path} 找不到")
+        except Exception as e:
+            print(f"讀取 CSS 檔案時發生錯誤: {e}")
+
+    def add_data( self ):
+        str_date = self.ui.qtDateEdit.date().toString( "yyyy-MM-dd" )
+        str_reason = self.ui.qtReasonLineEdit.text()
+        n_extension_days = self.ui.qtExtensionDaysSpinBox.value()
+
+        if str_date in self.dict_project_extension_data:
+            QMessageBox.warning( self, "警告", "該日期已經存在", QMessageBox.Ok )
+            return
+        else:
+            self.dict_project_extension_data[ str_date ] = {}
+            self.dict_project_extension_data[ str_date ][ ExtensionData.EXTENSION_DAYS ] = n_extension_days
+            self.dict_project_extension_data[ str_date ][ ExtensionData.EXTENSION_REASON ] = str_reason
+            self.process_data()
+
+        self.refresh_table()
+
+    def refresh_table( self ):
+        for index_row,( key_date, value_dict_extension_data ) in enumerate( self.dict_project_extension_data.items() ):
+            date_item = QStandardItem( Utility.get_concatenate_date_and_weekday_text( key_date ) )
+            date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
+            self.extension_data_model.setItem( index_row, 0, date_item ) 
+
+            extension_days_item = QStandardItem( str( value_dict_extension_data[ ExtensionData.EXTENSION_DAYS ] ) )
+            extension_days_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            extension_days_item.setFlags( extension_days_item.flags() & ~Qt.ItemIsEditable )
+            self.extension_data_model.setItem( index_row, 1, extension_days_item ) 
+
+            reason_item = QStandardItem( value_dict_extension_data[ ExtensionData.EXTENSION_REASON ] )
+            reason_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+            reason_item.setFlags( reason_item.flags() & ~Qt.ItemIsEditable )
+            self.extension_data_model.setItem( index_row, 2, reason_item ) 
+
+            delete_icon_item = QStandardItem("")
+            delete_icon_item.setIcon( delete_icon )
+            delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
+            self.extension_data_model.setItem( index_row, len( self.list_table_horizontal_header ) - 1, delete_icon_item ) 
+
+    def on_table_item_clicked( self, index, stock_list_model ):
+        if index.column() == len( self.list_table_horizontal_header ) - 1:
+            result = self.show_warning_message_box_with_ok_cancel_button( "警告", f"確定要刪掉這筆追加工期資料嗎?" )
+            if result:
+                # delete icon
+                date_item = self.extension_data_model.item( index.row(), 0 )
+                str_date = date_item.text().split(" ")[0]
+                del self.dict_project_extension_data[ str_date ]
+                self.extension_data_model.removeRow( index.row() )
+
+    def show_warning_message_box_with_ok_cancel_button( self, str_title, str_message ): 
+        message_box = QMessageBox( self )
+        message_box.setIcon( QMessageBox.Warning )  # 設置為警告圖示
+        message_box.setWindowTitle( str_title )
+        message_box.setText( str_message )
+
+        # 添加自訂按鈕
+        button_ok = message_box.addButton("確定", QMessageBox.AcceptRole)
+        button_cancel = message_box.addButton("取消", QMessageBox.RejectRole)
+
+        message_box.exec()
+
+        if message_box.clickedButton() == button_ok:
+            return True
+        elif message_box.clickedButton() == button_cancel:
+            return False
+    
+    def process_data( self ):
+        for key in sorted( self.dict_project_extension_data.keys() ):
+            self.dict_project_extension_data[ key ] = self.dict_project_extension_data.pop( key )
+
+    def accept_data( self ):
+        self.accept()
+    
+    def cancel( self ):
+        self.reject()
+
+
 class DailyReportPerDayDialog( QDialog ):
     def __init__( self, parent, dict_per_project_data, dict_per_project_dailyreport_data ):
         super().__init__( parent )
@@ -1432,11 +1642,7 @@ class MainWindow( QMainWindow ):
         dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
         
         for index_row,( key_date, value_dict_dailyreport_data ) in enumerate( dict_per_project_dailyreport_data.items() ):
-            obj_date = datetime.datetime.strptime( key_date, "%Y-%m-%d" )
-            n_weekday = obj_date.weekday()
-            str_weekday = Utility.get_obj_datetime_weekday_text( n_weekday )
-
-            date_item = QStandardItem( key_date + " " + str_weekday )
+            date_item = QStandardItem( Utility.get_concatenate_date_and_weekday_text( key_date ) )
             date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
             date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
             self.dailyreport_data_model.setItem( index_row, 0, date_item ) 
@@ -1530,9 +1736,41 @@ class MainWindow( QMainWindow ):
             self.process_dailyreport_data( key_project_number )
 
     def process_dailyreport_data( self, project_number ):
+        dict_per_project_data = self.dict_all_project_data[ project_number ]
         dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ project_number ]
         for key in sorted( dict_per_project_dailyreport_data.keys() ):
             dict_per_project_dailyreport_data[ key ] = dict_per_project_dailyreport_data.pop( key )
+
+        e_contract_condition = dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ]
+        n_contract_working_days = dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
+        obj_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
+        dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
+        list_const_holiday = []
+        list_const_workday = []
+        for key_str_date, value in dict_holiday_data.items():
+            if value[ HolidayData.HOLIDAY ]:
+                list_const_holiday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
+            else:
+                list_const_workday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
+
+        # while( True ):
+        #     if n_contract_working_days <= 0:
+        #         break
+        #     b_is_weekend = [False]
+        #     b_is_holiday = [False]
+        #     b_is_make_up_workday = [False]
+        #     str_date = obj_date.strftime( "%Y-%m-%d" )
+        #     if Utility.get_is_work_day( list_const_holiday, list_const_workday, str_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+        #         if str_date in dict_per_project_dailyreport_data: #有填日報表
+        #             pass
+                
+        #         pass
+        #     else: #非工作日
+        #         if str_date in dict_per_project_dailyreport_data: #非工作日，但有填日報表
+        #             pass
+        #         else:#非工作日，沒填日報表
+        #             pass
+        #     obj_date += datetime.timedelta( days = 1 )
 
     def save_UI_state( self ): 
         # 確保目錄存在，若不存在則遞歸創建
@@ -1639,6 +1877,13 @@ class MainWindow( QMainWindow ):
             export_json_human_condition_data[ "morning_human_other" ]       = int( dict_human_condition_data[ HumanCondition.MORNING_HUMAN_OTHER].value )
             export_json_human_condition_data[ "afternoon_human_other" ]     = int( dict_human_condition_data[ HumanCondition.AFTERNOON_HUMAN_OTHER].value )
             dict_per_project_data[ "human_condition_data" ] = export_json_human_condition_data
+
+            dict_extension_data = value[ ProjectData.DICT_EXTENSION_DATA ]
+            json_extension_data = {}
+            for key_extension_start_date, value_extension in dict_extension_data.items():
+                json_extension_data[ key_extension_start_date ] = { "extension_days" : value_extension[ ExtensionData.EXTENSION_DAYS ], 
+                                                                    "reason" : value_extension[ ExtensionData.EXTENSION_REASON ] }
+            dict_per_project_data[ "extension_data" ] = json_extension_data
             
             export_json_dailyreport_data = {}
             dict_daily_report = self.dict_all_project_dailyreport_data[ key_project_number ]
@@ -1691,6 +1936,12 @@ class MainWindow( QMainWindow ):
                         dict_human_condition_data[ HumanCondition.MORNING_HUMAN_OTHER ]   = VariableConditionNoCount( import_json_human_condition_data[ "morning_human_other" ] )
                         dict_human_condition_data[ HumanCondition.AFTERNOON_HUMAN_OTHER ] = VariableConditionNoCount( import_json_human_condition_data[ "afternoon_human_other" ] )
 
+                        dict_extension_data = {}
+                        import_json_extension_data = value[ "extension_data" ]
+                        for key_extension_start_date, value_extension in import_json_extension_data.items():
+                            dict_extension_data[ key_extension_start_date ] = { ExtensionData.EXTENSION_DAYS : value_extension[ "extension_days" ], 
+                                                                                ExtensionData.EXTENSION_REASON : value_extension[ "reason" ] }
+
                         self.dict_all_project_data[ key_project_number ] = Utility.create_project_data( key_project_number,
                                                                                                         value[ "project_name" ],
                                                                                                         value[ "contract_number" ],
@@ -1707,7 +1958,8 @@ class MainWindow( QMainWindow ):
                                                                                                         value[ "contract_finish_date" ],
                                                                                                         dict_holiday_data,
                                                                                                         dict_weather_condition_data,
-                                                                                                        dict_human_condition_data )
+                                                                                                        dict_human_condition_data,
+                                                                                                        dict_extension_data )
                         export_json_dailyreport_data = {}
                         import_json_daily_report = value[ "dailyreport_data" ]
                         for key_date, value_dailyreport_data in import_json_daily_report.items():

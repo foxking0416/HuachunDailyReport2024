@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>570</width>
-    <height>476</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -450,6 +450,13 @@
          <widget class="QPushButton" name="qtVariableConditionSettingPushButton">
           <property name="text">
            <string>變動因素設定(天候、人為)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="qtExtendPushButton">
+          <property name="text">
+           <string>追加工期設定</string>
           </property>
          </widget>
         </item>

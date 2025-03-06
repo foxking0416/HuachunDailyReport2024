@@ -24,7 +24,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(570, 476)
+        Dialog.resize(570, 494)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
@@ -355,6 +355,11 @@ class Ui_Dialog(object):
 
         self.verticalLayout_5.addWidget(self.qtVariableConditionSettingPushButton)
 
+        self.qtExtendPushButton = QPushButton(self.groupBox)
+        self.qtExtendPushButton.setObjectName(u"qtExtendPushButton")
+
+        self.verticalLayout_5.addWidget(self.qtExtendPushButton)
+
 
         self.horizontalLayout_2.addWidget(self.groupBox)
 
@@ -522,6 +527,7 @@ class Ui_Dialog(object):
         self.qtTwoDayOffRadioButton.setText(QCoreApplication.translate("Dialog", u"\u5468\u4f11\u4e8c\u65e5", None))
         self.qtConstantConditionSettingPushButton.setText(QCoreApplication.translate("Dialog", u"\u56fa\u5b9a\u56e0\u7d20\u8a2d\u5b9a(\u570b\u5b9a\u5047\u65e5)", None))
         self.qtVariableConditionSettingPushButton.setText(QCoreApplication.translate("Dialog", u"\u8b8a\u52d5\u56e0\u7d20\u8a2d\u5b9a(\u5929\u5019\u3001\u4eba\u70ba)", None))
+        self.qtExtendPushButton.setText(QCoreApplication.translate("Dialog", u"\u8ffd\u52a0\u5de5\u671f\u8a2d\u5b9a", None))
         self.label_2.setText(QCoreApplication.translate("Dialog", u"\u958b\u5de5\u65e5\u671f", None))
         self.qtStartWeekdayLabel.setText(QCoreApplication.translate("Dialog", u"TextLabel", None))
         self.label_3.setText(QCoreApplication.translate("Dialog", u"\u5951\u7d04\u5de5\u4f5c\u5929\u6578", None))

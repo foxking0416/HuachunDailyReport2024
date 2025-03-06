@@ -4,7 +4,7 @@ v1.0.0
         "project_name": "復仇者聯盟總部興建工程",
         "contract_number": "Avenger002",
         "project_location": "曼哈頓 1st Street",
-		"contract_value": 9999,
+        "contract_value": 9999,
         "owner": "神盾局",
         "supervisor": "復仇者聯盟",
         "designer": "東尼史塔克",
@@ -270,6 +270,12 @@ v1.0.0
             "morning_human_other": 1,
             "afternoon_human_other": 1
         },
+        "extension_data": {
+            "2025-03-06": {
+                "extension_days": 100,
+                "reason": "變更設計"
+            }
+        },
         "dailyreport_data": {
             "2025-02-27": {
                 "morning_weather": 2,
@@ -295,7 +301,7 @@ v1.0.0
         "project_name": "2",
         "contract_number": "3",
         "project_location": "4",
-		"contract_value": 99,
+        "contract_value": 99,
         "owner": "",
         "supervisor": "",
         "designer": "",
@@ -328,6 +334,7 @@ v1.0.0
             "morning_human_other": 1,
             "afternoon_human_other": 1
         },
+        "extension_data": {},
         "dailyreport_data": {}
     }
 }
