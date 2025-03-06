@@ -245,30 +245,30 @@ v1.0.0
             }
         },
         "morning_weather_condition_data": {
-            "rain": 1,
-            "heavyrain": 0,
-            "typhoon": 0,
-            "hot": 2,
-            "muddy": 2,
-            "weather_other": 2
-        },
-		"afternoon_weather_condition_data": {
-            "rain": 1,
+            "rain": 0.5,
             "heavyrain": 1,
             "typhoon": 1,
-            "hot": 2,
-            "muddy": 2,
-            "weather_other": 2
+            "hot": 0,
+            "muddy": 0,
+            "weather_other": 0
+        },
+		"afternoon_weather_condition_data": {
+            "rain": 0.5,
+            "heavyrain": 0.5,
+            "typhoon": 0.5,
+            "hot": 0,
+            "muddy": 0,
+            "weather_other": 0
         },
         "morning_human_condition_data": {
-            "suspension": 0,
-            "poweroff": 0,
-            "human_other": 1
-        },
-		"afternoon_human_condition_data": {
             "suspension": 1,
             "poweroff": 1,
-            "human_other": 1
+            "human_other": 0.5
+        },
+		"afternoon_human_condition_data": {
+            "suspension": 0.5,
+            "poweroff": 0.5,
+            "human_other": 0.5
         },
         "extension_data": {
             "2023-03-14": {
@@ -4695,30 +4695,30 @@ v1.0.0
         "contract_finish_date": "2025-03-04",
         "holiday_data": {},
         "morning_weather_condition_data": {
-            "rain": 1,
-            "heavyrain": 0,
-            "typhoon": 0,
-            "hot": 2,
-            "muddy": 2,
-            "weather_other": 2
-        },
-		"afternoon_weather_condition_data": {
-            "rain": 1,
+            "rain": 0.5,
             "heavyrain": 1,
             "typhoon": 1,
-            "hot": 2,
-            "muddy": 2,
-            "weather_other": 2
+            "hot": 0,
+            "muddy": 0,
+            "weather_other": 0
+        },
+		"afternoon_weather_condition_data": {
+            "rain": 0.5,
+            "heavyrain": 0.5,
+            "typhoon": 0.5,
+            "hot": 0,
+            "muddy": 0,
+            "weather_other": 0
         },
         "morning_human_condition_data": {
-            "suspension": 0,
-            "poweroff": 0,
-            "human_other": 1
-        },
-		"afternoon_human_condition_data": {
             "suspension": 1,
             "poweroff": 1,
-            "human_other": 1
+            "human_other": 0.5
+        },
+		"afternoon_human_condition_data": {
+            "suspension": 0.5,
+            "poweroff": 0.5,
+            "human_other": 0.5
         },
         "extension_data": {},
         "dailyreport_data": {}

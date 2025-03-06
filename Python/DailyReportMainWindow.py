@@ -203,9 +203,9 @@ class ContractCondition( Enum ):
     FIXED_DEADLINE = 4
 
 class VariableConditionNoCount( Enum ):
-    COUNT_ONE_DAY_OFF = 0
-    COUNT_HALF_DAY_OFF = 1
-    COUNT_NO_DAY_OFF = 2
+    COUNT_ZERO_DAY_OFF = 0
+    COUNT_HALF_DAY_OFF = 0.5
+    COUNT_ONE_DAY_OFF = 1
 
 class CenterIconDelegate( QStyledItemDelegate ):
     def paint( self, painter, option, index ):
@@ -1063,7 +1063,7 @@ class VariableConditionSettingDialog( QDialog ):
         elif qtHalfDayOffRadioButton.isChecked():
             return VariableConditionNoCount.COUNT_HALF_DAY_OFF
         else:
-            return VariableConditionNoCount.COUNT_NO_DAY_OFF
+            return VariableConditionNoCount.COUNT_ZERO_DAY_OFF
 
     def accept_data( self ):
         e_morning_rain          = self.get_day_off( self.ui.qtMorningRainOneDayOffRadioButton,         self.ui.qtMorningRainHalfDayOffRadioButton )
@@ -1073,7 +1073,7 @@ class VariableConditionSettingDialog( QDialog ):
         e_morning_muddy         = self.get_day_off( self.ui.qtMorningMuddyOneDayOffRadioButton,        self.ui.qtMorningMuddyHalfDayOffRadioButton )
         e_morning_weather_other = self.get_day_off( self.ui.qtMorningWeatherOtherOneDayOffRadioButton, self.ui.qtMorningWeatherOtherHalfDayOffRadioButton )
 
-        self.dict_morning_weather_condition_data[ Weather.SUN ]           = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        self.dict_morning_weather_condition_data[ Weather.SUN ]           = VariableConditionNoCount.COUNT_ZERO_DAY_OFF
         self.dict_morning_weather_condition_data[ Weather.RAIN ]          = e_morning_rain
         self.dict_morning_weather_condition_data[ Weather.HEAVY_RAIN ]    = e_morning_heavyrain
         self.dict_morning_weather_condition_data[ Weather.TYPHOON ]       = e_morning_typhoon
@@ -1088,7 +1088,7 @@ class VariableConditionSettingDialog( QDialog ):
         e_afternoon_muddy         = self.get_day_off( self.ui.qtAfternoonMuddyOneDayOffRadioButton,        self.ui.qtAfternoonMuddyHalfDayOffRadioButton )
         e_afternoon_weather_other = self.get_day_off( self.ui.qtAfternoonWeatherOtherOneDayOffRadioButton, self.ui.qtAfternoonWeatherOtherHalfDayOffRadioButton )
 
-        self.dict_afternoon_weather_condition_data[ Weather.SUN ]           = VariableConditionNoCount.COUNT_NO_DAY_OFF
+        self.dict_afternoon_weather_condition_data[ Weather.SUN ]           = VariableConditionNoCount.COUNT_ZERO_DAY_OFF
         self.dict_afternoon_weather_condition_data[ Weather.RAIN ]          = e_afternoon_rain
         self.dict_afternoon_weather_condition_data[ Weather.HEAVY_RAIN ]    = e_afternoon_heavyrain
         self.dict_afternoon_weather_condition_data[ Weather.TYPHOON ]       = e_afternoon_typhoon
@@ -1632,8 +1632,10 @@ class MainWindow( QMainWindow ):
 
         e_contract_condition = dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ]
         n_contract_working_days = dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
-        dict_weather_condition = dict_per_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
-        dict_human_condition = dict_per_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
+        dict_morning_weather_condition = dict_per_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
+        dict_afternoon_weather_condition = dict_per_project_data[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ]
+        dict_morning_human_condition = dict_per_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
+        dict_afternoon_human_condition = dict_per_project_data[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ]
         obj_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
         dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
         list_const_holiday = []
@@ -1763,36 +1765,36 @@ class MainWindow( QMainWindow ):
 
             dict_morning_weather_condition_data = value[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
             export_json_morning_weather_condition_data = {}
-            export_json_morning_weather_condition_data[ "rain" ]          = int( dict_morning_weather_condition_data[ Weather.RAIN].value )
-            export_json_morning_weather_condition_data[ "heavyrain" ]     = int( dict_morning_weather_condition_data[ Weather.HEAVY_RAIN].value )
-            export_json_morning_weather_condition_data[ "typhoon" ]       = int( dict_morning_weather_condition_data[ Weather.TYPHOON].value )
-            export_json_morning_weather_condition_data[ "hot" ]           = int( dict_morning_weather_condition_data[ Weather.HOT].value )
-            export_json_morning_weather_condition_data[ "muddy" ]         = int( dict_morning_weather_condition_data[ Weather.MUDDY].value )
-            export_json_morning_weather_condition_data[ "weather_other" ] = int( dict_morning_weather_condition_data[ Weather.WEATHER_OTHER].value )
+            export_json_morning_weather_condition_data[ "rain" ]          = float( dict_morning_weather_condition_data[ Weather.RAIN].value )
+            export_json_morning_weather_condition_data[ "heavyrain" ]     = float( dict_morning_weather_condition_data[ Weather.HEAVY_RAIN].value )
+            export_json_morning_weather_condition_data[ "typhoon" ]       = float( dict_morning_weather_condition_data[ Weather.TYPHOON].value )
+            export_json_morning_weather_condition_data[ "hot" ]           = float( dict_morning_weather_condition_data[ Weather.HOT].value )
+            export_json_morning_weather_condition_data[ "muddy" ]         = float( dict_morning_weather_condition_data[ Weather.MUDDY].value )
+            export_json_morning_weather_condition_data[ "weather_other" ] = float( dict_morning_weather_condition_data[ Weather.WEATHER_OTHER].value )
             dict_per_project_data[ "morning_weather_condition_data" ] = export_json_morning_weather_condition_data
 
             dict_afternoon_weather_condition_data = value[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ]
             export_json_afternoon_weather_condition_data = {}
-            export_json_afternoon_weather_condition_data[ "rain" ]          = int( dict_afternoon_weather_condition_data[ Weather.RAIN].value )
-            export_json_afternoon_weather_condition_data[ "heavyrain" ]     = int( dict_afternoon_weather_condition_data[ Weather.HEAVY_RAIN].value )
-            export_json_afternoon_weather_condition_data[ "typhoon" ]       = int( dict_afternoon_weather_condition_data[ Weather.TYPHOON].value )
-            export_json_afternoon_weather_condition_data[ "hot" ]           = int( dict_afternoon_weather_condition_data[ Weather.HOT].value )
-            export_json_afternoon_weather_condition_data[ "muddy" ]         = int( dict_afternoon_weather_condition_data[ Weather.MUDDY].value )
-            export_json_afternoon_weather_condition_data[ "weather_other" ] = int( dict_afternoon_weather_condition_data[ Weather.WEATHER_OTHER].value )
+            export_json_afternoon_weather_condition_data[ "rain" ]          = float( dict_afternoon_weather_condition_data[ Weather.RAIN].value )
+            export_json_afternoon_weather_condition_data[ "heavyrain" ]     = float( dict_afternoon_weather_condition_data[ Weather.HEAVY_RAIN].value )
+            export_json_afternoon_weather_condition_data[ "typhoon" ]       = float( dict_afternoon_weather_condition_data[ Weather.TYPHOON].value )
+            export_json_afternoon_weather_condition_data[ "hot" ]           = float( dict_afternoon_weather_condition_data[ Weather.HOT].value )
+            export_json_afternoon_weather_condition_data[ "muddy" ]         = float( dict_afternoon_weather_condition_data[ Weather.MUDDY].value )
+            export_json_afternoon_weather_condition_data[ "weather_other" ] = float( dict_afternoon_weather_condition_data[ Weather.WEATHER_OTHER].value )
             dict_per_project_data[ "afternoon_weather_condition_data" ] = export_json_afternoon_weather_condition_data
 
             dict_morning_human_condition_data = value[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
             export_json_morning_human_condition_data = {}
-            export_json_morning_human_condition_data[ "suspension" ]  = int( dict_morning_human_condition_data[ Human.SUSPENSION].value )
-            export_json_morning_human_condition_data[ "poweroff" ]    = int( dict_morning_human_condition_data[ Human.POWER_OFF].value )
-            export_json_morning_human_condition_data[ "human_other" ] = int( dict_morning_human_condition_data[ Human.HUMAN_OTHER].value )
+            export_json_morning_human_condition_data[ "suspension" ]  = float( dict_morning_human_condition_data[ Human.SUSPENSION].value )
+            export_json_morning_human_condition_data[ "poweroff" ]    = float( dict_morning_human_condition_data[ Human.POWER_OFF].value )
+            export_json_morning_human_condition_data[ "human_other" ] = float( dict_morning_human_condition_data[ Human.HUMAN_OTHER].value )
             dict_per_project_data[ "morning_human_condition_data" ] = export_json_morning_human_condition_data
 
             dict_afternoon_human_condition_data = value[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ]
             export_json_afternoon_human_condition_data = {}
-            export_json_afternoon_human_condition_data[ "suspension" ]  = int( dict_afternoon_human_condition_data[ Human.SUSPENSION].value )
-            export_json_afternoon_human_condition_data[ "poweroff" ]    = int( dict_afternoon_human_condition_data[ Human.POWER_OFF].value )
-            export_json_afternoon_human_condition_data[ "human_other" ] = int( dict_afternoon_human_condition_data[ Human.HUMAN_OTHER].value )
+            export_json_afternoon_human_condition_data[ "suspension" ]  = float( dict_afternoon_human_condition_data[ Human.SUSPENSION].value )
+            export_json_afternoon_human_condition_data[ "poweroff" ]    = float( dict_afternoon_human_condition_data[ Human.POWER_OFF].value )
+            export_json_afternoon_human_condition_data[ "human_other" ] = float( dict_afternoon_human_condition_data[ Human.HUMAN_OTHER].value )
             dict_per_project_data[ "afternoon_human_condition_data" ] = export_json_afternoon_human_condition_data
 
             dict_extension_data = value[ ProjectData.DICT_EXTENSION_DATA ]
