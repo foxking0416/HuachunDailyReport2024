@@ -1,52 +1,15 @@
 import json
 import os
 import datetime
-from enum import Enum, IntEnum, auto
-
-class HolidayData( Enum ):
-    REASON = 0
-    HOLIDAY = 1
-
-class ContractCondition( Enum ):
-    WORKING_DAY_NO_DAYOFF = 0
-    WORKING_DAY_ONE_DAYOFF = 1
-    WORKING_DAY_TWO_DAYOFF = 2
-    CALENDAR_DAY = 3
-    FIXED_DEADLINE = 4
-
-class WeatherCondition( Enum ):
-    MORNING_RAIN = 0
-    AFTERNOON_RAIN = 1
-    MORNING_HEAVYRAIN = 2
-    AFTERNOON_HEAVYRAIN = 3
-    MORNING_TYPHOON = 4
-    AFTERNOON_TYPHOON = 5
-    MORNING_HOT = 6
-    AFTERNOON_HOT = 7
-    MORNING_MUDDY = 8
-    AFTERNOON_MUDDY = 9
-    MORNING_WEATHER_OTHER = 10
-    AFTERNOON_WEATHER_OTHER = 11
-
-class HumanCondition( Enum ):
-    MORNING_SUSPENSION = 0
-    AFTERNOON_SUSPENSION = 1
-    MORNING_POWER_OFF = 2
-    AFTERNOON_POWER_OFF = 3
-    MORNING_HUMAN_OTHER = 4
-    AFTERNOON_HUMAN_OTHER = 5
-
-class VariableConditionNoCount( Enum ):
-    COUNT_ONE_DAY_OFF = 0
-    COUNT_HALF_DAY_OFF = 1
-    COUNT_NO_DAY_OFF = 2
+from enum import Enum
+from enum import IntEnum
 
 class SyspendWork(IntEnum):
     NONE = 0
     SUSPEND_WORK = 1
     TOTAL = 2
 
-class Weather( Enum ):
+class Weather(IntEnum):
     SUN = 0
     RAIN = 1
     HEAVY_RAIN = 2
@@ -56,14 +19,18 @@ class Weather( Enum ):
     OTHER = 6
     TOTAL = 7
 
-class Human( Enum ):
+class Human(IntEnum):
     NONE = 0
-    SUSPENSION = 1
-    POWER_OFF = 2
-    OTHER = 3
-    TOTAL = 4
+    POWER_OFF = 1
+    OTHER = 2
+    TOTAL = 3
 
-class Weekday( Enum ):
+class WorkDay(Enum):
+    ONE_DAY_OFF = 0
+    TWO_DAY_OFF = 1
+    NO_DAY_OFF = 2
+
+class Weekday(Enum):
     MONDAY = 0
     TUESDAY = 1
     WEDNESDAY = 2
@@ -348,7 +315,7 @@ def func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_we
     b_is_holiday[0] = False
     b_is_make_up_workday[0] = False
     if n_weekday == Weekday.SUNDAY.value:
-        if e_count_type == ContractCondition.WORKING_DAY_ONE_DAYOFF or e_count_type == ContractCondition.WORKING_DAY_TWO_DAYOFF:
+        if e_count_type == WorkDay.ONE_DAY_OFF or e_count_type == WorkDay.TWO_DAY_OFF:
             if obj_date in arr_const_workday:
                 b_is_make_up_workday[0] = True
                 return True
@@ -361,7 +328,7 @@ def func_check_is_work_day( arr_const_holiday, arr_const_workday, obj_date, n_we
         else:
             return True
     elif n_weekday == Weekday.SATURDAY.value:
-        if e_count_type == ContractCondition.WORKING_DAY_TWO_DAYOFF:
+        if e_count_type == WorkDay.TWO_DAY_OFF:
             if obj_date in arr_const_workday:
                 b_is_make_up_workday[0] = True
                 return True
