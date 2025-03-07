@@ -4658,24 +4658,6 @@ v1.0.0
                 "afternoon_weather": 0,
                 "morning_human": 0,
                 "afternoon_human": 0
-            },
-            "2025-02-27": {
-                "morning_weather": 2,
-                "afternoon_weather": 1,
-                "morning_human": 1,
-                "afternoon_human": 1
-            },
-            "2025-03-05": {
-                "morning_weather": 0,
-                "afternoon_weather": 0,
-                "morning_human": 0,
-                "afternoon_human": 0
-            },
-            "2025-03-17": {
-                "morning_weather": 0,
-                "afternoon_weather": 0,
-                "morning_human": 2,
-                "afternoon_human": 2
             }
         }
     },

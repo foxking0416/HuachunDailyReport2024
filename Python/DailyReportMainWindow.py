@@ -171,6 +171,14 @@ class DailyReportData( Enum ):
     E_AFTERNOON_WEATHER = auto()
     E_MORNING_HUMAN = auto()
     E_AFTERNOON_HUMAN = auto()
+    F_TODAY_NO_COUNT_DAYS = auto() #今日不計工期
+    F_ACCUMULATED_USED_WORKING_DAYS = auto() #累計使用工作天數
+    F_ACCUMULATED_USED_CALENDAR_DAYS = auto() #累計使用日曆天數
+    F_ACCUMULATED_NO_COUNT_DAYS = auto() #累計不計工期天數
+    F_ACCUMULATED_EXTENSION_WORKING_DAYS = auto() #累計追加工作天數
+    F_ACCUMULATED_EXTENSION_CALENDAR_DAYS = auto() #累計追加日曆天數
+    F_ACCUMULATED_REST_WORKING_DAYS = auto() #累計剩餘工作天數
+    F_ACCUMULATED_REST_CALENDAR_DAYS = auto() #累計剩餘日曆天數
 
 class Weather( Enum ):
     SUN = 0
@@ -334,7 +342,7 @@ class Utility():
         else:
             return ""
 
-    def get_is_work_day( list_const_holiday, list_const_workday, obj_date, e_contract_condition, ret_b_is_weekend, ret_b_is_holiday, ret_b_is_makeup_workday ):
+    def get_is_work_day( list_obj_holidays, list_obj_working_days, obj_date, e_contract_condition, ret_b_is_weekend, ret_b_is_holiday, ret_b_is_makeup_workday ):
         ret_b_is_weekend[0] = False
         ret_b_is_holiday[0] = False
         ret_b_is_makeup_workday[0] = False
@@ -342,32 +350,32 @@ class Utility():
         if n_weekday == Weekday.SUNDAY.value:
             if ( e_contract_condition == ContractCondition.WORKING_DAY_ONE_DAYOFF or 
                  e_contract_condition == ContractCondition.WORKING_DAY_TWO_DAYOFF ):
-                if obj_date in list_const_workday:
+                if obj_date in list_obj_working_days:
                     ret_b_is_makeup_workday[0] = True
                     return True
                 else:
                     ret_b_is_weekend[0] = True
                     return False
-            elif obj_date in list_const_holiday:
+            elif obj_date in list_obj_holidays:
                 ret_b_is_holiday[0] = True
                 return False
             else:
                 return True
         elif n_weekday == Weekday.SATURDAY.value:
             if e_contract_condition == ContractCondition.WORKING_DAY_TWO_DAYOFF:
-                if obj_date in list_const_workday:
+                if obj_date in list_obj_working_days:
                     ret_b_is_makeup_workday[0] = True
                     return True
                 else:
                     ret_b_is_weekend[0] = True
                     return False
-            elif obj_date in list_const_holiday:
+            elif obj_date in list_obj_holidays:
                 ret_b_is_holiday[0] = True
                 return False
             else:
                 return True
         else:
-            if obj_date in list_const_holiday:
+            if obj_date in list_obj_holidays:
                 ret_b_is_holiday[0] = True
                 return False
             else:
@@ -1533,39 +1541,37 @@ class MainWindow( QMainWindow ):
         else:
             self.ui.qtCurrentSelectProjectLabel.setText( "" )
 
+    def clear_dailyreport_list_table( self ):
+        self.dailyreport_data_model.clear()
+        self.dailyreport_data_model.setHorizontalHeaderLabels( self.list_dailyreport_list_table_horizontal_header )
+
     def refresh_dailyreport_list_table( self ):
+        self.clear_dailyreport_list_table()
+        if self.str_picked_project_number == "":
+            return
+        dict_per_project_data = self.dict_all_project_data[ self.str_picked_project_number ]
         dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
-        
-        for index_row,( key_date, value_dict_dailyreport_data ) in enumerate( dict_per_project_dailyreport_data.items() ):
-            date_item = QStandardItem( Utility.get_concatenate_date_and_weekday_text( key_date ) )
-            date_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            date_item.setFlags( date_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, 0, date_item ) 
+        str_start_date = dict_per_project_data[ ProjectData.STR_START_DATE ]
 
-            e_morning_weather = value_dict_dailyreport_data[ DailyReportData.E_MORNING_WEATHER ]
-            e_afternoon_weather = value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_WEATHER ]
-            e_morning_human = value_dict_dailyreport_data[ DailyReportData.E_MORNING_HUMAN ]
-            e_afternoon_human = value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_HUMAN ]
+        index_row = 0
+        for key_date, value_dict_dailyreport_data in dict_per_project_dailyreport_data.items():
+            if key_date < str_start_date:
+                continue
+            list_item_value = []
+            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( key_date ) ) #日期
+            list_item_value.append( self.get_weather_text( value_dict_dailyreport_data[ DailyReportData.E_MORNING_WEATHER ] ) ) #上午天氣
+            list_item_value.append( self.get_weather_text( value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_WEATHER ] ) ) #下午天氣
+            list_item_value.append( self.get_human_text( value_dict_dailyreport_data[ DailyReportData.E_MORNING_HUMAN ] ) ) #上午人為
+            list_item_value.append( self.get_human_text( value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_HUMAN ] ) ) #下午人為
+            if DailyReportData.F_TODAY_NO_COUNT_DAYS not in value_dict_dailyreport_data:
+                pass
+            list_item_value.append( str( value_dict_dailyreport_data[ DailyReportData.F_TODAY_NO_COUNT_DAYS ] ) ) #當日不計工期
 
-            morning_weather_item = QStandardItem( self.get_weather_text( e_morning_weather ) )
-            morning_weather_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            morning_weather_item.setFlags( morning_weather_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, 1, morning_weather_item ) 
-
-            afternoon_weather_item = QStandardItem( self.get_weather_text( e_afternoon_weather ) )
-            afternoon_weather_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            afternoon_weather_item.setFlags( afternoon_weather_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, 2, afternoon_weather_item ) 
-
-            morning_human_item = QStandardItem( self.get_human_text( e_morning_human ) )
-            morning_human_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            morning_human_item.setFlags( morning_human_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, 3, morning_human_item ) 
-
-            afternoon_human_item = QStandardItem( self.get_human_text( e_afternoon_human ) )
-            afternoon_human_item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
-            afternoon_human_item.setFlags( afternoon_human_item.flags() & ~Qt.ItemIsEditable )
-            self.dailyreport_data_model.setItem( index_row, 4, afternoon_human_item ) 
+            for index_column, str_item_value in enumerate( list_item_value ):
+                item = QStandardItem( str_item_value )
+                item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
+                item.setFlags( item.flags() & ~Qt.ItemIsEditable )
+                self.dailyreport_data_model.setItem( index_row, index_column, item )
 
             edit_icon_item = QStandardItem("")
             edit_icon_item.setIcon( edit_icon )
@@ -1576,7 +1582,9 @@ class MainWindow( QMainWindow ):
             delete_icon_item.setIcon( delete_icon )
             delete_icon_item.setFlags( delete_icon_item.flags() & ~Qt.ItemIsEditable )
             self.dailyreport_data_model.setItem( index_row, len( self.list_dailyreport_list_table_horizontal_header ) - 1, delete_icon_item ) 
-        
+            
+            index_row += 1
+
         for column in range( len( self.list_dailyreport_list_table_horizontal_header ) ):
             if column < len( self.list_dailyreport_list_column_width ):
                 self.ui.qtDailyReportListTableView.setColumnWidth( column, self.list_dailyreport_list_column_width[ column ] )
@@ -1636,57 +1644,75 @@ class MainWindow( QMainWindow ):
         for key in sorted( dict_per_project_dailyreport_data.keys() ):
             dict_per_project_dailyreport_data[ key ] = dict_per_project_dailyreport_data.pop( key )
 
+        obj_last_dailyreport_date = None
+        if len( dict_per_project_dailyreport_data ) > 0:
+            last_key_date = next( reversed ( dict_per_project_dailyreport_data ) )
+            obj_last_dailyreport_date = datetime.datetime.strptime( last_key_date, "%Y-%m-%d" )
+
         e_contract_condition = dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ]
         n_contract_working_days = dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
         dict_morning_weather_condition = dict_per_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
         dict_afternoon_weather_condition = dict_per_project_data[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ]
         dict_morning_human_condition = dict_per_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
         dict_afternoon_human_condition = dict_per_project_data[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ]
-        obj_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
+        obj_start_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
         dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
-        list_const_holiday = []
-        list_const_workday = []
+        list_obj_holidays = []
+        list_obj_workdays = []
         for key_str_date, value in dict_holiday_data.items():
             if value[ HolidayData.HOLIDAY ]:
-                list_const_holiday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
+                list_obj_holidays.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
             else:
-                list_const_workday.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
+                list_obj_workdays.append( datetime.datetime.strptime( key_str_date, "%Y-%m-%d") )
 
-        # while( True ):
-        #     if n_contract_working_days <= 0:
-        #         break
-        #     str_date = obj_date.strftime( "%Y-%m-%d" )
-        #     e_morning_weather = Weather.SUN
-        #     e_afternoon_weather = Weather.SUN
-        #     e_morning_human = Human.NONE
-        #     e_afternoon_human = Human.NONE
-        #     if str_date in dict_per_project_dailyreport_data:
-        #         e_morning_weather = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_MORNING_WEATHER ]
-        #         e_afternoon_weather = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_AFTERNOON_WEATHER ]
-        #         e_morning_human = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_MORNING_HUMAN ]
-        #         e_afternoon_human = dict_per_project_dailyreport_data[ str_date ][ DailyReportData.E_AFTERNOON_HUMAN ]
+        n_real_rest_working_days = n_contract_working_days
+        n_expect_rest_working_days = n_contract_working_days
+        obj_real_end_date = obj_start_date 
+        obj_expect_end_date = obj_start_date
+        n_past_working_days = 0
+        n_total_extend_days = 0
+        while( True ):
+            b_is_weekend = [False]
+            b_is_holiday = [False]
+            b_is_make_up_workday = [False]
+            str_real_end_date = obj_real_end_date.strftime( "%Y-%m-%d" )
+            if Utility.get_is_work_day( list_obj_holidays, list_obj_workdays, obj_real_end_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
+                e_morning_weather = Weather.SUN
+                e_afternoon_weather = Weather.SUN
+                e_morning_human = Human.NONE
+                e_afternoon_human = Human.NONE
+                if str_real_end_date in dict_per_project_dailyreport_data:
+                    e_morning_weather = dict_per_project_dailyreport_data[ str_real_end_date ][ DailyReportData.E_MORNING_WEATHER ]
+                    e_afternoon_weather = dict_per_project_dailyreport_data[ str_real_end_date ][ DailyReportData.E_AFTERNOON_WEATHER ]
+                    e_morning_human = dict_per_project_dailyreport_data[ str_real_end_date ][ DailyReportData.E_MORNING_HUMAN ]
+                    e_afternoon_human = dict_per_project_dailyreport_data[ str_real_end_date ][ DailyReportData.E_AFTERNOON_HUMAN ]
+                f_morning_weather_nocount = dict_morning_weather_condition[ e_morning_weather ].value
+                f_morning_human_nocount = dict_morning_human_condition[ e_morning_human ].value
+                f_morning_nocount = max( f_morning_weather_nocount, f_morning_human_nocount ) #0, 0.5, 1
 
-        #     if( e_morning_weather != Weather.SUN or e_morning_human != Human.NONE ):
-        #         f_morning_weather_nocount = dict_weather_condition[ e_morning_weather ]
-        #         f_morning_human_nocount = dict_human_condition[ e_morning_human ]
-        #         pass
+                f_afternoon_weather_nocount = dict_afternoon_weather_condition[ e_afternoon_weather ].value
+                f_afternoon_human_nocount = dict_afternoon_human_condition[ e_afternoon_human ].value
+                f_afternoon_nocount = max( f_afternoon_weather_nocount, f_afternoon_human_nocount ) #0, 0.5, 1
+                
+                f_all_day_nocount = min( f_morning_nocount + f_afternoon_nocount, 1 ) #0, 0.5, 1
+                
+                n_past_working_days += ( 1 - f_all_day_nocount )
+                n_real_rest_working_days -= ( 1 - f_all_day_nocount )
 
-        #     b_is_weekend = [False]
-        #     b_is_holiday = [False]
-        #     b_is_make_up_workday = [False]
-        #     if Utility.get_is_work_day( list_const_holiday, list_const_workday, str_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
-                
-                
-        #         if str_date in dict_per_project_dailyreport_data: #有填日報表
-        #             pass
-                
-        #         pass
-        #     else: #非工作日
-        #         if str_date in dict_per_project_dailyreport_data: #非工作日，但有填日報表
-        #             pass
-        #         else:#非工作日，沒填日報表
-        #             pass
-        #     obj_date += datetime.timedelta( days = 1 )
+            if str_real_end_date in dict_per_project_dailyreport_data:
+                dict_per_day_dailyreport_data = dict_per_project_dailyreport_data[ str_real_end_date ]
+                dict_per_day_dailyreport_data[ DailyReportData.F_TODAY_NO_COUNT_DAYS ] = f_all_day_nocount
+                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_WORKING_DAYS ] = f_all_day_nocount
+                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_CALENDAR_DAYS ] = f_all_day_nocount
+                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_NO_COUNT_DAYS ] = f_all_day_nocount
+
+                n_expect_rest_working_days -= 1
+            if n_real_rest_working_days <= 0 and ( obj_last_dailyreport_date is None or obj_real_end_date >= obj_last_dailyreport_date ):
+                break
+            if n_expect_rest_working_days > 0:
+                obj_expect_end_date += datetime.timedelta( days = 1 )
+            obj_real_end_date += datetime.timedelta( days = 1 )
+        pass
 
     def save_UI_state( self ): 
         # 確保目錄存在，若不存在則遞歸創建
