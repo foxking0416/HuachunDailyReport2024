@@ -155,6 +155,8 @@ class ProjectData( Enum ):
     DICT_MORNING_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
     DICT_AFTERNOON_HUMAN_CONDITION_DATA = auto() #變動人為條件資料
     DICT_EXTENSION_DATA = auto() #追加工期資料
+    STR_EXPECT_FINISH_DATE_NON_SAVE = auto() #預計完工日期(不存檔)
+    STR_MODIFIED_FINISH_DATE_NON_SAVE = auto() #實際完工日期(不存檔)
 
 class Weekday( Enum ):
     MONDAY = 0
@@ -408,86 +410,6 @@ class Utility():
     # dict_weather_and_human_related_holiday 因為天氣停工資料
     # dict_extend_data 追加工期資料
     def get_real_finish_date( e_contract_condition, 
-                              n_contract_working_days, 
-                              obj_start_date, 
-                              obj_today_date, 
-                              list_const_holiday, 
-                              list_const_workday, 
-                              dict_weather_and_human_related_holiday, 
-                              dict_extend_data ):
-        obj_real_end_date = obj_start_date 
-        obj_expect_end_date = obj_start_date
-        n_real_rest_workdays = n_contract_working_days
-        n_expect_rest_workdays = n_contract_working_days
-        n_past_workdays = 0
-        n_total_extend_days = 0
-
-        #讀入追加工期資料
-        for key, value in dict_extend_data.items():
-            obj_extend_start_date = key
-            if obj_today_date >= obj_extend_start_date:
-                n_total_extend_days += value
-
-        n_real_rest_workdays += n_total_extend_days
-
-        while( True ):
-            b_is_weekend = [False]
-            b_is_holiday = [False]
-            b_is_make_up_workday = [False]
-            if Utility.get_is_work_day( list_const_holiday, list_const_workday, obj_real_end_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
-                if obj_real_end_date <= obj_today_date:
-                    if obj_real_end_date in dict_weather_and_human_related_holiday:
-                        if dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.NO_COUNT:
-                            pass
-                        elif dict_weather_and_human_related_holiday[ obj_real_end_date ] == CountWorkingDay.COUNT_HALF_DAY:
-                            n_past_workdays += 0.5
-                            n_real_rest_workdays -= 0.5
-                        else:
-                            n_past_workdays += 1
-                            n_real_rest_workdays -= 1
-                    else:
-                        n_past_workdays += 1
-                        n_real_rest_workdays -= 1#沒填日報表就當作一般晴天
-                else:
-                    n_real_rest_workdays -= 1#未來的日子還沒有日報表
-                n_expect_rest_workdays -= 1
-
-            if n_real_rest_workdays <= 0:
-                break
-
-            if n_expect_rest_workdays > 0:
-                obj_expect_end_date += datetime.timedelta( days = 1 )
-
-            obj_real_end_date += datetime.timedelta( days = 1 )
-
-        obj_return_value = {}
-        obj_return_value['ExpectFinishDate']        = obj_expect_end_date
-        obj_return_value['ExpectTotalCalendarDays'] = ( obj_expect_end_date - obj_start_date ).days + 1
-        obj_return_value['RealFinishDate']          = obj_real_end_date
-        obj_return_value['RealTotalCalendarDays']   = ( obj_real_end_date - obj_start_date ).days + 1
-        obj_return_value['FromStartCalendarDays']   = ( obj_today_date - obj_start_date ).days + 1
-        obj_return_value['FromStartWorkDays']       = n_past_workdays
-        obj_return_value['ExpectRestWorkDays']      = n_contract_working_days - n_past_workdays
-        obj_return_value['ExpectRestCalendarkDays'] = ( obj_expect_end_date - obj_today_date ).days
-        obj_return_value['RealRestWorkDays']        = n_contract_working_days + n_total_extend_days - n_past_workdays
-        obj_return_value['RealRestCalendarkDays']   = ( obj_real_end_date - obj_today_date ).days 
-        #契約工期         合約給定
-        #契約完工日       ExpectFinishDate
-        #契約天數         ExpectTotalCalendarDays
-
-        #開工迄今工作天數  FromStartWorkDays
-        #開工迄今日曆天數  FromStartCalendarDays
-        #變動完工日       RealFinishDate
-        #變動完工天數     RealTotalCalendarDays
-        #預計剩餘工期     ExpectRestWorkDays
-        #預計剩餘天數     ExpectRestCalendarkDays
-        #實際剩餘工期     RealRestWorkDays
-        #實際剩餘天數     RealRestCalendarkDays
-
-
-        return obj_return_value
-
-    def get_real_finish_date2( e_contract_condition, 
                               n_contract_working_days, 
                               obj_start_date, 
                               obj_today_date, 
@@ -1336,7 +1258,7 @@ class MainWindow( QMainWindow ):
             self.progress_bar.setVisible( False )
         
         delegate = CenterIconDelegate()
-        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件', '開工日期', '契約工期', '預計完工日', '預計完工天數', '編輯', '刪除' ]
+        self.list_project_list_table_horizontal_header = [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件', '開工日期', '契約工期', '預計完工日', '預計完工天數', '變動完工日', '變動完工天數', '編輯', '刪除' ]
         self.project_data_model = QStandardItemModel( 0, 0 ) 
         self.project_data_model.setHorizontalHeaderLabels( self.list_project_list_table_horizontal_header )
         self.ui.qtProjectListTableView.setModel( self.project_data_model )
@@ -1459,7 +1381,7 @@ class MainWindow( QMainWindow ):
             self.refresh_project_list_table()
 
     def refresh_project_list_table( self ):
-        # [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件', '開工日期', '契約工期', '預計完工日', '預計完工天數', '編輯', '刪除' ]
+        # [ '工程編號', '工程名稱', '案號及契約號', '工程地點', '業主', '設計單位', '工期條件', '開工日期', '契約工期', '預計完工日', '預計完工天數', '變動完工日', '變動完工天數', '編輯', '刪除' ]
         list_vertical_labels = ["   "] * len( self.dict_all_project_data )
         for index_row,( key_project_number, value_dict_project_data ) in enumerate( self.dict_all_project_data.items() ):
             list_item_value = []
@@ -1472,8 +1394,10 @@ class MainWindow( QMainWindow ):
             list_item_value.append( Utility.get_contract_condition_text( value_dict_project_data[ ProjectData.E_CONTRACT_CONDITION ] ) ) #工期條件
             list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_START_DATE ] ) ) #開工日期
             list_item_value.append( str( value_dict_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ] ) ) #契約工期
-            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_INITIAL_CONTRACT_FINISH_DATE ] ) ) #預計完工日
-
+            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_EXPECT_FINISH_DATE_NON_SAVE ] ) ) #預計完工日
+            list_item_value.append("") #預計完工天數
+            list_item_value.append( Utility.get_concatenate_date_and_weekday_text( value_dict_project_data[ ProjectData.STR_MODIFIED_FINISH_DATE_NON_SAVE ] ) ) #變動完工日
+            list_item_value.append("") #變動完工天數
             for index_column, str_item_value in enumerate( list_item_value ):
                 item = QStandardItem( str_item_value )
                 item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
@@ -1679,12 +1603,16 @@ class MainWindow( QMainWindow ):
 
         e_contract_condition = dict_per_project_data[ ProjectData.E_CONTRACT_CONDITION ]
         n_contract_working_days = dict_per_project_data[ ProjectData.F_INITIAL_CONTRACT_WORKING_DAYS ]
+        dict_extend_data = copy.deepcopy( dict_per_project_data[ ProjectData.DICT_EXTENSION_DATA ] )
+        for key in sorted( dict_extend_data.keys() ):
+            dict_extend_data[ key ] = dict_extend_data.pop( key )
         dict_morning_weather_condition = dict_per_project_data[ ProjectData.DICT_MORNING_WEATHER_CONDITION_DATA ]
         dict_afternoon_weather_condition = dict_per_project_data[ ProjectData.DICT_AFTERNOON_WEATHER_CONDITION_DATA ]
         dict_morning_human_condition = dict_per_project_data[ ProjectData.DICT_MORNING_HUMAN_CONDITION_DATA ]
         dict_afternoon_human_condition = dict_per_project_data[ ProjectData.DICT_AFTERNOON_HUMAN_CONDITION_DATA ]
         obj_start_date = datetime.datetime.strptime( dict_per_project_data[ ProjectData.STR_START_DATE ], "%Y-%m-%d" )
         dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
+
         list_obj_holidays = []
         list_obj_workdays = []
         for key_str_date, value in dict_holiday_data.items():
@@ -1697,15 +1625,26 @@ class MainWindow( QMainWindow ):
         n_expect_rest_working_days = n_contract_working_days
         obj_real_end_date = obj_start_date 
         obj_expect_end_date = obj_start_date
+        obj_modified_end_date = obj_start_date
         n_past_working_days = 0
-        n_total_extend_days = 0
         f_accumulated_used_working_days = 0
         f_accumulated_used_calendar_days = 0
         while( True ):
+            n_total_extend_days = 0
             b_is_weekend = [False]
             b_is_holiday = [False]
             b_is_make_up_workday = [False]
             str_real_end_date = obj_real_end_date.strftime( "%Y-%m-%d" )
+
+            keys_to_delete = []
+            for key_str_extend_start_date, value in dict_extend_data.items():
+                if obj_real_end_date.strftime( "%Y-%m-%d" ) >= key_str_extend_start_date:
+                    n_total_extend_days += value[ ExtensionData.EXTENSION_DAYS ] 
+                    keys_to_delete.append( key_str_extend_start_date ) 
+            for key in keys_to_delete:
+                dict_extend_data.pop( key )
+            n_real_rest_working_days += n_total_extend_days
+
             if Utility.get_is_work_day( list_obj_holidays, list_obj_workdays, obj_real_end_date, e_contract_condition, b_is_weekend, b_is_holiday, b_is_make_up_workday ):
                 e_morning_weather = Weather.SUN
                 e_afternoon_weather = Weather.SUN
@@ -1729,6 +1668,7 @@ class MainWindow( QMainWindow ):
                 n_real_rest_working_days -= ( 1 - f_all_day_nocount )
 
                 f_accumulated_used_working_days += ( 1 - f_all_day_nocount )
+                n_expect_rest_working_days -= 1
             f_accumulated_used_calendar_days += 1
 
             if str_real_end_date in dict_per_project_dailyreport_data:
@@ -1738,13 +1678,15 @@ class MainWindow( QMainWindow ):
                 dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_CALENDAR_DAYS ] = f_accumulated_used_calendar_days
                 dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_NO_COUNT_DAYS ] = f_accumulated_used_calendar_days - f_accumulated_used_working_days
 
-                n_expect_rest_working_days -= 1
-            if n_real_rest_working_days <= 0 and ( obj_last_dailyreport_date is None or obj_real_end_date >= obj_last_dailyreport_date ):
+            if n_real_rest_working_days <= 0 and ( obj_last_dailyreport_date is None or obj_real_end_date >= obj_last_dailyreport_date ): #只要有填日報表，即使日報表資料在變動完工日之後，也要持續計算
                 break
+            if n_real_rest_working_days > 0:
+                obj_modified_end_date += datetime.timedelta( days = 1 )
             if n_expect_rest_working_days > 0:
                 obj_expect_end_date += datetime.timedelta( days = 1 )
             obj_real_end_date += datetime.timedelta( days = 1 )
-        pass
+        dict_per_project_data[ ProjectData.STR_EXPECT_FINISH_DATE_NON_SAVE ] = obj_expect_end_date.strftime( "%Y-%m-%d" )
+        dict_per_project_data[ ProjectData.STR_MODIFIED_FINISH_DATE_NON_SAVE ] = obj_modified_end_date.strftime( "%Y-%m-%d" )
 
     def save_UI_state( self ): 
         # 確保目錄存在，若不存在則遞歸創建
