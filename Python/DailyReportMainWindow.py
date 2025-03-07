@@ -1348,7 +1348,7 @@ class MainWindow( QMainWindow ):
         self.ui.qtProjectListTableView.clicked.connect( lambda index: self.on_project_list_table_item_clicked( index, self.project_data_model ) )
         self.pick_up_project( None )
 
-        self.list_dailyreport_list_table_horizontal_header = [ '日期', '上午天氣', '下午天氣', '上午人為', '下午人為', '今日不計', '工期總計','開工迄今天數', '編輯', '刪除' ]
+        self.list_dailyreport_list_table_horizontal_header = [ '日期', '節日', '上午天氣', '下午天氣', '上午人為', '下午人為', '今日不計', '開工迄今日曆天數','開工迄今工作天數', '開工迄今累計不計工期', '編輯', '刪除' ]
         self.dailyreport_data_model = QStandardItemModel( 0, 0 ) 
         self.dailyreport_data_model.setHorizontalHeaderLabels( self.list_dailyreport_list_table_horizontal_header )
         self.ui.qtDailyReportListTableView.setModel( self.dailyreport_data_model )
@@ -1550,8 +1550,9 @@ class MainWindow( QMainWindow ):
         if self.str_picked_project_number == "":
             return
         dict_per_project_data = self.dict_all_project_data[ self.str_picked_project_number ]
-        dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
         str_start_date = dict_per_project_data[ ProjectData.STR_START_DATE ]
+        dict_holiday_data = dict_per_project_data[ ProjectData.DICT_HOLIDAY_DATA ]
+        dict_per_project_dailyreport_data = self.dict_all_project_dailyreport_data[ self.str_picked_project_number ]
 
         index_row = 0
         for key_date, value_dict_dailyreport_data in dict_per_project_dailyreport_data.items():
@@ -1559,16 +1560,43 @@ class MainWindow( QMainWindow ):
                 continue
             list_item_value = []
             list_item_value.append( Utility.get_concatenate_date_and_weekday_text( key_date ) ) #日期
+            if key_date in dict_holiday_data:
+                list_item_value.append( dict_holiday_data[ key_date ][ HolidayData.REASON ] ) #節日
+            else:
+                list_item_value.append( "" )
             list_item_value.append( self.get_weather_text( value_dict_dailyreport_data[ DailyReportData.E_MORNING_WEATHER ] ) ) #上午天氣
             list_item_value.append( self.get_weather_text( value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_WEATHER ] ) ) #下午天氣
             list_item_value.append( self.get_human_text( value_dict_dailyreport_data[ DailyReportData.E_MORNING_HUMAN ] ) ) #上午人為
             list_item_value.append( self.get_human_text( value_dict_dailyreport_data[ DailyReportData.E_AFTERNOON_HUMAN ] ) ) #下午人為
-            if DailyReportData.F_TODAY_NO_COUNT_DAYS not in value_dict_dailyreport_data:
-                pass
             list_item_value.append( str( value_dict_dailyreport_data[ DailyReportData.F_TODAY_NO_COUNT_DAYS ] ) ) #當日不計工期
+            list_item_value.append( str( value_dict_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_CALENDAR_DAYS ] ) ) #開工迄今日曆天數
+            list_item_value.append( str( value_dict_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_WORKING_DAYS ] ) ) #開工迄今工作天數
+            list_item_value.append( str( value_dict_dailyreport_data[ DailyReportData.F_ACCUMULATED_NO_COUNT_DAYS ] ) ) #開工迄今累計不計工期
 
             for index_column, str_item_value in enumerate( list_item_value ):
                 item = QStandardItem( str_item_value )
+                if index_column == 2 or index_column == 3:
+                    if str_item_value == "晴":
+                        item.setBackground( QBrush( '#FF0000' ) )
+                    elif str_item_value == "雨":
+                        item.setBackground( QBrush( '#4472C4' ) )
+                    elif str_item_value == "豪雨":
+                        item.setBackground( QBrush( '#7030A0' ) )
+                    elif str_item_value == "颱風":
+                        item.setBackground( QBrush( '#000000' ) )
+                    elif str_item_value == "酷熱":
+                        item.setBackground( QBrush( '#F4B183' ) )
+                    elif str_item_value == "泥濘":
+                        item.setBackground( QBrush( '#BF9000' ) )
+                    elif str_item_value == "其他":
+                        item.setBackground( QBrush( '#C9C9C9' ) )
+                elif index_column == 4 or index_column == 5:
+                    if str_item_value == "停工":
+                        item.setBackground( QBrush( '#59853B' ) )
+                    elif str_item_value == "停電":
+                        item.setBackground( QBrush( '#FFFF00' ) )
+                    elif str_item_value == "其他":
+                        item.setBackground( QBrush( '#FF00FF' ) )
                 item.setTextAlignment( Qt.AlignHCenter | Qt.AlignVCenter )
                 item.setFlags( item.flags() & ~Qt.ItemIsEditable )
                 self.dailyreport_data_model.setItem( index_row, index_column, item )
@@ -1671,6 +1699,8 @@ class MainWindow( QMainWindow ):
         obj_expect_end_date = obj_start_date
         n_past_working_days = 0
         n_total_extend_days = 0
+        f_accumulated_used_working_days = 0
+        f_accumulated_used_calendar_days = 0
         while( True ):
             b_is_weekend = [False]
             b_is_holiday = [False]
@@ -1695,16 +1725,18 @@ class MainWindow( QMainWindow ):
                 f_afternoon_nocount = max( f_afternoon_weather_nocount, f_afternoon_human_nocount ) #0, 0.5, 1
                 
                 f_all_day_nocount = min( f_morning_nocount + f_afternoon_nocount, 1 ) #0, 0.5, 1
-                
                 n_past_working_days += ( 1 - f_all_day_nocount )
                 n_real_rest_working_days -= ( 1 - f_all_day_nocount )
+
+                f_accumulated_used_working_days += ( 1 - f_all_day_nocount )
+            f_accumulated_used_calendar_days += 1
 
             if str_real_end_date in dict_per_project_dailyreport_data:
                 dict_per_day_dailyreport_data = dict_per_project_dailyreport_data[ str_real_end_date ]
                 dict_per_day_dailyreport_data[ DailyReportData.F_TODAY_NO_COUNT_DAYS ] = f_all_day_nocount
-                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_WORKING_DAYS ] = f_all_day_nocount
-                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_CALENDAR_DAYS ] = f_all_day_nocount
-                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_NO_COUNT_DAYS ] = f_all_day_nocount
+                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_WORKING_DAYS ] = f_accumulated_used_working_days
+                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_USED_CALENDAR_DAYS ] = f_accumulated_used_calendar_days
+                dict_per_day_dailyreport_data[ DailyReportData.F_ACCUMULATED_NO_COUNT_DAYS ] = f_accumulated_used_calendar_days - f_accumulated_used_working_days
 
                 n_expect_rest_working_days -= 1
             if n_real_rest_working_days <= 0 and ( obj_last_dailyreport_date is None or obj_real_end_date >= obj_last_dailyreport_date ):
