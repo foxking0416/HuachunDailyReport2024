@@ -14,7 +14,6 @@ import logging
 from QtDailyReportMainWindow import Ui_MainWindow  # 導入轉換後的 UI 類
 from QtCreateProjectDialog import Ui_Dialog as Ui_CreateProjectDialog
 from QtDailyReportPerDayDialog import Ui_Dialog as Ui_DailyReportPerDayDialog
-from QtSelectEditProjectDialog import Ui_Dialog as Ui_SelectEditProjectDialog
 from QtHolidaySettingDialog import Ui_Dialog as Ui_HolidaySettingDialog
 from QtVariableConditionSettingDialog import Ui_Dialog as Ui_VariableConditionSettingDialog
 from QtExtendWorkingDaysSettingDialog import Ui_Dialog as Ui_ExtendWorkingDaysSettingDialog
@@ -1274,6 +1273,8 @@ class MainWindow( QMainWindow ):
         self.ui.qtCreateNewProjectAction.triggered.connect( self.on_trigger_create_new_project )
 
         self.ui.qtAddDailyReportPushButton.clicked.connect( self.on_add_daily_report_data_push_button_clicked )
+        self.ui.qtExportExpectFinishFormPushButton.clicked.connect( self.on_export_expect_finish_form_push_button_clicked )
+        self.ui.qtExportDailyReportFormPushButton.clicked.connect( self.on_export_daily_report_form_push_button_clicked )
 
         self.list_project_list_column_width = [ 85 ] * len( self.list_project_list_table_horizontal_header )
         self.list_project_list_column_width[ len( self.list_project_list_table_horizontal_header ) - 2 ] = 40
@@ -1576,6 +1577,13 @@ class MainWindow( QMainWindow ):
         if dialog.exec():
             self.auto_save_project_data()
             self.refresh_dailyreport_list_table()
+
+    def on_export_expect_finish_form_push_button_clicked( self ):
+        # export = ExportExpectFinishForm( self, self.dict_all_project_data, self.dict_all_project_dailyreport_data )
+        pass
+
+    def on_export_daily_report_form_push_button_clicked( self ):
+        pass
 
     def process_all_dailyreport_data( self ): 
         for key_project_number, value_dict_per_project_dailyreport_data in self.dict_all_project_dailyreport_data.items():

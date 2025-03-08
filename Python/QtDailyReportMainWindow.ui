@@ -66,14 +66,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="qtExportExpectFinishFormPushButton">
         <property name="text">
          <string>預計完工表</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="qtExportDailyReportFormPushButton">
         <property name="text">
          <string>晴雨表</string>
         </property>

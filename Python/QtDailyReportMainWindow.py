@@ -114,15 +114,15 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.pushButton = QPushButton(self.centralwidget)
-        self.pushButton.setObjectName(u"pushButton")
+        self.qtExportExpectFinishFormPushButton = QPushButton(self.centralwidget)
+        self.qtExportExpectFinishFormPushButton.setObjectName(u"qtExportExpectFinishFormPushButton")
 
-        self.horizontalLayout_4.addWidget(self.pushButton)
+        self.horizontalLayout_4.addWidget(self.qtExportExpectFinishFormPushButton)
 
-        self.pushButton_3 = QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName(u"pushButton_3")
+        self.qtExportDailyReportFormPushButton = QPushButton(self.centralwidget)
+        self.qtExportDailyReportFormPushButton.setObjectName(u"qtExportDailyReportFormPushButton")
 
-        self.horizontalLayout_4.addWidget(self.pushButton_3)
+        self.horizontalLayout_4.addWidget(self.qtExportDailyReportFormPushButton)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
@@ -197,8 +197,8 @@ class Ui_MainWindow(object):
         self.qtROCYearAction.setText(QCoreApplication.translate("MainWindow", u"\u4ee5\u6c11\u570b\u986f\u793a", None))
         self.qtCurrentSelectProjectLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.qtAddDailyReportPushButton.setText(QCoreApplication.translate("MainWindow", u"\u65b0\u589e\u65e5\u5831\u8868", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u9810\u8a08\u5b8c\u5de5\u8868", None))
-        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"\u6674\u96e8\u8868", None))
+        self.qtExportExpectFinishFormPushButton.setText(QCoreApplication.translate("MainWindow", u"\u9810\u8a08\u5b8c\u5de5\u8868", None))
+        self.qtExportDailyReportFormPushButton.setText(QCoreApplication.translate("MainWindow", u"\u6674\u96e8\u8868", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u767b\u5165/\u767b\u51fa", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u8cc7\u6599\u7dad\u8b77", None))
         self.menu_4.setTitle(QCoreApplication.translate("MainWindow", u"\u65e5\u5831\u8868\u4f5c\u696d", None))
